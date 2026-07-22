@@ -1,0 +1,315 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Configuration du client FileZilla
+#
+# Système client :
+# - Windows 10
+#
+# Objectifs :
+# - Installer FileZilla Client
+# - Se connecter au serveur FTP
+# - Vérifier la connexion
+# - Télécharger des fichiers
+# - Envoyer des fichiers
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# FileZilla Client est un logiciel permettant
+# de se connecter à un serveur FTP afin de :
+
+# - parcourir les répertoires ;
+# - télécharger des fichiers ;
+# - envoyer des fichiers ;
+# - supprimer ou modifier des fichiers
+#   selon les droits accordés.
+
+
+###############################################################################
+# 2. TÉLÉCHARGEMENT
+###############################################################################
+
+Télécharger FileZilla Client :
+
+https://filezilla-project.org/
+
+Version :
+
+FileZilla Client
+
+
+###############################################################################
+# 3. INSTALLATION
+###############################################################################
+
+# Lancer le programme d'installation.
+
+Étapes du laboratoire :
+
+1. Cliquer sur :
+
+I Agree
+
+2. Accepter les options proposées.
+
+3. Cliquer sur :
+
+Next
+
+4. Sélectionner les composants souhaités.
+
+5. Cliquer sur :
+
+Install
+
+6. Terminer l'installation.
+
+###############################################################################
+# 4. LANCEMENT
+###############################################################################
+
+Ouvrir :
+
+FileZilla Client
+
+
+###############################################################################
+# 5. PARAMÈTRES DE CONNEXION
+###############################################################################
+
+Hôte :
+
+192.168.11.240
+
+Utilisateur :
+
+anonymous
+
+Mot de passe :
+
+(vide)
+
+Port :
+
+21
+
+
+###############################################################################
+# 6. CONNEXION AU SERVEUR
+###############################################################################
+
+Cliquer sur :
+
+Connexion rapide
+
+
+# Vérifier que la connexion est établie.
+
+###############################################################################
+# 7. VÉRIFICATION
+###############################################################################
+
+Le journal de connexion doit notamment
+indiquer que la connexion au serveur FTP
+a été réalisée avec succès.
+
+
+###############################################################################
+# 8. STRUCTURE DE L'INTERFACE
+###############################################################################
+
+Partie gauche :
+
+Ordinateur local
+
+Partie droite :
+
+Serveur FTP
+
+En bas :
+
+Journal des transferts
+
+
+###############################################################################
+# 9. NAVIGATION
+###############################################################################
+
+Côté serveur :
+
+/srv/ftp
+
+Vérifier la présence des fichiers :
+
+welcome.msg
+
+mega-fichier.txt
+
+
+###############################################################################
+# 10. TÉLÉCHARGER UN FICHIER
+###############################################################################
+
+Sélectionner :
+
+mega-fichier.txt
+
+Puis :
+
+Glisser-déposer
+
+vers le bureau Windows.
+
+###############################################################################
+# 11. VÉRIFICATION DU TÉLÉCHARGEMENT
+###############################################################################
+
+Ouvrir :
+
+mega-fichier.txt
+
+Vérifier son contenu.
+
+
+###############################################################################
+# 12. CRÉER UN FICHIER LOCAL
+###############################################################################
+
+Créer sur le bureau :
+
+mega-fichier-2.txt
+
+Exemple :
+
+bonjour mega-admin ici mega-tech !
+
+
+###############################################################################
+# 13. ENVOYER UN FICHIER
+###############################################################################
+
+Glisser-déposer :
+
+mega-fichier-2.txt
+
+vers :
+
+/srv/ftp
+
+
+###############################################################################
+# 14. VÉRIFICATION DU TRANSFERT
+###############################################################################
+
+Sur le serveur :
+
+ls /srv/ftp
+
+Le fichier doit être présent.
+
+
+###############################################################################
+# 15. MODIFIER UN FICHIER
+###############################################################################
+
+Modifier :
+
+mega-fichier.txt
+
+Puis enregistrer le fichier.
+
+
+###############################################################################
+# 16. REMPLACEMENT
+###############################################################################
+
+Lors de l'envoi du fichier modifié,
+FileZilla propose plusieurs choix :
+
+- Remplacer
+- Renommer
+- Ignorer
+
+
+Sélection utilisée :
+
+Remplacer
+
+
+###############################################################################
+# 17. CONTRÔLE
+###############################################################################
+
+Vérifier le contenu directement
+sur le serveur :
+
+cat /srv/ftp/mega-fichier.txt
+
+
+###############################################################################
+# 18. COMMANDES DE VÉRIFICATION
+###############################################################################
+
+Sur le serveur :
+
+ls -l /srv/ftp
+
+cat /srv/ftp/mega-fichier.txt
+
+systemctl status proftpd
+
+
+###############################################################################
+# 19. PROBLÈMES COURANTS
+###############################################################################
+
+Connexion impossible :
+
+- vérifier le service ProFTPD ;
+- vérifier l'adresse IP ;
+- vérifier le port 21 ;
+- vérifier les permissions du dossier /srv/ftp.
+
+Transfert refusé :
+
+- vérifier les droits sur /srv/ftp ;
+- vérifier la configuration de proftpd.conf.
+
+###############################################################################
+# 20. VALIDATION
+###############################################################################
+
+# La configuration est correcte si :
+
+[ ] FileZilla est installé.
+
+[ ] Le client se connecte au serveur FTP.
+
+[ ] Le mode anonymous fonctionne.
+
+[ ] Le contenu du dossier /srv/ftp est visible.
+
+[ ] Le téléchargement de mega-fichier.txt fonctionne.
+
+[ ] L'envoi de mega-fichier-2.txt fonctionne.
+
+[ ] Le remplacement d'un fichier existant fonctionne.
+
+[ ] Les modifications sont visibles côté serveur.
+
+###############################################################################
+# 21. FICHIERS ASSOCIÉS
+###############################################################################
+
+configuration-reseau.txt
+
+installation-proftpd.txt
+
+configuration-proftpd.txt
+
+transfert-fichiers.txt
+
+verification.txt

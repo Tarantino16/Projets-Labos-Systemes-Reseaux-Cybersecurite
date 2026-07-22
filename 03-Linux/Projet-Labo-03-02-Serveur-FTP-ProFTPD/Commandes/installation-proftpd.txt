@@ -1,0 +1,351 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Installation de ProFTPD
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Mettre à jour le système
+# - Installer ProFTPD
+# - Vérifier l'installation
+# - Vérifier le service
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# ProFTPD (Professional File Transfer Protocol Daemon)
+# est un serveur FTP libre pour les systèmes GNU/Linux.
+#
+# Il permet :
+#
+# - le téléchargement de fichiers ;
+# - l'envoi de fichiers ;
+# - la gestion des utilisateurs FTP ;
+# - les connexions anonymes ou authentifiées ;
+# - le partage de fichiers sur un réseau local
+#   ou via Internet.
+
+
+###############################################################################
+# 2. MISE À JOUR DU SYSTÈME
+###############################################################################
+
+apt update
+
+
+###############################################################################
+# 3. MISE À JOUR DES PAQUETS
+###############################################################################
+
+apt upgrade -y
+
+
+###############################################################################
+# 4. INSTALLATION DE PROFTPD
+###############################################################################
+
+apt install proftpd -y
+
+
+###############################################################################
+# 5. INSTALLATION EN UNE SEULE COMMANDE
+###############################################################################
+
+apt update && apt install proftpd -y
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'INSTALLATION
+###############################################################################
+
+proftpd --version
+
+
+###############################################################################
+# 7. VÉRIFICATION DU PAQUET
+###############################################################################
+
+dpkg -l | grep proftpd
+
+
+###############################################################################
+# 8. VÉRIFICATION DU SERVICE
+###############################################################################
+
+systemctl status proftpd
+
+
+###############################################################################
+# 9. DÉMARRER LE SERVICE
+###############################################################################
+
+systemctl start proftpd
+
+
+###############################################################################
+# 10. ACTIVER AU DÉMARRAGE
+###############################################################################
+
+systemctl enable proftpd
+
+
+###############################################################################
+# 11. REDÉMARRER LE SERVICE
+###############################################################################
+
+systemctl restart proftpd
+
+
+###############################################################################
+# 12. ARRÊTER LE SERVICE
+###############################################################################
+
+systemctl stop proftpd
+
+
+###############################################################################
+# 13. RECHARGER LA CONFIGURATION
+###############################################################################
+
+systemctl reload proftpd
+
+
+###############################################################################
+# 14. VÉRIFIER LES PROCESSUS
+###############################################################################
+
+ps aux | grep proftpd
+
+
+###############################################################################
+# 15. VÉRIFIER LE PORT FTP
+###############################################################################
+
+ss -tln
+
+
+# Après installation, vérifier que le port :
+
+21
+
+# est à l'écoute.
+
+
+###############################################################################
+# 16. VÉRIFIER LE FICHIER DE CONFIGURATION
+###############################################################################
+
+ls -l /etc/proftpd/
+
+
+Le fichier principal doit être :
+
+proftpd.conf
+
+
+###############################################################################
+# 17. CONSULTER LA CONFIGURATION
+###############################################################################
+
+nano /etc/proftpd/proftpd.conf
+
+
+###############################################################################
+# 18. VÉRIFIER LE DOSSIER FTP
+###############################################################################
+
+ls -ld /srv/ftp
+
+
+# Ce répertoire sera utilisé
+# dans la configuration du serveur.
+
+
+###############################################################################
+# 19. VÉRIFIER LES JOURNAUX
+###############################################################################
+
+journalctl -u proftpd
+
+
+###############################################################################
+# 20. TEST LOCAL
+###############################################################################
+
+ftp localhost
+
+
+###############################################################################
+# 21. TEST DEPUIS L'ADRESSE IP
+###############################################################################
+
+ftp 192.168.11.240
+
+
+###############################################################################
+# 22. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+Version :
+
+proftpd --version
+
+Paquet :
+
+dpkg -l | grep proftpd
+
+Service :
+
+systemctl status proftpd
+
+Journal :
+
+journalctl -u proftpd
+
+Processus :
+
+ps aux | grep proftpd
+
+Ports :
+
+ss -tln
+
+
+###############################################################################
+# 23. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Le paquet ne s'installe pas :
+
+→ Vérifier la connexion Internet.
+
+Le service ne démarre pas :
+
+→ Vérifier le fichier proftpd.conf.
+
+Le port 21 n'apparaît pas :
+
+→ Vérifier que le service est démarré.
+
+Connexion FTP impossible :
+
+→ Vérifier la configuration réseau.
+
+
+###############################################################################
+# 24. RÉCAPITULATIF
+###############################################################################
+
+Système :
+
+Debian GNU/Linux
+
+Serveur FTP :
+
+ProFTPD
+
+Installation :
+
+APT
+
+Port :
+
+21
+
+Service :
+
+proftpd
+
+Configuration :
+
+/etc/proftpd/proftpd.conf
+
+
+###############################################################################
+# 25. COMMANDES PRINCIPALES
+###############################################################################
+
+Mise à jour :
+
+apt update
+
+Installation :
+
+apt install proftpd -y
+
+Version :
+
+proftpd --version
+
+État :
+
+systemctl status proftpd
+
+Démarrer :
+
+systemctl start proftpd
+
+Activer :
+
+systemctl enable proftpd
+
+Redémarrer :
+
+systemctl restart proftpd
+
+Arrêter :
+
+systemctl stop proftpd
+
+Journaux :
+
+journalctl -u proftpd
+
+Ports :
+
+ss -tln
+
+
+###############################################################################
+# 26. FICHIERS ASSOCIÉS
+###############################################################################
+
+configuration-reseau.txt
+
+configuration-proftpd.txt
+
+configuration-filezilla.txt
+
+transfert-fichiers.txt
+
+verification.txt
+
+
+###############################################################################
+# 27. VALIDATION
+###############################################################################
+
+# L'installation est considérée comme terminée si :
+
+[ ] Les dépôts APT sont accessibles.
+
+[ ] Le paquet ProFTPD est installé.
+
+[ ] La commande proftpd --version fonctionne.
+
+[ ] Le service ProFTPD est actif.
+
+[ ] Le service démarre automatiquement.
+
+[ ] Le port 21 est ouvert.
+
+[ ] Le fichier /etc/proftpd/proftpd.conf est présent.
+
+[ ] Le dossier /srv/ftp est disponible.
+
+[ ] Le serveur est prêt à être configuré.
+###############################################################################

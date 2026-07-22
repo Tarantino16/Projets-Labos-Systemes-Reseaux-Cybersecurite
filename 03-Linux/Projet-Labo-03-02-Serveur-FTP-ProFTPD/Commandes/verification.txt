@@ -1,0 +1,435 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Vérification complète du laboratoire
+#
+# Objectifs :
+# - Vérifier l'installation de ProFTPD
+# - Vérifier la configuration réseau
+# - Vérifier le fonctionnement du serveur FTP
+# - Vérifier les transferts de fichiers
+# - Valider l'ensemble du laboratoire
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DE L'ADRESSE IP
+###############################################################################
+
+Afficher la configuration réseau :
+
+ip a
+
+Résultat attendu :
+
+Adresse IP :
+192.168.11.240/24
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA PASSERELLE
+###############################################################################
+
+ip route
+
+Résultat attendu :
+
+default via 192.168.11.254
+
+
+###############################################################################
+# 3. TEST DE CONNECTIVITÉ
+###############################################################################
+
+Tester la passerelle :
+
+ping -c 4 192.168.11.254
+
+Résultat attendu :
+
+0 % de perte.
+
+
+###############################################################################
+# 4. TEST INTERNET
+###############################################################################
+
+ping -c 4 8.8.8.8
+
+Résultat attendu :
+
+Le serveur répond.
+
+
+###############################################################################
+# 5. TEST DNS
+###############################################################################
+
+ping -c 4 debian.org
+
+Résultat attendu :
+
+Résolution du nom réussie.
+
+
+###############################################################################
+# 6. VÉRIFICATION DU PAQUET
+###############################################################################
+
+dpkg -l | grep proftpd
+
+Résultat attendu :
+
+Le paquet ProFTPD est installé.
+
+
+###############################################################################
+# 7. VERSION DE PROFTPD
+###############################################################################
+
+proftpd --version
+
+Résultat attendu :
+
+La version installée est affichée.
+
+
+###############################################################################
+# 8. ÉTAT DU SERVICE
+###############################################################################
+
+systemctl status proftpd
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 9. DÉMARRAGE AUTOMATIQUE
+###############################################################################
+
+systemctl is-enabled proftpd
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# 10. PORT FTP
+###############################################################################
+
+ss -tln
+
+Résultat attendu :
+
+Le port 21 est à l'écoute.
+
+
+###############################################################################
+# 11. VÉRIFICATION DU DOSSIER FTP
+###############################################################################
+
+ls -ld /srv/ftp
+
+Résultat attendu :
+
+Le dossier existe.
+
+
+###############################################################################
+# 12. PROPRIÉTAIRE
+###############################################################################
+
+ls -ld /srv/ftp
+
+Résultat attendu :
+
+Propriétaire :
+
+ftp
+
+Groupe :
+
+nogroup
+
+
+###############################################################################
+# 13. PERMISSIONS
+###############################################################################
+
+ls -ld /srv/ftp
+
+Résultat attendu :
+
+Les permissions correspondent
+à la configuration choisie.
+
+
+###############################################################################
+# 14. FICHIER DE TEST
+###############################################################################
+
+ls -l /srv/ftp
+
+Résultat attendu :
+
+mega-fichier.txt
+
+est présent.
+
+
+###############################################################################
+# 15. TEST DE CONNEXION FILEZILLA
+###############################################################################
+
+Depuis Windows :
+
+Connexion à :
+
+192.168.11.240
+
+Utilisateur :
+
+anonymous
+
+Port :
+
+21
+
+Résultat attendu :
+
+Connexion réussie.
+
+
+###############################################################################
+# 16. TEST DE NAVIGATION
+###############################################################################
+
+Le contenu du dossier distant
+est affiché correctement.
+
+
+###############################################################################
+# 17. TEST DE TÉLÉCHARGEMENT
+###############################################################################
+
+Télécharger :
+
+mega-fichier.txt
+
+Résultat attendu :
+
+Le fichier est présent
+sur le poste client.
+
+
+###############################################################################
+# 18. TEST DE LECTURE
+###############################################################################
+
+Ouvrir :
+
+mega-fichier.txt
+
+Résultat attendu :
+
+Le contenu est lisible.
+
+
+###############################################################################
+# 19. TEST D'UPLOAD
+###############################################################################
+
+Créer :
+
+mega-fichier-2.txt
+
+L'envoyer sur le serveur.
+
+Résultat attendu :
+
+Le fichier apparaît
+dans /srv/ftp.
+
+
+###############################################################################
+# 20. TEST DE REMPLACEMENT
+###############################################################################
+
+Modifier :
+
+mega-fichier.txt
+
+Puis le renvoyer.
+
+Résultat attendu :
+
+Le remplacement est accepté.
+
+
+###############################################################################
+# 21. VÉRIFICATION CÔTÉ SERVEUR
+###############################################################################
+
+cat /srv/ftp/mega-fichier.txt
+
+Résultat attendu :
+
+Le contenu correspond
+à la dernière version envoyée.
+
+
+###############################################################################
+# 22. CONSULTATION DES JOURNAUX
+###############################################################################
+
+journalctl -u proftpd
+
+Résultat attendu :
+
+Aucune erreur critique.
+
+
+###############################################################################
+# 23. PROCESSUS
+###############################################################################
+
+ps aux | grep proftpd
+
+Résultat attendu :
+
+Le processus ProFTPD est actif.
+
+
+###############################################################################
+# 24. TEST FTP LOCAL
+###############################################################################
+
+ftp localhost
+
+Résultat attendu :
+
+Connexion possible.
+
+
+###############################################################################
+# 25. TEST FTP DISTANT
+###############################################################################
+
+ftp 192.168.11.240
+
+Résultat attendu :
+
+Connexion possible.
+
+
+###############################################################################
+# 26. DIAGNOSTIC EN CAS D'ÉCHEC
+###############################################################################
+
+Service arrêté :
+
+systemctl restart proftpd
+
+Configuration :
+
+nano /etc/proftpd/proftpd.conf
+
+Ports :
+
+ss -tln
+
+Permissions :
+
+ls -ld /srv/ftp
+
+Journaux :
+
+journalctl -u proftpd
+
+
+###############################################################################
+# 27. CHECK-LIST FINALE
+###############################################################################
+
+Installation
+
+[ ] ProFTPD est installé.
+
+[ ] Le paquet est correctement détecté.
+
+[ ] La version est affichée.
+
+------------------------------------------------------------
+
+Réseau
+
+[ ] Adresse IP configurée.
+
+[ ] Passerelle configurée.
+
+[ ] Réseau accessible.
+
+[ ] Internet accessible.
+
+[ ] DNS fonctionnel.
+
+------------------------------------------------------------
+
+Serveur FTP
+
+[ ] Service actif.
+
+[ ] Service activé au démarrage.
+
+[ ] Port 21 ouvert.
+
+[ ] Répertoire /srv/ftp présent.
+
+[ ] Permissions correctement configurées.
+
+------------------------------------------------------------
+
+Client FTP
+
+[ ] FileZilla installé.
+
+[ ] Connexion réussie.
+
+[ ] Navigation fonctionnelle.
+
+------------------------------------------------------------
+
+Transferts
+
+[ ] Téléchargement fonctionnel.
+
+[ ] Upload fonctionnel.
+
+[ ] Modification fonctionnelle.
+
+[ ] Remplacement fonctionnel.
+
+------------------------------------------------------------
+
+Validation
+
+[ ] Toutes les vérifications sont conformes.
+
+[ ] Le laboratoire est entièrement opérationnel.
+
+
+###############################################################################
+# 28. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-proftpd.txt
+
+configuration-reseau.txt
+
+configuration-proftpd.txt
+
+configuration-filezilla.txt
+
+transfert-fichiers.txt

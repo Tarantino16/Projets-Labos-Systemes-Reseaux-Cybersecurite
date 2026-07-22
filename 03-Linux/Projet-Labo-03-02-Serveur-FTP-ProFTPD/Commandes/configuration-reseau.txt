@@ -1,0 +1,345 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Configuration réseau
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Configurer l'adresse IP du serveur FTP
+# - Configurer la passerelle
+# - Vérifier la connectivité réseau
+# - Préparer le serveur à recevoir les connexions FTP
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Avant d'installer ProFTPD, le serveur doit disposer
+# d'une configuration réseau fonctionnelle.
+
+# Le laboratoire utilise une adresse IP statique
+# afin que les clients puissent retrouver facilement
+# le serveur FTP.
+
+
+###############################################################################
+# 2. CONFIGURATION UTILISÉE
+###############################################################################
+
+Adresse IP :
+
+192.168.11.240/24
+
+
+Passerelle :
+
+192.168.11.254
+
+
+Type d'adressage :
+
+Statique
+
+
+###############################################################################
+# 3. INTERFACE RÉSEAU
+###############################################################################
+
+# Identifier l'interface réseau :
+
+ip link
+
+
+# Exemple courant :
+
+enp0s3
+
+
+###############################################################################
+# 4. CONFIGURATION (Debian classique)
+###############################################################################
+
+Éditer :
+
+nano /etc/network/interfaces
+
+
+###############################################################################
+# 5. CONFIGURATION DE L'INTERFACE
+###############################################################################
+
+auto lo
+iface lo inet loopback
+
+auto enp0s3
+iface enp0s3 inet static
+    address 192.168.11.240/24
+    gateway 192.168.11.254
+
+
+###############################################################################
+# 6. REDÉMARRER LE SERVICE RÉSEAU
+###############################################################################
+
+systemctl restart networking
+
+
+# Ou redémarrer la machine :
+
+reboot
+
+
+###############################################################################
+# 7. VÉRIFIER L'ADRESSE IP
+###############################################################################
+
+ip addr show
+
+
+# ou
+
+ip a
+
+
+###############################################################################
+# 8. VÉRIFIER LA PASSERELLE
+###############################################################################
+
+ip route
+
+
+Résultat attendu :
+
+default via 192.168.11.254
+
+
+###############################################################################
+# 9. TEST DE CONNECTIVITÉ
+###############################################################################
+
+Tester la passerelle :
+
+ping -c 4 192.168.11.254
+
+
+###############################################################################
+# 10. TEST INTERNET
+###############################################################################
+
+ping -c 4 8.8.8.8
+
+
+###############################################################################
+# 11. TEST DNS
+###############################################################################
+
+ping -c 4 debian.org
+
+
+###############################################################################
+# 12. VÉRIFICATION DU NOM D'HÔTE
+###############################################################################
+
+hostname
+
+
+###############################################################################
+# 13. VÉRIFICATION COMPLÈTE
+###############################################################################
+
+hostnamectl
+
+
+###############################################################################
+# 14. CONTRÔLE DES INTERFACES
+###############################################################################
+
+ip link
+
+
+###############################################################################
+# 15. CONTRÔLE DES PORTS
+###############################################################################
+
+ss -tln
+
+
+# Après installation de ProFTPD,
+# le port 21 devra apparaître.
+
+
+###############################################################################
+# 16. TEST DEPUIS LE CLIENT
+###############################################################################
+
+Depuis le poste Windows :
+
+ping 192.168.11.240
+
+
+Le serveur doit répondre.
+
+
+###############################################################################
+# 17. TEST DEPUIS FILEZILLA
+###############################################################################
+
+Adresse du serveur :
+
+192.168.11.240
+
+Port :
+
+21
+
+Utilisateur :
+
+anonymous
+
+
+###############################################################################
+# 18. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+Adresse IP :
+
+ip a
+
+Routes :
+
+ip route
+
+Interfaces :
+
+ip link
+
+Nom d'hôte :
+
+hostname
+
+Informations système :
+
+hostnamectl
+
+
+###############################################################################
+# 19. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Aucune adresse IP :
+
+→ Vérifier le fichier interfaces.
+
+Impossible de joindre la passerelle :
+
+→ Vérifier le masque réseau.
+
+Le client Windows ne répond pas :
+
+→ Vérifier la connectivité réseau.
+
+Connexion FTP impossible :
+
+→ Vérifier l'adresse IP du serveur.
+
+
+###############################################################################
+# 20. CONFIGURATION RÉCAPITULATIVE
+###############################################################################
+
+Système :
+
+Debian GNU/Linux
+
+Adresse IP :
+
+192.168.11.240/24
+
+Passerelle :
+
+192.168.11.254
+
+Service :
+
+ProFTPD
+
+Port FTP :
+
+21
+
+
+###############################################################################
+# 21. COMMANDES PRINCIPALES
+###############################################################################
+
+Éditer la configuration :
+
+nano /etc/network/interfaces
+
+Afficher les interfaces :
+
+ip a
+
+Afficher les routes :
+
+ip route
+
+Afficher les liens :
+
+ip link
+
+Redémarrer le réseau :
+
+systemctl restart networking
+
+Tester la passerelle :
+
+ping 192.168.11.254
+
+Tester Internet :
+
+ping 8.8.8.8
+
+
+###############################################################################
+# 22. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-proftpd.txt
+
+configuration-proftpd.txt
+
+configuration-filezilla.txt
+
+transfert-fichiers.txt
+
+verification.txt
+
+
+###############################################################################
+# 23. VALIDATION
+###############################################################################
+
+# La configuration réseau est correcte si :
+
+[ ] L'interface réseau est active.
+
+[ ] L'adresse IP est 192.168.11.240/24.
+
+[ ] La passerelle est 192.168.11.254.
+
+[ ] Le serveur répond au ping.
+
+[ ] La passerelle répond au ping.
+
+[ ] L'accès Internet fonctionne.
+
+[ ] La résolution DNS fonctionne.
+
+[ ] Le client Windows peut joindre le serveur.
+
+[ ] FileZilla peut se connecter sur le port 21.
+###############################################################################

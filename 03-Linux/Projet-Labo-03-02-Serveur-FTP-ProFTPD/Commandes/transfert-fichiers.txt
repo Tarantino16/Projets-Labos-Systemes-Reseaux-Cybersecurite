@@ -1,0 +1,352 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Transfert de fichiers
+#
+# Objectifs :
+# - Télécharger un fichier depuis le serveur FTP
+# - Envoyer un fichier vers le serveur
+# - Modifier un fichier existant
+# - Remplacer un fichier
+# - Vérifier les transferts
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+Le protocole FTP (File Transfer Protocol) permet de :
+
+- télécharger des fichiers depuis un serveur ;
+- envoyer des fichiers vers un serveur ;
+- modifier des fichiers existants ;
+- supprimer des fichiers (selon les permissions) ;
+- synchroniser des données entre un client et un serveur.
+
+
+###############################################################################
+# 2. PRÉREQUIS
+###############################################################################
+
+Le serveur ProFTPD est installé.
+
+Le service ProFTPD est démarré.
+
+Le client FileZilla est installé.
+
+La connexion au serveur FTP fonctionne.
+
+Le dossier partagé est :
+
+/srv/ftp
+
+
+###############################################################################
+# 3. CONNEXION AU SERVEUR
+###############################################################################
+
+Ouvrir FileZilla Client.
+
+Paramètres :
+
+Hôte :
+192.168.11.240
+
+Utilisateur :
+anonymous
+
+Mot de passe :
+(vide)
+
+Port :
+21
+
+Cliquer sur :
+
+Connexion rapide
+
+
+###############################################################################
+# 4. VÉRIFIER LE CONTENU DU SERVEUR
+###############################################################################
+
+Dans la partie distante de FileZilla,
+ouvrir le dossier :
+
+/srv/ftp
+
+Le fichier suivant doit être présent :
+
+mega-fichier.txt
+
+
+###############################################################################
+# 5. TÉLÉCHARGER UN FICHIER
+###############################################################################
+
+Sélectionner :
+
+mega-fichier.txt
+
+Glisser-déposer le fichier vers
+le Bureau Windows.
+
+Ou :
+
+Clic droit
+
+Télécharger
+
+
+###############################################################################
+# 6. VÉRIFIER LE TÉLÉCHARGEMENT
+###############################################################################
+
+Ouvrir :
+
+mega-fichier.txt
+
+Vérifier son contenu.
+
+
+###############################################################################
+# 7. CRÉER UN NOUVEAU FICHIER
+###############################################################################
+
+Créer sur le poste client :
+
+mega-fichier-2.txt
+
+Exemple de contenu :
+
+Bonjour depuis FileZilla !
+
+Ceci est un fichier de test.
+
+
+###############################################################################
+# 8. ENVOYER UN FICHIER
+###############################################################################
+
+Glisser-déposer :
+
+mega-fichier-2.txt
+
+dans le dossier distant :
+
+/srv/ftp
+
+Ou :
+
+Clic droit
+
+Envoyer
+
+
+###############################################################################
+# 9. VÉRIFIER L'UPLOAD
+###############################################################################
+
+Sur le serveur :
+
+ls -l /srv/ftp
+
+Le fichier doit apparaître dans la liste.
+
+
+###############################################################################
+# 10. MODIFIER UN FICHIER
+###############################################################################
+
+Modifier :
+
+mega-fichier.txt
+
+Enregistrer les modifications.
+
+
+###############################################################################
+# 11. REMPLACER LE FICHIER
+###############################################################################
+
+Glisser-déposer le fichier modifié
+vers le serveur.
+
+Lorsque FileZilla demande l'action :
+
+Remplacer
+
+Valider le remplacement.
+
+
+###############################################################################
+# 12. VÉRIFIER LES MODIFICATIONS
+###############################################################################
+
+Sur le serveur :
+
+cat /srv/ftp/mega-fichier.txt
+
+Le contenu affiché doit correspondre
+à la dernière version envoyée.
+
+
+###############################################################################
+# 13. RAFRAÎCHIR L'AFFICHAGE
+###############################################################################
+
+Dans FileZilla :
+
+Appuyer sur F5
+
+ou
+
+Cliquer sur Actualiser.
+
+
+###############################################################################
+# 14. TESTS COMPLÉMENTAIRES
+###############################################################################
+
+Télécharger :
+
+mega-fichier-2.txt
+
+Comparer son contenu avec
+le fichier présent sur le serveur.
+
+Créer un troisième fichier.
+
+L'envoyer.
+
+Vérifier sa présence.
+
+
+###############################################################################
+# 15. VÉRIFICATION CÔTÉ SERVEUR
+###############################################################################
+
+Lister les fichiers :
+
+ls -l /srv/ftp
+
+Afficher le contenu :
+
+cat /srv/ftp/mega-fichier.txt
+
+cat /srv/ftp/mega-fichier-2.txt
+
+
+###############################################################################
+# 16. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+Vérifier les permissions :
+
+ls -ld /srv/ftp
+
+Vérifier les fichiers :
+
+ls -l /srv/ftp
+
+Vérifier le service :
+
+systemctl status proftpd
+
+Consulter les journaux :
+
+journalctl -u proftpd
+
+
+###############################################################################
+# 17. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Le téléchargement échoue :
+
+- vérifier la connexion FTP ;
+- vérifier les permissions du fichier.
+
+L'envoi échoue :
+
+- vérifier les droits sur /srv/ftp ;
+- vérifier que le service ProFTPD est actif.
+
+Le fichier n'apparaît pas :
+
+- actualiser l'affichage ;
+- vérifier le bon répertoire.
+
+Le remplacement est refusé :
+
+- vérifier les permissions ;
+- vérifier le propriétaire du dossier.
+
+
+###############################################################################
+# 18. RÉCAPITULATIF
+###############################################################################
+
+Téléchargement :
+
+Serveur → Client
+
+Upload :
+
+Client → Serveur
+
+Modification :
+
+Édition locale puis envoi
+
+Remplacement :
+
+Écrasement de la version existante
+
+Vérification :
+
+ls
+
+cat
+
+FileZilla
+
+
+###############################################################################
+# 19. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-proftpd.txt
+
+configuration-reseau.txt
+
+configuration-proftpd.txt
+
+configuration-filezilla.txt
+
+verification.txt
+
+
+###############################################################################
+# 20. VALIDATION
+###############################################################################
+
+[ ] La connexion FTP est établie.
+
+[ ] Le contenu du dossier distant est visible.
+
+[ ] Le téléchargement de mega-fichier.txt fonctionne.
+
+[ ] Le fichier téléchargé est lisible.
+
+[ ] Un nouveau fichier peut être envoyé.
+
+[ ] Le fichier envoyé apparaît sur le serveur.
+
+[ ] Un fichier existant peut être modifié.
+
+[ ] Le remplacement d'un fichier fonctionne.
+
+[ ] Les modifications sont visibles côté serveur.
+
+[ ] Les transferts sont réalisés sans erreur.

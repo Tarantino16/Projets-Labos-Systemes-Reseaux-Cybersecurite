@@ -1,0 +1,516 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Configuration du serveur ProFTPD
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Configurer le serveur FTP
+# - Autoriser les connexions anonymes
+# - Définir le répertoire FTP
+# - Configurer les permissions
+# - Vérifier le bon fonctionnement du service
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Après l'installation de ProFTPD,
+# le serveur doit être configuré afin de :
+
+# - accepter les connexions FTP ;
+# - utiliser le dossier /srv/ftp ;
+# - autoriser les transferts de fichiers ;
+# - définir les permissions nécessaires ;
+# - démarrer automatiquement avec Debian.
+
+
+###############################################################################
+# 2. FICHIER DE CONFIGURATION
+###############################################################################
+
+Le fichier principal est :
+
+/etc/proftpd/proftpd.conf
+
+
+Édition :
+
+nano /etc/proftpd/proftpd.conf
+
+
+###############################################################################
+# 3. CONFIGURATION ANONYMOUS
+###############################################################################
+
+Rechercher la section :
+
+<Anonymous ~ftp>
+
+
+Décommenter la section afin d'autoriser
+les connexions anonymes.
+
+
+###############################################################################
+# 4. UTILISATEUR FTP
+###############################################################################
+
+Vérifier la présence :
+
+User ftp
+
+Group nogroup
+
+
+###############################################################################
+# 5. RÉPERTOIRE FTP
+###############################################################################
+
+Dans la section Anonymous,
+modifier :
+
+<Directory *>
+
+
+par :
+
+<Directory ftp>
+
+
+Le répertoire utilisé devient :
+
+/srv/ftp
+
+
+###############################################################################
+# 6. AUTORISER LES TRANSFERTS
+###############################################################################
+
+Vérifier les directives permettant :
+
+- le téléchargement ;
+- l'envoi de fichiers ;
+- la modification des fichiers ;
+- la navigation dans le dossier FTP.
+
+
+###############################################################################
+# 7. PORT FTP
+###############################################################################
+
+Vérifier la directive :
+
+Port 21
+
+
+Le protocole FTP utilise :
+
+Port 21
+
+pour les connexions clientes.
+
+
+###############################################################################
+# 8. VÉRIFICATION DU RÉPERTOIRE
+###############################################################################
+
+cd /srv
+
+ls
+
+
+Le dossier :
+
+ftp
+
+doit être présent.
+
+
+###############################################################################
+# 9. VÉRIFIER LE CHEMIN
+###############################################################################
+
+pwd
+
+
+Résultat attendu :
+
+/srv/ftp
+
+
+###############################################################################
+# 10. PROPRIÉTAIRE DU DOSSIER
+###############################################################################
+
+Attribuer le propriétaire :
+
+chown ftp:nogroup /srv/ftp
+
+
+###############################################################################
+# 11. PERMISSIONS DU DOSSIER
+###############################################################################
+
+Attribuer les permissions :
+
+chmod 733 /srv/ftp
+
+
+###############################################################################
+# 12. SIGNIFICATION DES PERMISSIONS
+###############################################################################
+
+733
+
+User  = rwx
+
+Group = -wx
+
+Other = -wx
+
+Cette configuration correspond à celle
+utilisée dans le laboratoire. :contentReference[oaicite:1]{index=1}
+
+
+###############################################################################
+# 13. VÉRIFICATION
+###############################################################################
+
+ls -ld /srv/ftp
+
+
+###############################################################################
+# 14. CRÉATION DU FICHIER DE TEST
+###############################################################################
+
+cd /srv/ftp
+
+nano mega-fichier.txt
+
+
+Exemple :
+
+Bienvenue dans le fichier nommé "mega-fichier.txt"
+
+Le mega-administrateur vous salue
+et vous souhaite :
+"bon mega-tutoriel"
+
+
+###############################################################################
+# 15. VÉRIFICATION DU FICHIER
+###############################################################################
+
+ls
+
+cat mega-fichier.txt
+
+
+###############################################################################
+# 16. ACTIVATION DU SERVICE
+###############################################################################
+
+systemctl enable proftpd
+
+
+###############################################################################
+# 17. REDÉMARRAGE
+###############################################################################
+
+systemctl restart proftpd
+
+
+###############################################################################
+# 18. ÉTAT DU SERVICE
+###############################################################################
+
+systemctl status proftpd
+
+
+Le service doit être :
+
+active (running)
+
+
+###############################################################################
+# 19. VÉRIFICATION DE L'ÉCOUTE
+###############################################################################
+
+ss -tln
+
+
+Vérifier que le port :
+
+21
+
+est bien à l'écoute.
+
+
+###############################################################################
+# 20. TEST LOCAL
+###############################################################################
+
+ftp localhost
+
+
+ou
+
+ftp 127.0.0.1
+
+
+###############################################################################
+# 21. TEST DEPUIS LE CLIENT
+###############################################################################
+
+Depuis le poste Windows :
+
+Hôte :
+
+192.168.11.240
+
+Utilisateur :
+
+anonymous
+
+Port :
+
+21
+
+
+###############################################################################
+# 22. TEST DU RÉPERTOIRE FTP
+###############################################################################
+
+Une fois connecté :
+
+Le contenu du dossier :
+
+/srv/ftp
+
+doit être visible.
+
+
+###############################################################################
+# 23. TEST DE TÉLÉCHARGEMENT
+###############################################################################
+
+Télécharger :
+
+mega-fichier.txt
+
+
+Vérifier son contenu.
+
+
+###############################################################################
+# 24. TEST D'UPLOAD
+###############################################################################
+
+Créer :
+
+mega-fichier-2.txt
+
+
+L'envoyer sur le serveur.
+
+
+###############################################################################
+# 25. TEST DE MODIFICATION
+###############################################################################
+
+Modifier :
+
+mega-fichier.txt
+
+
+Puis le renvoyer sur le serveur.
+
+
+###############################################################################
+# 26. CONTRÔLE
+###############################################################################
+
+Sur le serveur :
+
+cat /srv/ftp/mega-fichier.txt
+
+cat /srv/ftp/mega-fichier-2.txt
+
+
+###############################################################################
+# 27. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+Service :
+
+systemctl status proftpd
+
+Journal :
+
+journalctl -u proftpd
+
+Ports :
+
+ss -tln
+
+Permissions :
+
+ls -ld /srv/ftp
+
+Configuration :
+
+nano /etc/proftpd/proftpd.conf
+
+
+###############################################################################
+# 28. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Connexion refusée :
+
+- service arrêté ;
+- port 21 fermé.
+
+Connexion impossible :
+
+- mauvaise adresse IP ;
+- mauvaise configuration réseau.
+
+Impossible d'envoyer un fichier :
+
+- permissions incorrectes ;
+- mauvais propriétaire du dossier.
+
+Répertoire vide :
+
+- mauvais chemin dans proftpd.conf.
+
+
+###############################################################################
+# 29. CONFIGURATION RÉCAPITULATIVE
+###############################################################################
+
+Serveur :
+
+ProFTPD
+
+Configuration :
+
+/etc/proftpd/proftpd.conf
+
+Répertoire FTP :
+
+/srv/ftp
+
+Utilisateur FTP :
+
+ftp
+
+Groupe :
+
+nogroup
+
+Permissions :
+
+733
+
+Port :
+
+21
+
+Service :
+
+proftpd
+
+
+###############################################################################
+# 30. COMMANDES PRINCIPALES
+###############################################################################
+
+Configuration :
+
+nano /etc/proftpd/proftpd.conf
+
+Changer le propriétaire :
+
+chown ftp:nogroup /srv/ftp
+
+Permissions :
+
+chmod 733 /srv/ftp
+
+Vérifier :
+
+ls -ld /srv/ftp
+
+Créer un fichier :
+
+nano mega-fichier.txt
+
+Activer :
+
+systemctl enable proftpd
+
+Redémarrer :
+
+systemctl restart proftpd
+
+État :
+
+systemctl status proftpd
+
+Ports :
+
+ss -tln
+
+
+###############################################################################
+# 31. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-proftpd.txt
+
+configuration-reseau.txt
+
+configuration-filezilla.txt
+
+transfert-fichiers.txt
+
+verification.txt
+
+
+###############################################################################
+# 32. VALIDATION
+###############################################################################
+
+# La configuration est correcte si :
+
+[ ] ProFTPD est installé.
+
+[ ] Le fichier proftpd.conf est configuré.
+
+[ ] Les connexions anonymous sont autorisées.
+
+[ ] Le dossier /srv/ftp est utilisé.
+
+[ ] Le propriétaire est ftp:nogroup.
+
+[ ] Les permissions sont configurées.
+
+[ ] Le service démarre automatiquement.
+
+[ ] Le service est actif.
+
+[ ] Le port 21 est ouvert.
+
+[ ] Le client FileZilla peut se connecter.
+
+[ ] Les téléchargements fonctionnent.
+
+[ ] Les uploads fonctionnent.
+
+[ ] Les modifications des fichiers sont correctement enregistrées.
