@@ -1,0 +1,27 @@
+# =========================================================
+# Projet-Labo-01-4-DNS-DDNS
+# Serveur DNS primaire
+# Fichier : /etc/network/interfaces
+#
+# Description :
+# Configuration réseau du serveur DNS primaire
+# hébergeant les zones Bind9 et les mises à jour
+# dynamiques (DDNS).
+# =========================================================
+
+# Interface loopback
+auto lo
+iface lo inet loopback
+
+
+# =========================================================
+# Interface réseau
+# =========================================================
+
+auto enp0s3
+iface enp0s3 inet static
+    address 192.168.11.250/24
+    gateway 192.168.11.254
+
+    dns-nameservers 127.0.0.1
+    dns-search tarantino.family

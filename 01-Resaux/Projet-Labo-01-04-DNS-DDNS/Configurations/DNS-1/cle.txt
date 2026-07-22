@@ -1,0 +1,17 @@
+# =========================================================
+# Projet-Labo-01-4-DNS-DDNS
+# Serveur DNS primaire
+# Fichier : cle.txt
+#
+# Description :
+# Clé TSIG utilisée pour sécuriser les mises à jour
+# dynamiques (DDNS) entre le serveur DHCP et Bind9.
+#
+# À générer avec :
+# tsig-keygen -a hmac-sha256 cle_dhcp
+# =========================================================
+
+key "cle_dhcp" {
+    algorithm hmac-sha256;
+    secret "VOTRE_CLE_TSIG_GENEREE_ICI";
+};

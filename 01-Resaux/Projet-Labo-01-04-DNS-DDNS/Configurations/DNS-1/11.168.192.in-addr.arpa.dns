@@ -1,0 +1,42 @@
+;
+; =========================================================
+; Projet-Labo-01-4-DNS-DDNS
+; Serveur DNS primaire
+; Fichier :
+; /etc/bind/11.168.192.in-addr.arpa.dns
+;
+; Description :
+; Zone DNS inversée du réseau 192.168.11.0/24.
+; Les enregistrements PTR sont mis à jour
+; automatiquement par le serveur DHCP via DDNS.
+; =========================================================
+;
+
+$TTL    604800
+
+@       IN      SOA     dns-1.tarantino.family. admin.tarantino.family. (
+                        2          ; Serial
+                        604800     ; Refresh
+                        86400      ; Retry
+                        2419200    ; Expire
+                        604800 )   ; Negative Cache TTL
+
+;
+; Serveurs de noms
+;
+
+@       IN      NS      dns-1.tarantino.family.
+@       IN      NS      dns-2.tarantino.family.
+
+;
+; Enregistrements PTR statiques
+;
+
+250     IN      PTR     dns-1.tarantino.family.
+251     IN      PTR     dhcp.tarantino.family.
+254     IN      PTR     routeur.tarantino.family.
+
+;
+; Les clients DHCP seront ajoutés automatiquement
+; par les mises à jour dynamiques (DDNS).
+;

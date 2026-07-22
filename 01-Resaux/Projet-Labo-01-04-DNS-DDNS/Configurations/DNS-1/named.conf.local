@@ -1,0 +1,56 @@
+// =========================================================
+// Projet-Labo-01-4-DNS-DDNS
+// Serveur DNS primaire
+// Fichier : /etc/bind/named.conf.local
+//
+// Description :
+// Déclaration des zones DNS directe et inversée.
+// Les directives allow-update sont volontairement
+// laissées en commentaire afin de tester le transfert
+// de zone vers DNS-2 avant l'activation du DDNS.
+// =========================================================
+
+// Clé TSIG
+include "/etc/bind/cle.txt";
+
+
+// =========================================================
+// Zone directe
+// =========================================================
+
+zone "tarantino.family" {
+
+    type primary;
+
+    file "/var/cache/bind/tarantino.family.dns";
+
+    //allow-update {
+    //    192.168.11.251;
+    //    key cle_dhcp;
+    //};
+
+    allow-transfer {
+        192.168.12.250;
+    };
+};
+
+
+// =========================================================
+// Zone inversée
+// =========================================================
+
+zone "11.168.192.in-addr.arpa" {
+
+    type primary;
+
+    file "/var/cache/bind/11.168.192.in-addr.arpa.dns";
+
+    //allow-update {
+    //    192.168.11.251;
+    //    key cle_dhcp;
+    //};
+
+    allow-transfer {
+        192.168.12.250;
+    };
+};

@@ -1,0 +1,26 @@
+$TTL    86400
+
+@       IN      SOA     dns-1.tarantino.family. giosue.tarantino.family. (
+                        1238       ; Serial
+                        604800     ; Refresh (1 week)
+                        86400      ; Retry (1 day)
+                        2419200    ; Expire (4 weeks)
+                        86400 )    ; Negative Cache TTL
+
+
+; =========================================================
+; Serveurs de noms
+; =========================================================
+
+@       IN      NS      dns-1.tarantino.family.
+@       IN      NS      dns-2.tarantino.family.
+
+
+; =========================================================
+; Enregistrements A statiques
+; =========================================================
+
+dns-1      IN    A       192.168.11.250
+dhcp       IN    A       192.168.11.251
+dns-2      IN    A       192.168.12.250
+routeur    IN    A       192.168.11.254

@@ -1,0 +1,14 @@
+# =========================================================
+# Projet-Labo-01-4-DNS-DDNS
+# Serveur DNS primaire
+# Fichier : /etc/default/named
+#
+# Description :
+# Configuration du service Bind9.
+# Le paramètre -4 force le service à écouter
+# uniquement en IPv4.
+# =========================================================
+
+# Exécution de Bind9 avec l'utilisateur bind
+# et restriction à IPv4.
+OPTIONS="-u bind -4"
