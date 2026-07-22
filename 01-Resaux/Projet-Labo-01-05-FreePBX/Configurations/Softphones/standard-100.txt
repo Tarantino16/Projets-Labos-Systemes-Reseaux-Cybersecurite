@@ -1,0 +1,345 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration du softphone - Standard
+#
+# Serveur :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Utilisateur :
+# - Standard
+# - Extension : 100
+###############################################################################
+
+
+###############################################################################
+# 1. INFORMATIONS DU COMPTE
+###############################################################################
+
+Nom du compte     : Standard
+
+Nom d'affichage   : Standard
+
+Extension         : 100
+
+Utilisateur       : 100
+
+Identifiant Auth  : 100
+
+Serveur / Domaine : ADRESSE-IP-FREEPBX
+
+Mot de passe      : MOT-DE-PASSE-SIP-100
+
+
+###############################################################################
+# 2. CONFIGURATION DU COMPTE SIP/PJSIP
+###############################################################################
+
+# Configurer le softphone du Standard avec les informations suivantes :
+#
+# Account Name :
+# Standard
+#
+# User / Extension :
+# 100
+#
+# Auth ID :
+# 100
+#
+# Password :
+# MOT-DE-PASSE-SIP-100
+#
+# Domain / Server :
+# ADRESSE-IP-FREEPBX
+#
+# Le mot de passe doit correspondre au mot de passe
+# configuré pour l'extension 100 dans FreePBX.
+
+
+###############################################################################
+# 3. CONFIGURATION DU CODEC
+###############################################################################
+
+Codec utilisé :
+
+PCMA / G.711A
+
+# Vérifier que le codec PCMA / G.711A est activé
+# dans les paramètres audio du softphone.
+
+
+###############################################################################
+# 4. ENREGISTREMENT DU SOFTPHONE
+###############################################################################
+
+# Après avoir renseigné les paramètres du compte,
+# enregistrer la configuration.
+#
+# Vérifier que le softphone indique un état tel que :
+#
+# Registered
+#
+# ou :
+#
+# Online
+#
+# selon le logiciel utilisé.
+
+
+###############################################################################
+# 5. VÉRIFICATION DEPUIS FREEPBX / ASTERISK
+###############################################################################
+
+# Depuis le serveur FreePBX :
+
+asterisk -rx "pjsip show endpoint 100"
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+# L'extension 100 doit apparaître comme enregistrée
+# lorsque le softphone du Standard est connecté.
+
+
+###############################################################################
+# 6. TEST D'APPEL VERS BOB
+###############################################################################
+
+# Depuis le softphone du Standard :
+#
+# Composer :
+
+101
+
+# Résultat attendu :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Bob peut décrocher.
+# [ ] L'appel est établi.
+# [ ] Standard entend Bob.
+# [ ] Bob entend Standard.
+
+
+###############################################################################
+# 7. TEST D'APPEL VERS ALICE
+###############################################################################
+
+# Depuis le softphone du Standard :
+#
+# Composer :
+
+102
+
+# Résultat attendu :
+#
+# [ ] Le softphone d'Alice sonne.
+# [ ] Alice peut décrocher.
+# [ ] L'appel est établi.
+# [ ] Standard entend Alice.
+# [ ] Alice entend Standard.
+
+
+###############################################################################
+# 8. TEST D'APPEL ENTRANT DEPUIS BOB
+###############################################################################
+
+# Depuis Bob (101) :
+#
+# Composer :
+
+100
+
+# Résultat attendu :
+#
+# [ ] Le softphone du Standard sonne.
+# [ ] L'appel peut être décroché.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 9. TEST D'APPEL ENTRANT DEPUIS ALICE
+###############################################################################
+
+# Depuis Alice (102) :
+#
+# Composer :
+
+100
+
+# Résultat attendu :
+#
+# [ ] Le softphone du Standard sonne.
+# [ ] L'appel peut être décroché.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 10. TEST DU RING GROUP
+###############################################################################
+
+# Depuis le softphone du Standard, composer :
+
+6000
+
+# Le Ring Group 6000 contient :
+#
+# 101 - Bob
+# 102 - Alice
+#
+# Stratégie :
+#
+# Ring All
+#
+# Résultat attendu :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Le softphone d'Alice sonne.
+# [ ] Bob et Alice sonnent simultanément.
+# [ ] Le premier utilisateur qui décroche prend l'appel.
+# [ ] L'autre extension cesse de sonner.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 11. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Si la messagerie vocale est activée pour l'extension 100 :
+#
+# Depuis le softphone du Standard, composer :
+
+*97
+
+# Vérifier que :
+#
+# [ ] Le Standard accède à sa boîte vocale.
+# [ ] Le mot de passe de messagerie est accepté.
+# [ ] Les messages peuvent être consultés.
+
+
+###############################################################################
+# 12. OBSERVATION DES APPELS
+###############################################################################
+
+# Depuis le serveur FreePBX, ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Effectuer un appel depuis le Standard vers Bob ou Alice.
+#
+# Observer le traitement de l'appel en temps réel.
+
+
+###############################################################################
+# 13. VÉRIFICATION PJSIP
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Activer temporairement le logger PJSIP :
+
+pjsip set logger on
+
+# Effectuer un appel avec l'extension 100.
+#
+# Observer les messages de signalisation.
+
+# Désactiver ensuite :
+
+pjsip set logger off
+
+
+###############################################################################
+# 14. VÉRIFICATION DU FLUX AUDIO
+###############################################################################
+
+# Depuis la console Asterisk :
+
+rtp set debug on
+
+# Effectuer un appel avec le Standard.
+#
+# Vérifier la présence du trafic RTP correspondant
+# au transport de la voix.
+
+# Désactiver ensuite :
+
+rtp set debug off
+
+
+###############################################################################
+# 15. DÉPANNAGE
+###############################################################################
+
+# Si le softphone du Standard ne s'enregistre pas :
+#
+# - vérifier l'adresse IP du serveur FreePBX ;
+# - vérifier que l'extension est 100 ;
+# - vérifier l'identifiant d'authentification ;
+# - vérifier le mot de passe SIP/PJSIP ;
+# - vérifier la connectivité réseau ;
+# - vérifier la configuration du pare-feu.
+
+
+# Tester la communication avec FreePBX :
+
+ping -c 4 ADRESSE-IP-FREEPBX
+
+
+# Vérifier l'extension 100 :
+
+asterisk -rx "pjsip show endpoint 100"
+
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+
+###############################################################################
+# 16. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier le véritable mot de passe SIP/PJSIP
+# de l'extension 100 dans un dépôt GitHub public.
+#
+# Conserver dans ce fichier la valeur générique :
+#
+# MOT-DE-PASSE-SIP-100
+
+
+###############################################################################
+# 17. VALIDATION FINALE
+###############################################################################
+
+# Le softphone du Standard est correctement configuré si :
+#
+# [ ] L'extension utilisée est 100.
+#
+# [ ] Le compte est enregistré auprès du serveur FreePBX.
+#
+# [ ] L'extension 100 apparaît dans les endpoints PJSIP.
+#
+# [ ] Standard peut appeler Bob (101).
+#
+# [ ] Standard peut appeler Alice (102).
+#
+# [ ] Standard peut recevoir des appels de Bob.
+#
+# [ ] Standard peut recevoir des appels d'Alice.
+#
+# [ ] La communication audio fonctionne dans les deux sens.
+#
+# [ ] Le codec PCMA / G.711A fonctionne.
+#
+# [ ] Standard peut appeler le Ring Group 6000.
+#
+# [ ] L'appel vers 6000 fait sonner Bob et Alice simultanément.
+#
+# [ ] La messagerie vocale fonctionne si elle est activée.
+#
+# [ ] Le softphone du Standard est opérationnel.
+###############################################################################

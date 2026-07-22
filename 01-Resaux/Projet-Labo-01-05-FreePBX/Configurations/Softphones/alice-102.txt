@@ -1,0 +1,339 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration du softphone - Alice
+#
+# Serveur :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Utilisateur :
+# - Alice
+# - Extension : 102
+###############################################################################
+
+
+###############################################################################
+# 1. INFORMATIONS DU COMPTE
+###############################################################################
+
+Nom du compte     : Alice
+
+Nom d'affichage   : Alice
+
+Extension         : 102
+
+Utilisateur       : 102
+
+Identifiant Auth  : 102
+
+Serveur / Domaine : ADRESSE-IP-FREEPBX
+
+Mot de passe      : MOT-DE-PASSE-SIP-102
+
+
+###############################################################################
+# 2. CONFIGURATION DU COMPTE SIP/PJSIP
+###############################################################################
+
+# Configurer le softphone d'Alice avec les informations suivantes :
+#
+# Account Name :
+# Alice
+#
+# User / Extension :
+# 102
+#
+# Auth ID :
+# 102
+#
+# Password :
+# MOT-DE-PASSE-SIP-102
+#
+# Domain / Server :
+# ADRESSE-IP-FREEPBX
+#
+# Le mot de passe doit correspondre au mot de passe
+# configuré pour l'extension 102 dans FreePBX.
+
+
+###############################################################################
+# 3. CONFIGURATION DU CODEC
+###############################################################################
+
+Codec utilisé :
+
+PCMA / G.711A
+
+# Vérifier que le codec PCMA / G.711A est activé
+# dans les paramètres audio du softphone.
+
+
+###############################################################################
+# 4. ENREGISTREMENT DU SOFTPHONE
+###############################################################################
+
+# Après avoir renseigné les paramètres du compte,
+# enregistrer la configuration.
+#
+# Vérifier que le softphone indique un état tel que :
+#
+# Registered
+#
+# ou :
+#
+# Online
+#
+# selon le logiciel utilisé.
+
+
+###############################################################################
+# 5. VÉRIFICATION DEPUIS FREEPBX / ASTERISK
+###############################################################################
+
+# Depuis le serveur FreePBX :
+
+asterisk -rx "pjsip show endpoint 102"
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+# L'extension 102 doit apparaître comme enregistrée
+# lorsque le softphone d'Alice est connecté.
+
+
+###############################################################################
+# 6. TEST D'APPEL VERS BOB
+###############################################################################
+
+# Depuis le softphone d'Alice :
+#
+# Composer :
+
+101
+
+# Résultat attendu :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Bob peut décrocher.
+# [ ] L'appel est établi.
+# [ ] Alice entend Bob.
+# [ ] Bob entend Alice.
+
+
+###############################################################################
+# 7. TEST D'APPEL VERS LE STANDARD
+###############################################################################
+
+# Depuis le softphone d'Alice :
+#
+# Composer :
+
+100
+
+# Résultat attendu :
+#
+# [ ] Le Standard sonne.
+# [ ] L'appel peut être décroché.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 8. TEST D'APPEL ENTRANT DEPUIS BOB
+###############################################################################
+
+# Depuis Bob (101) :
+#
+# Composer :
+
+102
+
+# Résultat attendu :
+#
+# [ ] Le softphone d'Alice sonne.
+# [ ] Alice peut décrocher.
+# [ ] L'appel est établi.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 9. TEST D'APPEL ENTRANT DEPUIS LE STANDARD
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer :
+
+102
+
+# Vérifier qu'Alice reçoit correctement l'appel.
+
+
+###############################################################################
+# 10. TEST DU RING GROUP
+###############################################################################
+
+# Alice appartient au Ring Group :
+#
+# 6000
+#
+# Membres :
+#
+# 101 - Bob
+# 102 - Alice
+#
+# Stratégie :
+#
+# Ring All
+
+
+# Depuis Standard (100), composer :
+
+6000
+
+# Résultat attendu :
+#
+# [ ] Le softphone d'Alice sonne.
+# [ ] Le softphone de Bob sonne.
+# [ ] Bob et Alice sonnent simultanément.
+# [ ] Alice peut décrocher l'appel.
+# [ ] Si Alice décroche, Bob cesse de sonner.
+
+
+###############################################################################
+# 11. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Si la messagerie vocale est activée pour l'extension 102 :
+#
+# Depuis le softphone d'Alice, composer :
+
+*97
+
+# Vérifier que :
+#
+# [ ] Alice accède à sa boîte vocale.
+# [ ] Le mot de passe de messagerie est accepté.
+# [ ] Les messages peuvent être consultés.
+
+
+###############################################################################
+# 12. OBSERVATION DE L'APPEL
+###############################################################################
+
+# Depuis le serveur FreePBX, ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Effectuer un appel depuis ou vers Alice.
+#
+# Observer le traitement de l'appel en temps réel.
+
+
+###############################################################################
+# 13. VÉRIFICATION PJSIP
+###############################################################################
+
+# Activer temporairement le logger PJSIP :
+
+asterisk -rvvv
+
+# Puis :
+
+pjsip set logger on
+
+# Effectuer un appel avec l'extension 102.
+
+# Désactiver ensuite :
+
+pjsip set logger off
+
+
+###############################################################################
+# 14. VÉRIFICATION DU FLUX AUDIO
+###############################################################################
+
+# Depuis la console Asterisk :
+
+rtp set debug on
+
+# Effectuer un appel avec Alice.
+#
+# Vérifier la présence du trafic RTP.
+
+# Désactiver ensuite :
+
+rtp set debug off
+
+
+###############################################################################
+# 15. DÉPANNAGE
+###############################################################################
+
+# Si le softphone d'Alice ne s'enregistre pas :
+#
+# - vérifier l'adresse IP du serveur FreePBX ;
+# - vérifier que l'extension est 102 ;
+# - vérifier l'identifiant d'authentification ;
+# - vérifier le mot de passe SIP/PJSIP ;
+# - vérifier la connectivité réseau ;
+# - vérifier la configuration du pare-feu.
+
+
+# Tester la communication avec FreePBX :
+
+ping -c 4 ADRESSE-IP-FREEPBX
+
+
+# Vérifier l'extension 102 :
+
+asterisk -rx "pjsip show endpoint 102"
+
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+
+###############################################################################
+# 16. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier le véritable mot de passe SIP/PJSIP
+# de l'extension 102 dans un dépôt GitHub public.
+#
+# Conserver dans ce fichier la valeur générique :
+#
+# MOT-DE-PASSE-SIP-102
+
+
+###############################################################################
+# 17. VALIDATION FINALE
+###############################################################################
+
+# Le softphone d'Alice est correctement configuré si :
+#
+# [ ] L'extension utilisée est 102.
+#
+# [ ] Le compte est enregistré auprès du serveur FreePBX.
+#
+# [ ] L'extension 102 apparaît dans les endpoints PJSIP.
+#
+# [ ] Alice peut appeler Bob (101).
+#
+# [ ] Alice peut appeler le Standard (100).
+#
+# [ ] Alice peut recevoir des appels de Bob.
+#
+# [ ] Alice peut recevoir des appels du Standard.
+#
+# [ ] La communication audio fonctionne dans les deux sens.
+#
+# [ ] Le codec PCMA / G.711A fonctionne.
+#
+# [ ] Alice reçoit les appels du Ring Group 6000.
+#
+# [ ] La messagerie vocale fonctionne si elle est activée.
+#
+# [ ] Le softphone d'Alice est opérationnel.
+###############################################################################

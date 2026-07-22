@@ -1,0 +1,339 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration du softphone - Bob
+#
+# Serveur :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Utilisateur :
+# - Bob
+# - Extension : 101
+###############################################################################
+
+
+###############################################################################
+# 1. INFORMATIONS DU COMPTE
+###############################################################################
+
+Nom du compte     : Bob
+
+Nom d'affichage   : Bob
+
+Extension         : 101
+
+Utilisateur       : 101
+
+Identifiant Auth  : 101
+
+Serveur / Domaine : ADRESSE-IP-FREEPBX
+
+Mot de passe      : MOT-DE-PASSE-SIP-101
+
+
+###############################################################################
+# 2. CONFIGURATION DU COMPTE SIP/PJSIP
+###############################################################################
+
+# Configurer le softphone de Bob avec les informations suivantes :
+#
+# Account Name :
+# Bob
+#
+# User / Extension :
+# 101
+#
+# Auth ID :
+# 101
+#
+# Password :
+# MOT-DE-PASSE-SIP-101
+#
+# Domain / Server :
+# ADRESSE-IP-FREEPBX
+#
+# Le mot de passe doit correspondre au mot de passe
+# configuré pour l'extension 101 dans FreePBX.
+
+
+###############################################################################
+# 3. CONFIGURATION DU CODEC
+###############################################################################
+
+Codec utilisé :
+
+PCMA / G.711A
+
+# Vérifier que le codec PCMA / G.711A est activé
+# dans les paramètres audio du softphone.
+
+
+###############################################################################
+# 4. ENREGISTREMENT DU SOFTPHONE
+###############################################################################
+
+# Après avoir renseigné les paramètres du compte,
+# enregistrer la configuration.
+#
+# Vérifier que le softphone indique un état tel que :
+#
+# Registered
+#
+# ou :
+#
+# Online
+#
+# selon le logiciel utilisé.
+
+
+###############################################################################
+# 5. VÉRIFICATION DEPUIS FREEPBX / ASTERISK
+###############################################################################
+
+# Depuis le serveur FreePBX :
+
+asterisk -rx "pjsip show endpoint 101"
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+# L'extension 101 doit apparaître comme enregistrée
+# lorsque le softphone de Bob est connecté.
+
+
+###############################################################################
+# 6. TEST D'APPEL VERS ALICE
+###############################################################################
+
+# Depuis le softphone de Bob :
+#
+# Composer :
+
+102
+
+# Résultat attendu :
+#
+# [ ] Le softphone d'Alice sonne.
+# [ ] Alice peut décrocher.
+# [ ] L'appel est établi.
+# [ ] Bob entend Alice.
+# [ ] Alice entend Bob.
+
+
+###############################################################################
+# 7. TEST D'APPEL VERS LE STANDARD
+###############################################################################
+
+# Depuis le softphone de Bob :
+#
+# Composer :
+
+100
+
+# Résultat attendu :
+#
+# [ ] Le Standard sonne.
+# [ ] L'appel peut être décroché.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 8. TEST D'APPEL ENTRANT DEPUIS ALICE
+###############################################################################
+
+# Depuis Alice (102) :
+#
+# Composer :
+
+101
+
+# Résultat attendu :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Bob peut décrocher.
+# [ ] L'appel est établi.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 9. TEST D'APPEL ENTRANT DEPUIS LE STANDARD
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer :
+
+101
+
+# Vérifier que Bob reçoit correctement l'appel.
+
+
+###############################################################################
+# 10. TEST DU RING GROUP
+###############################################################################
+
+# Bob appartient au Ring Group :
+#
+# 6000
+#
+# Membres :
+#
+# 101 - Bob
+# 102 - Alice
+#
+# Stratégie :
+#
+# Ring All
+
+
+# Depuis Standard (100), composer :
+
+6000
+
+# Résultat attendu :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Le softphone d'Alice sonne.
+# [ ] Bob et Alice sonnent simultanément.
+# [ ] Bob peut décrocher l'appel.
+# [ ] Si Bob décroche, Alice cesse de sonner.
+
+
+###############################################################################
+# 11. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Si la messagerie vocale est activée pour l'extension 101 :
+#
+# Depuis le softphone de Bob, composer :
+
+*97
+
+# Vérifier que :
+#
+# [ ] Bob accède à sa boîte vocale.
+# [ ] Le mot de passe de messagerie est accepté.
+# [ ] Les messages peuvent être consultés.
+
+
+###############################################################################
+# 12. OBSERVATION DE L'APPEL
+###############################################################################
+
+# Depuis le serveur FreePBX, ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Effectuer un appel depuis ou vers Bob.
+#
+# Observer le traitement de l'appel en temps réel.
+
+
+###############################################################################
+# 13. VÉRIFICATION PJSIP
+###############################################################################
+
+# Activer temporairement le logger PJSIP :
+
+asterisk -rvvv
+
+# Puis :
+
+pjsip set logger on
+
+# Effectuer un appel avec l'extension 101.
+
+# Désactiver ensuite :
+
+pjsip set logger off
+
+
+###############################################################################
+# 14. VÉRIFICATION DU FLUX AUDIO
+###############################################################################
+
+# Depuis la console Asterisk :
+
+rtp set debug on
+
+# Effectuer un appel avec Bob.
+#
+# Vérifier la présence du trafic RTP.
+
+# Désactiver ensuite :
+
+rtp set debug off
+
+
+###############################################################################
+# 15. DÉPANNAGE
+###############################################################################
+
+# Si le softphone de Bob ne s'enregistre pas :
+#
+# - vérifier l'adresse IP du serveur FreePBX ;
+# - vérifier que l'extension est 101 ;
+# - vérifier l'identifiant d'authentification ;
+# - vérifier le mot de passe SIP/PJSIP ;
+# - vérifier la connectivité réseau ;
+# - vérifier la configuration du pare-feu.
+
+
+# Tester la communication avec FreePBX :
+
+ping -c 4 ADRESSE-IP-FREEPBX
+
+
+# Vérifier l'extension 101 :
+
+asterisk -rx "pjsip show endpoint 101"
+
+
+# Vérifier les contacts enregistrés :
+
+asterisk -rx "pjsip show contacts"
+
+
+###############################################################################
+# 16. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier le véritable mot de passe SIP/PJSIP
+# de l'extension 101 dans un dépôt GitHub public.
+#
+# Conserver dans ce fichier la valeur générique :
+#
+# MOT-DE-PASSE-SIP-101
+
+
+###############################################################################
+# 17. VALIDATION FINALE
+###############################################################################
+
+# Le softphone de Bob est correctement configuré si :
+#
+# [ ] L'extension utilisée est 101.
+#
+# [ ] Le compte est enregistré auprès du serveur FreePBX.
+#
+# [ ] L'extension 101 apparaît dans les endpoints PJSIP.
+#
+# [ ] Bob peut appeler Alice (102).
+#
+# [ ] Bob peut appeler le Standard (100).
+#
+# [ ] Bob peut recevoir des appels d'Alice.
+#
+# [ ] Bob peut recevoir des appels du Standard.
+#
+# [ ] La communication audio fonctionne dans les deux sens.
+#
+# [ ] Le codec PCMA / G.711A fonctionne.
+#
+# [ ] Bob reçoit les appels du Ring Group 6000.
+#
+# [ ] La messagerie vocale fonctionne si elle est activée.
+#
+# [ ] Le softphone de Bob est opérationnel.
+###############################################################################
