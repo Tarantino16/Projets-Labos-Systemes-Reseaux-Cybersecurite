@@ -1,0 +1,519 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Installation des outils RSAT
+#
+# RSAT : Remote Server Administration Tools
+#
+# Objectif :
+# Administrer à distance les rôles et services du serveur
+# Windows Server 2022 Core depuis un poste client Windows.
+#
+# Services administrés dans le laboratoire :
+# - Active Directory Domain Services (AD DS)
+# - DNS
+# - DHCP
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉREQUIS
+###############################################################################
+
+# Avant d'installer RSAT, vérifier :
+#
+# - que le poste client Windows est opérationnel ;
+# - que le poste client communique avec le serveur ;
+# - que le serveur Windows Server 2022 Core est accessible ;
+# - que la configuration réseau est correcte.
+#
+# Serveur du laboratoire :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Domaine :
+# Tarantino.Mega
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONNECTIVITÉ AVEC LE SERVEUR
+###############################################################################
+
+# Depuis le poste client Windows :
+
+ping 192.168.11.250
+
+# Le serveur doit répondre.
+
+
+###############################################################################
+# 3. VÉRIFICATION DE LA CONFIGURATION RÉSEAU DU CLIENT
+###############################################################################
+
+ipconfig /all
+
+# Vérifier notamment :
+#
+# - l'adresse IPv4 ;
+# - le masque de sous-réseau ;
+# - la passerelle ;
+# - le serveur DHCP ;
+# - le serveur DNS.
+#
+# Le serveur DNS du laboratoire est :
+
+192.168.11.250
+
+
+###############################################################################
+# 4. VÉRIFICATION DES COMPOSANTS RSAT DISPONIBLES
+###############################################################################
+
+# Ouvrir PowerShell en tant qu'administrateur.
+
+# Afficher les fonctionnalités RSAT disponibles :
+
+Get-WindowsCapability `
+    -Name RSAT* `
+    -Online
+
+
+###############################################################################
+# 5. INSTALLATION DES OUTILS RSAT
+###############################################################################
+
+# Installer l'ensemble des fonctionnalités RSAT disponibles :
+
+Get-WindowsCapability `
+    -Name RSAT* `
+    -Online |
+Add-WindowsCapability `
+    -Online
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'INSTALLATION
+###############################################################################
+
+Get-WindowsCapability `
+    -Name RSAT* `
+    -Online
+
+# Vérifier que les composants nécessaires indiquent :
+
+Installed
+
+
+###############################################################################
+# 7. OUTILS RSAT UTILISÉS DANS LE LABORATOIRE
+###############################################################################
+
+# Les principaux outils utilisés sont :
+#
+# - Utilisateurs et ordinateurs Active Directory ;
+# - Gestionnaire DNS ;
+# - Gestionnaire DHCP.
+#
+# Ces consoles permettent d'administrer graphiquement
+# le serveur Windows Server 2022 Core depuis le poste client.
+
+
+###############################################################################
+# 8. OUVERTURE DES UTILISATEURS ET ORDINATEURS ACTIVE DIRECTORY
+###############################################################################
+
+# Lancer :
+
+dsa.msc
+
+# Cette console permet notamment de gérer :
+#
+# - les utilisateurs ;
+# - les groupes ;
+# - les unités d'organisation (OU) ;
+# - les ordinateurs du domaine.
+
+
+###############################################################################
+# 9. OUVERTURE DU GESTIONNAIRE DNS
+###############################################################################
+
+# Lancer :
+
+dnsmgmt.msc
+
+# Cette console permet notamment de gérer :
+#
+# - les zones de recherche directe ;
+# - les zones de recherche inversée ;
+# - les enregistrements A ;
+# - les enregistrements PTR ;
+# - les alias CNAME ;
+# - les enregistrements MX ;
+# - les mises à jour dynamiques DNS.
+
+
+###############################################################################
+# 10. OUVERTURE DU GESTIONNAIRE DHCP
+###############################################################################
+
+# Lancer :
+
+dhcpmgmt.msc
+
+# Cette console permet notamment de gérer :
+#
+# - les étendues DHCP ;
+# - les plages d'adresses IPv4 ;
+# - les options DHCP ;
+# - les baux DHCP ;
+# - les classes utilisateurs ;
+# - les stratégies DHCP.
+
+
+###############################################################################
+# 11. OUVERTURE DU GESTIONNAIRE DE SERVEUR
+###############################################################################
+
+# Depuis le poste d'administration :
+
+ServerManager.exe
+
+# Le Gestionnaire de serveur permet d'accéder
+# aux différents outils d'administration Windows Server.
+
+
+###############################################################################
+# 12. AJOUT DU SERVEUR DANS LE GESTIONNAIRE DE SERVEUR
+###############################################################################
+
+# Depuis Server Manager :
+#
+# Manage
+#     └── Add Servers
+#
+# Rechercher le serveur par :
+#
+# - son nom ;
+# - son adresse IP ;
+# - Active Directory.
+#
+# Serveur du laboratoire :
+#
+# SRV-1
+#
+# Adresse IPv4 :
+#
+# 192.168.11.250
+
+
+###############################################################################
+# 13. VÉRIFICATION DE LA RÉSOLUTION DNS
+###############################################################################
+
+# Depuis le poste client :
+
+nslookup SRV-1.Tarantino.Mega
+
+# ou :
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# Le serveur doit être résolu vers :
+
+192.168.11.250
+
+
+###############################################################################
+# 14. VÉRIFICATION DU DOMAINE
+###############################################################################
+
+# Tester la résolution du domaine :
+
+nslookup Tarantino.Mega
+
+# Le domaine doit être correctement résolu
+# par le serveur DNS du laboratoire.
+
+
+###############################################################################
+# 15. ACCÈS À ACTIVE DIRECTORY
+###############################################################################
+
+# Ouvrir :
+
+dsa.msc
+
+# Vérifier que le domaine suivant apparaît :
+
+Tarantino.Mega
+
+# L'administrateur doit pouvoir consulter :
+#
+# - les unités d'organisation ;
+# - les groupes ;
+# - les utilisateurs ;
+# - les ordinateurs.
+
+
+###############################################################################
+# 16. ACCÈS AU SERVEUR DNS
+###############################################################################
+
+# Ouvrir :
+
+dnsmgmt.msc
+
+# Ajouter ou sélectionner le serveur DNS :
+
+SRV-1
+
+# Vérifier la présence de la zone :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 17. ACCÈS AU SERVEUR DHCP
+###############################################################################
+
+# Ouvrir :
+
+dhcpmgmt.msc
+
+# Ajouter ou sélectionner le serveur DHCP.
+
+# Vérifier la présence de l'étendue :
+
+192.168.11.0/24
+
+
+###############################################################################
+# 18. VÉRIFICATION DES OUTILS ACTIVE DIRECTORY POWERSHELL
+###############################################################################
+
+# Vérifier la disponibilité du module Active Directory :
+
+Get-Module `
+    -ListAvailable ActiveDirectory
+
+# Charger le module :
+
+Import-Module ActiveDirectory
+
+
+###############################################################################
+# 19. TEST DU MODULE ACTIVE DIRECTORY
+###############################################################################
+
+Get-ADDomain
+
+# Le domaine attendu est :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 20. VÉRIFICATION DES UNITÉS D'ORGANISATION
+###############################################################################
+
+Get-ADOrganizationalUnit `
+    -Filter *
+
+# Cette commande permet d'administrer Active Directory
+# depuis PowerShell sur le poste équipé de RSAT.
+
+
+###############################################################################
+# 21. VÉRIFICATION DES UTILISATEURS
+###############################################################################
+
+Get-ADUser `
+    -Filter *
+
+
+###############################################################################
+# 22. VÉRIFICATION DES GROUPES
+###############################################################################
+
+Get-ADGroup `
+    -Filter *
+
+
+###############################################################################
+# 23. VÉRIFICATION DU MODULE DNS
+###############################################################################
+
+Get-Module `
+    -ListAvailable DnsServer
+
+# Charger le module si nécessaire :
+
+Import-Module DnsServer
+
+
+###############################################################################
+# 24. VÉRIFICATION DU MODULE DHCP
+###############################################################################
+
+Get-Module `
+    -ListAvailable DHCPServer
+
+# Charger le module si nécessaire :
+
+Import-Module DHCPServer
+
+
+###############################################################################
+# 25. ADMINISTRATION À DISTANCE
+###############################################################################
+
+# RSAT permet d'administrer Windows Server 2022 Core
+# sans installer d'interface graphique sur le serveur.
+#
+# Architecture :
+#
+# +-----------------------+
+# | Poste client Windows  |
+# |                       |
+# | RSAT                  |
+# | - AD DS               |
+# | - DNS                 |
+# | - DHCP                |
+# +-----------+-----------+
+#             |
+#             | Réseau
+#             |
+# +-----------v-----------+
+# | Windows Server 2022   |
+# | Core                  |
+# |                       |
+# | - AD DS               |
+# | - DNS                 |
+# | - DHCP                |
+# +-----------------------+
+
+
+###############################################################################
+# 26. DÉPANNAGE - RSAT NON DISPONIBLE
+###############################################################################
+
+# Vérifier les fonctionnalités disponibles :
+
+Get-WindowsCapability `
+    -Name RSAT* `
+    -Online
+
+# Rechercher les composants dont l'état est :
+
+NotPresent
+
+# Puis relancer leur installation.
+
+
+###############################################################################
+# 27. DÉPANNAGE - ACTIVE DIRECTORY INACCESSIBLE
+###############################################################################
+
+# Vérifier la configuration DNS :
+
+ipconfig /all
+
+# Vérifier que le DNS utilisé par le poste client est :
+
+192.168.11.250
+
+# Tester le serveur :
+
+ping 192.168.11.250
+
+# Tester le domaine :
+
+nslookup Tarantino.Mega
+
+# Tester les enregistrements Active Directory :
+
+nslookup -type=SRV _ldap._tcp.dc._msdcs.Tarantino.Mega
+
+
+###############################################################################
+# 28. DÉPANNAGE - CONSOLE DNS
+###############################################################################
+
+# Vérifier la résolution du serveur :
+
+nslookup SRV-1.Tarantino.Mega
+
+# Tester le port DNS :
+
+Test-NetConnection `
+    -ComputerName 192.168.11.250 `
+    -Port 53
+
+
+###############################################################################
+# 29. DÉPANNAGE - CONSOLE DHCP
+###############################################################################
+
+# Vérifier la communication avec le serveur :
+
+ping 192.168.11.250
+
+# Vérifier que le serveur DHCP est autorisé
+# dans Active Directory depuis le serveur :
+
+Get-DhcpServerInDC
+
+
+###############################################################################
+# 30. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Installation AD DS :
+#
+# commandes/installation-adds.txt
+#
+# Configuration Active Directory :
+#
+# commandes/configuration-active-directory.txt
+#
+# Configuration DHCP :
+#
+# commandes/configuration-dhcp.txt
+#
+# Configuration DNS :
+#
+# commandes/configuration-dns.txt
+
+
+###############################################################################
+# 31. VALIDATION FINALE
+###############################################################################
+
+# L'installation et la configuration de RSAT sont correctes si :
+#
+# [ ] Les composants RSAT nécessaires sont installés.
+#
+# [ ] Le poste client communique avec 192.168.11.250.
+#
+# [ ] Le poste client utilise le serveur DNS du laboratoire.
+#
+# [ ] La résolution de SRV-1.Tarantino.Mega fonctionne.
+#
+# [ ] dsa.msc permet d'accéder à Active Directory.
+#
+# [ ] dnsmgmt.msc permet d'administrer le serveur DNS.
+#
+# [ ] dhcpmgmt.msc permet d'administrer le serveur DHCP.
+#
+# [ ] Le domaine Tarantino.Mega est accessible.
+#
+# [ ] Les unités d'organisation sont visibles.
+#
+# [ ] Les utilisateurs et les groupes sont visibles.
+#
+# [ ] Les modules PowerShell nécessaires sont disponibles.
+#
+# [ ] Windows Server 2022 Core peut être administré
+#     à distance depuis le poste client.
+###############################################################################

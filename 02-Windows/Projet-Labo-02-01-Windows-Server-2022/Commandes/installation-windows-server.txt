@@ -1,0 +1,556 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Installation de Windows Server 2022 Core
+#
+# Environnement :
+# - Windows Server 2022
+# - Installation Server Core
+# - Machine virtuelle
+#
+# Objectif :
+# Installer et préparer un serveur Windows Server 2022 Core
+# destiné à héberger les rôles :
+#
+# - DHCP
+# - DNS
+# - Active Directory Domain Services (AD DS)
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉPARATION DE LA MACHINE VIRTUELLE
+###############################################################################
+
+# Créer une nouvelle machine virtuelle destinée à accueillir
+# Windows Server 2022.
+#
+# Configuration utilisée pour le laboratoire :
+#
+# Système :
+# Windows Server 2022
+#
+# Mémoire vive :
+# 2 Go
+#
+# Stockage :
+# 50 Go
+#
+# Carte réseau :
+# Connectée au réseau utilisé par le laboratoire.
+#
+# Monter ensuite l'image ISO de Windows Server 2022
+# dans le lecteur optique virtuel de la machine.
+
+
+###############################################################################
+# 2. DÉMARRAGE DE LA MACHINE VIRTUELLE
+###############################################################################
+
+# Démarrer la machine virtuelle.
+#
+# Lorsque le message suivant apparaît :
+#
+# Press any key to boot from CD or DVD...
+#
+# Appuyer sur une touche pour démarrer depuis
+# l'image ISO de Windows Server 2022.
+
+
+###############################################################################
+# 3. SÉLECTION DE LA LANGUE
+###############################################################################
+
+# Dans l'assistant d'installation Windows :
+#
+# Sélectionner :
+#
+# - la langue d'installation ;
+# - le format horaire et monétaire ;
+# - le clavier.
+#
+# Puis cliquer sur :
+#
+# Suivant
+
+
+###############################################################################
+# 4. LANCEMENT DE L'INSTALLATION
+###############################################################################
+
+# Cliquer sur :
+
+Installer maintenant
+
+
+###############################################################################
+# 5. SÉLECTION DE L'ÉDITION WINDOWS SERVER
+###############################################################################
+
+# Sélectionner l'édition de Windows Server 2022
+# correspondant au laboratoire.
+#
+# Le serveur est installé en mode :
+#
+# Server Core
+#
+# Cette installation ne possède pas d'environnement
+# graphique Windows complet.
+#
+# L'administration est principalement réalisée avec :
+#
+# - SConfig ;
+# - PowerShell ;
+# - les outils RSAT depuis un poste distant.
+
+
+###############################################################################
+# 6. ACCEPTATION DU CONTRAT DE LICENCE
+###############################################################################
+
+# Lire et accepter les termes du contrat de licence.
+#
+# Puis cliquer sur :
+
+Suivant
+
+
+###############################################################################
+# 7. TYPE D'INSTALLATION
+###############################################################################
+
+# Sélectionner :
+
+Personnalisé :
+Installer uniquement Microsoft Server Operating System
+
+
+###############################################################################
+# 8. SÉLECTION DU DISQUE
+###############################################################################
+
+# Sélectionner le disque virtuel de la machine.
+#
+# Taille configurée dans le laboratoire :
+#
+# 50 Go
+#
+# Sélectionner l'espace non alloué puis cliquer sur :
+
+Suivant
+
+
+###############################################################################
+# 9. INSTALLATION DU SYSTÈME
+###############################################################################
+
+# Windows procède automatiquement :
+#
+# - à la copie des fichiers ;
+# - à l'installation du système ;
+# - à l'installation des fonctionnalités ;
+# - à la préparation du serveur.
+#
+# La machine virtuelle peut redémarrer plusieurs fois.
+
+
+###############################################################################
+# 10. CONFIGURATION DU COMPTE ADMINISTRATEUR
+###############################################################################
+
+# Après l'installation, Windows Server demande
+# de définir le mot de passe du compte :
+
+Administrateur
+
+# Définir un mot de passe sécurisé.
+#
+# IMPORTANT :
+#
+# Ne jamais publier le véritable mot de passe
+# administrateur dans un dépôt GitHub public.
+
+
+###############################################################################
+# 11. PREMIÈRE CONNEXION
+###############################################################################
+
+# Se connecter avec le compte :
+
+Administrateur
+
+# Puis saisir le mot de passe défini lors
+# de l'installation.
+
+
+###############################################################################
+# 12. WINDOWS SERVER CORE
+###############################################################################
+
+# Après la connexion, Windows Server Core affiche
+# principalement une interface en ligne de commande.
+#
+# Contrairement à une installation Desktop Experience,
+# Server Core ne dispose pas de l'interface graphique
+# Windows classique.
+#
+# L'administration locale peut être réalisée avec :
+#
+# - SConfig ;
+# - PowerShell ;
+# - CMD.
+#
+# L'administration distante sera réalisée avec :
+#
+# - RSAT ;
+# - Server Manager ;
+# - les consoles Active Directory ;
+# - le Gestionnaire DNS ;
+# - le Gestionnaire DHCP.
+
+
+###############################################################################
+# 13. LANCEMENT DE SCONFIG
+###############################################################################
+
+# Lancer l'outil de configuration du serveur :
+
+SConfig
+
+# SConfig permet notamment de gérer :
+#
+# - le domaine ou groupe de travail ;
+# - le nom du serveur ;
+# - les paramètres réseau ;
+# - Windows Update ;
+# - l'administration à distance ;
+# - la date et l'heure ;
+# - l'activation Windows.
+
+
+###############################################################################
+# 14. VÉRIFICATION DE LA VERSION DE WINDOWS
+###############################################################################
+
+# Depuis PowerShell ou CMD :
+
+winver
+
+# Si winver n'est pas utilisable dans l'environnement Core,
+# utiliser :
+
+systeminfo
+
+# Pour afficher uniquement le nom du système :
+
+(Get-CimInstance Win32_OperatingSystem).Caption
+
+# Pour afficher la version :
+
+(Get-CimInstance Win32_OperatingSystem).Version
+
+
+###############################################################################
+# 15. VÉRIFICATION DU NOM DU SERVEUR
+###############################################################################
+
+hostname
+
+# ou :
+
+$env:COMPUTERNAME
+
+
+###############################################################################
+# 16. MODIFICATION DU NOM DU SERVEUR
+###############################################################################
+
+# Le serveur peut être renommé afin d'être facilement
+# identifiable dans l'infrastructure.
+#
+# Exemple :
+
+Rename-Computer `
+    -NewName "SRV-1" `
+    -Restart
+
+# Le serveur redémarre afin d'appliquer le nouveau nom.
+
+
+###############################################################################
+# 17. VÉRIFICATION APRÈS REDÉMARRAGE
+###############################################################################
+
+hostname
+
+# Résultat attendu :
+
+SRV-1
+
+
+###############################################################################
+# 18. AFFICHAGE DES INTERFACES RÉSEAU
+###############################################################################
+
+Get-NetAdapter
+
+# Cette commande permet d'identifier :
+#
+# - le nom de l'interface ;
+# - son état ;
+# - son adresse MAC ;
+# - sa vitesse ;
+# - son index.
+
+
+###############################################################################
+# 19. AFFICHAGE DE LA CONFIGURATION IP
+###############################################################################
+
+Get-NetIPConfiguration
+
+# ou :
+
+ipconfig /all
+
+
+###############################################################################
+# 20. CONFIGURATION RÉSEAU À VENIR
+###############################################################################
+
+# Le serveur sera ensuite configuré avec
+# une adresse IPv4 statique.
+#
+# Configuration du laboratoire :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Préfixe :
+# /24
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# DNS local :
+# 127.0.0.1
+#
+# La procédure complète est disponible dans :
+#
+# commandes/configuration-reseau.txt
+
+
+###############################################################################
+# 21. VÉRIFICATION DE POWERSHELL
+###############################################################################
+
+# Afficher la version de PowerShell :
+
+$PSVersionTable
+
+# PowerShell sera utilisé pour installer et administrer
+# les différents rôles Windows Server.
+
+
+###############################################################################
+# 22. AFFICHAGE DES RÔLES ET FONCTIONNALITÉS
+###############################################################################
+
+Get-WindowsFeature
+
+# Cette commande affiche les rôles et fonctionnalités
+# disponibles sur Windows Server.
+
+
+###############################################################################
+# 23. VÉRIFICATION DES RÔLES DU LABORATOIRE
+###############################################################################
+
+# Rechercher DHCP :
+
+Get-WindowsFeature *DHCP*
+
+# Rechercher DNS :
+
+Get-WindowsFeature *DNS*
+
+# Rechercher Active Directory :
+
+Get-WindowsFeature *AD*
+
+
+###############################################################################
+# 24. ORDRE DE DÉPLOIEMENT DU LABORATOIRE
+###############################################################################
+
+# Après l'installation de Windows Server 2022 Core,
+# poursuivre le laboratoire dans l'ordre suivant :
+#
+# 1. Configuration réseau
+#
+#    commandes/configuration-reseau.txt
+#
+#
+# 2. Installation du rôle DHCP
+#
+#    commandes/installation-dhcp.txt
+#
+#
+# 3. Configuration du serveur DHCP
+#
+#    commandes/configuration-dhcp.txt
+#
+#
+# 4. Installation du rôle DNS
+#
+#    commandes/installation-dns.txt
+#
+#
+# 5. Configuration du serveur DNS
+#
+#    commandes/configuration-dns.txt
+#
+#
+# 6. Installation d'Active Directory Domain Services
+#
+#    commandes/installation-adds.txt
+#
+#
+# 7. Configuration d'Active Directory
+#
+#    commandes/configuration-active-directory.txt
+#
+#
+# 8. Installation des outils RSAT
+#
+#    commandes/installation-rsat.txt
+#
+#
+# 9. Vérification globale
+#
+#    commandes/verification.txt
+
+
+###############################################################################
+# 25. ARCHITECTURE FINALE DU SERVEUR
+###############################################################################
+
+# À l'issue du laboratoire :
+#
+# +------------------------------------------------+
+# | Windows Server 2022 Core                       |
+# |                                                |
+# | Nom : SRV-1                                    |
+# | IP  : 192.168.11.250                           |
+# |                                                |
+# | Rôles :                                        |
+# |                                                |
+# | - DHCP Server                                  |
+# | - DNS Server                                   |
+# | - Active Directory Domain Services (AD DS)     |
+# |                                                |
+# | Domaine :                                      |
+# | Tarantino.Mega                                 |
+# +------------------------------------------------+
+#
+#                     |
+#                     | Réseau
+#                     |
+# +------------------------------------------------+
+# | Poste client Windows                           |
+# |                                                |
+# | - Client DHCP                                  |
+# | - Client DNS                                   |
+# | - RSAT                                         |
+# | - Administration distante                      |
+# +------------------------------------------------+
+
+
+###############################################################################
+# 26. SÉCURITÉ DU DÉPÔT GITHUB
+###############################################################################
+
+# Ne jamais publier dans le dépôt :
+#
+# - le mot de passe Administrateur réel ;
+# - le mot de passe DSRM ;
+# - les identifiants sensibles ;
+# - les mots de passe des utilisateurs Active Directory ;
+# - les clés ou secrets d'administration.
+#
+# Utiliser uniquement des exemples fictifs
+# dans les fichiers publics.
+
+
+###############################################################################
+# 27. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+# Informations système :
+
+systeminfo
+
+
+# Nom du serveur :
+
+hostname
+
+
+# Configuration réseau :
+
+ipconfig /all
+
+
+# Interfaces réseau :
+
+Get-NetAdapter
+
+
+# Configuration IP :
+
+Get-NetIPConfiguration
+
+
+# Rôles installés :
+
+Get-WindowsFeature |
+Where-Object InstallState -eq "Installed"
+
+
+# Version PowerShell :
+
+$PSVersionTable
+
+
+###############################################################################
+# 28. VALIDATION FINALE
+###############################################################################
+
+# L'installation initiale est terminée si :
+#
+# [ ] Windows Server 2022 est installé.
+#
+# [ ] L'installation Server Core est opérationnelle.
+#
+# [ ] Le compte Administrateur est configuré.
+#
+# [ ] La connexion au serveur fonctionne.
+#
+# [ ] SConfig est accessible.
+#
+# [ ] PowerShell est accessible.
+#
+# [ ] Le serveur possède un nom identifiable.
+#
+# [ ] L'interface réseau est détectée.
+#
+# [ ] Les rôles Windows Server peuvent être consultés
+#     avec Get-WindowsFeature.
+#
+# [ ] Le serveur est prêt pour la configuration réseau.
+#
+# [ ] Le serveur est prêt pour l'installation
+#     des rôles DHCP, DNS et AD DS.
+###############################################################################

@@ -1,0 +1,535 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Installation du rôle DNS
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Serveur :
+# - 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Domaine :
+# - Tarantino.Mega
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉREQUIS
+###############################################################################
+
+# Avant d'installer le rôle DNS, vérifier :
+#
+# - que Windows Server 2022 Core est installé ;
+# - que le serveur possède une adresse IPv4 statique ;
+# - que la passerelle réseau est configurée ;
+# - que le serveur est joignable sur le réseau.
+#
+# Configuration du laboratoire :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ipconfig /all
+
+# Vérifier que le serveur possède bien l'adresse :
+
+192.168.11.250
+
+
+###############################################################################
+# 3. TEST DE LA PASSERELLE
+###############################################################################
+
+ping 192.168.11.254
+
+# La passerelle doit répondre.
+
+
+###############################################################################
+# 4. RECHERCHE DU RÔLE DNS
+###############################################################################
+
+# Rechercher les fonctionnalités liées au DNS :
+
+Get-WindowsFeature *DNS*
+
+# ou :
+
+Get-WindowsFeature DNS
+
+
+###############################################################################
+# 5. INSTALLATION DU RÔLE DNS
+###############################################################################
+
+Install-WindowsFeature -Name DNS
+
+# Attendre la fin de l'installation.
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'INSTALLATION
+###############################################################################
+
+Get-WindowsFeature DNS
+
+# La colonne Install State doit indiquer :
+
+Installed
+
+
+###############################################################################
+# 7. VÉRIFICATION DU SERVICE DNS
+###############################################################################
+
+Get-Service DNS
+
+# Le service DNS doit être présent.
+
+
+###############################################################################
+# 8. DÉMARRAGE DU SERVICE DNS
+###############################################################################
+
+Start-Service DNS
+
+# Configurer le démarrage automatique :
+
+Set-Service DNS -StartupType Automatic
+
+
+###############################################################################
+# 9. VÉRIFICATION DE L'ÉTAT DU SERVICE
+###############################################################################
+
+Get-Service DNS
+
+# L'état attendu est :
+
+Running
+
+
+###############################################################################
+# 10. VÉRIFICATION DU MODULE POWERSHELL DNS
+###############################################################################
+
+Get-Module -ListAvailable DnsServer
+
+# Importer le module si nécessaire :
+
+Import-Module DnsServer
+
+
+###############################################################################
+# 11. AFFICHAGE DES COMMANDES DNS DISPONIBLES
+###############################################################################
+
+Get-Command -Module DnsServer
+
+
+###############################################################################
+# 12. VÉRIFICATION DU PORT DNS
+###############################################################################
+
+netstat -an | findstr ":53"
+
+# Le service DNS utilise principalement :
+#
+# UDP 53 :
+# Requêtes DNS classiques.
+#
+# TCP 53 :
+# Certaines requêtes DNS et transferts de zones.
+
+
+###############################################################################
+# 13. AFFICHAGE DES ZONES DNS
+###############################################################################
+
+Get-DnsServerZone
+
+# Cette commande permet d'afficher les zones
+# actuellement présentes sur le serveur.
+
+
+###############################################################################
+# 14. CONFIGURATION DU SERVEUR COMME SON PROPRE DNS
+###############################################################################
+
+# Identifier l'interface réseau :
+
+Get-NetIPInterface
+
+# Dans le laboratoire, l'index utilisé est 3.
+#
+# Vérifier l'index avant d'exécuter la commande,
+# car celui-ci peut varier selon la machine virtuelle.
+
+Set-DnsClientServerAddress `
+    -InterfaceIndex 3 `
+    -ServerAddresses 127.0.0.1
+
+
+###############################################################################
+# 15. VÉRIFICATION DE LA CONFIGURATION DNS LOCALE
+###############################################################################
+
+Get-DnsClientServerAddress
+
+# Vérification complète :
+
+ipconfig /all
+
+# Le serveur DNS configuré doit être :
+
+127.0.0.1
+
+
+###############################################################################
+# 16. CONFIGURATION DES REDIRECTEURS DNS
+###############################################################################
+
+# Les redirecteurs permettent au serveur DNS local
+# de transmettre les requêtes qu'il ne peut pas résoudre
+# lui-même vers des serveurs DNS externes.
+
+Add-DnsServerForwarder `
+    -IPAddress 8.8.8.8,8.8.4.4,1.1.1.1
+
+
+###############################################################################
+# 17. VÉRIFICATION DES REDIRECTEURS
+###############################################################################
+
+Get-DnsServerForwarder
+
+
+###############################################################################
+# 18. TEST DE RÉSOLUTION DNS EXTERNE
+###############################################################################
+
+Resolve-DnsName google.com
+
+# ou :
+
+nslookup google.com
+
+# Si la résolution fonctionne, le serveur DNS
+# peut résoudre les noms externes.
+
+
+###############################################################################
+# 19. TEST DE CONNECTIVITÉ DNS
+###############################################################################
+
+Test-NetConnection `
+    -ComputerName 127.0.0.1 `
+    -Port 53
+
+
+###############################################################################
+# 20. CRÉATION DES ZONES DNS
+###############################################################################
+
+# L'installation du rôle DNS est maintenant terminée.
+#
+# La création des zones DNS est documentée dans :
+#
+# commandes/configuration-dns.txt
+#
+# Le laboratoire comprend notamment :
+#
+# - une zone de recherche directe ;
+# - une zone de recherche inversée ;
+# - des enregistrements A ;
+# - des enregistrements PTR ;
+# - un enregistrement MX ;
+# - un alias CNAME.
+
+
+###############################################################################
+# 21. ZONE DE RECHERCHE DIRECTE
+###############################################################################
+
+# La zone directe utilisée dans le laboratoire est :
+
+Tarantino.Mega
+
+# Elle permet notamment la résolution :
+
+Nom d'hôte
+    |
+    v
+Adresse IPv4
+
+
+###############################################################################
+# 22. ZONE DE RECHERCHE INVERSÉE
+###############################################################################
+
+# Réseau :
+
+192.168.11.0/24
+
+# Zone correspondante :
+
+11.168.192.in-addr.arpa
+
+# Elle permet la résolution :
+
+Adresse IPv4
+    |
+    v
+Nom d'hôte
+
+
+###############################################################################
+# 23. INTÉGRATION AVEC ACTIVE DIRECTORY
+###############################################################################
+
+# Plus tard dans le laboratoire, le serveur est promu
+# en contrôleur de domaine Active Directory.
+#
+# Domaine :
+
+Tarantino.Mega
+
+# DNS devient alors un composant essentiel d'AD DS.
+#
+# Active Directory utilise notamment DNS pour localiser :
+#
+# - les contrôleurs de domaine ;
+# - les services LDAP ;
+# - les services Kerberos.
+
+
+###############################################################################
+# 24. VÉRIFICATION APRÈS INSTALLATION D'AD DS
+###############################################################################
+
+# Après la promotion du serveur en contrôleur de domaine :
+
+Get-DnsServerZone
+
+# Vérifier la présence de la zone :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 25. VÉRIFICATION DES ENREGISTREMENTS ACTIVE DIRECTORY
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 26. VÉRIFICATION DES ENREGISTREMENTS SRV
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 27. INTÉGRATION AVEC LE SERVEUR DHCP
+###############################################################################
+
+# Le serveur DHCP peut être configuré pour mettre
+# automatiquement à jour les enregistrements DNS
+# des postes clients.
+#
+# Cette configuration est détaillée dans :
+#
+# commandes/configuration-dhcp.txt
+#
+# et :
+#
+# commandes/configuration-dns.txt
+
+
+###############################################################################
+# 28. TEST DE RÉSOLUTION LOCALE
+###############################################################################
+
+Resolve-DnsName localhost
+
+# Après configuration de la zone :
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# ou :
+
+nslookup SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 29. VIDAGE DU CACHE DNS CLIENT
+###############################################################################
+
+ipconfig /flushdns
+
+
+###############################################################################
+# 30. VIDAGE DU CACHE DU SERVEUR DNS
+###############################################################################
+
+Clear-DnsServerCache -Force
+
+
+###############################################################################
+# 31. CONSULTATION DU CACHE DNS
+###############################################################################
+
+Show-DnsServerCache
+
+
+###############################################################################
+# 32. REDÉMARRAGE DU SERVICE DNS
+###############################################################################
+
+Restart-Service DNS
+
+# Vérifier ensuite :
+
+Get-Service DNS
+
+
+###############################################################################
+# 33. ADMINISTRATION DISTANTE AVEC RSAT
+###############################################################################
+
+# Le serveur DNS peut également être administré
+# depuis un poste Windows équipé des outils RSAT.
+#
+# Sur le poste client :
+
+Get-WindowsCapability -Name RSAT* -Online |
+Add-WindowsCapability -Online
+
+# Ouvrir ensuite le Gestionnaire DNS :
+
+dnsmgmt.msc
+
+
+###############################################################################
+# 34. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier le rôle DNS :
+
+Get-WindowsFeature DNS
+
+
+# Vérifier le service DNS :
+
+Get-Service DNS
+
+
+# Redémarrer le service :
+
+Restart-Service DNS
+
+
+# Vérifier les zones :
+
+Get-DnsServerZone
+
+
+# Vérifier les redirecteurs :
+
+Get-DnsServerForwarder
+
+
+# Vérifier la configuration DNS locale :
+
+Get-DnsClientServerAddress
+
+
+# Vérifier la configuration réseau :
+
+ipconfig /all
+
+
+# Tester la résolution :
+
+Resolve-DnsName google.com
+
+
+# Vérifier le port DNS :
+
+netstat -an | findstr ":53"
+
+
+###############################################################################
+# 35. SUITE DU PROJET
+###############################################################################
+
+# Après l'installation du rôle DNS, consulter :
+#
+# commandes/configuration-dns.txt
+#
+# Ce fichier contient notamment :
+#
+# - la création de la zone directe Tarantino.Mega ;
+# - la création de la zone inversée ;
+# - la création des enregistrements DNS ;
+# - la configuration des redirecteurs ;
+# - l'intégration avec Active Directory ;
+# - les mises à jour dynamiques sécurisées ;
+# - l'intégration DHCP / DNS ;
+# - les procédures de vérification.
+
+
+###############################################################################
+# 36. VALIDATION FINALE
+###############################################################################
+
+# L'installation du rôle DNS est terminée si :
+#
+# [ ] Le rôle DNS est installé.
+#
+# [ ] Get-WindowsFeature DNS indique Installed.
+#
+# [ ] Le service DNS existe.
+#
+# [ ] Le service DNS est démarré.
+#
+# [ ] Le service DNS démarre automatiquement.
+#
+# [ ] Le module PowerShell DnsServer est disponible.
+#
+# [ ] Les commandes DNS PowerShell sont accessibles.
+#
+# [ ] Le serveur utilise 127.0.0.1 comme serveur DNS local.
+#
+# [ ] Le service répond sur le port 53.
+#
+# [ ] Les redirecteurs DNS sont configurés.
+#
+# [ ] La résolution des noms externes fonctionne.
+#
+# [ ] Le serveur est prêt pour la création
+#     et la configuration des zones DNS.
+###############################################################################

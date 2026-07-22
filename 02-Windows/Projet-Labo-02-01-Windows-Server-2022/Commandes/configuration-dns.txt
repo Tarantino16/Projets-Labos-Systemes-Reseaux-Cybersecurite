@@ -1,0 +1,688 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration du serveur DNS
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Serveur DNS :
+# - 192.168.11.250
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Réseau :
+# - 192.168.11.0/24
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DU RÔLE DNS
+###############################################################################
+
+# Vérifier que le rôle DNS est installé :
+
+Get-WindowsFeature DNS
+
+# Vérifier le service DNS :
+
+Get-Service DNS
+
+
+###############################################################################
+# 2. DÉMARRAGE DU SERVICE DNS
+###############################################################################
+
+Start-Service DNS
+
+# Configurer le démarrage automatique :
+
+Set-Service DNS -StartupType Automatic
+
+# Vérification :
+
+Get-Service DNS
+
+
+###############################################################################
+# 3. AFFICHAGE DES COMMANDES DNS DISPONIBLES
+###############################################################################
+
+Get-Command *DnsServer*
+
+
+###############################################################################
+# 4. CRÉATION DE LA ZONE DE RECHERCHE DIRECTE
+###############################################################################
+
+# Création d'une zone DNS primaire :
+#
+# Tarantino.Mega
+
+Add-DnsServerPrimaryZone `
+    -Name "Tarantino.Mega" `
+    -ZoneFile "Tarantino.Mega.dns"
+
+
+###############################################################################
+# 5. CRÉATION DE LA ZONE DE RECHERCHE INVERSÉE
+###############################################################################
+
+# Réseau :
+#
+# 192.168.11.0/24
+
+Add-DnsServerPrimaryZone `
+    -NetworkID "192.168.11.0/24" `
+    -ZoneFile "11.168.192.in-addr.arpa.dns"
+
+
+###############################################################################
+# 6. VÉRIFICATION DES ZONES DNS
+###############################################################################
+
+Get-DnsServerZone
+
+# Vérifier la présence de :
+#
+# Tarantino.Mega
+#
+# 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 7. CRÉATION DE L'ENREGISTREMENT A DU SERVEUR
+###############################################################################
+
+# Création de l'hôte :
+#
+# SRV-1.Tarantino.Mega
+#
+# Adresse :
+#
+# 192.168.11.250
+
+Add-DnsServerResourceRecordA `
+    -Name "SRV-1" `
+    -ZoneName "Tarantino.Mega" `
+    -IPv4Address "192.168.11.250"
+
+
+###############################################################################
+# 8. VÉRIFICATION DE L'ENREGISTREMENT A
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier la présence de :
+
+# SRV-1
+# 192.168.11.250
+
+
+###############################################################################
+# 9. CRÉATION DE L'ENREGISTREMENT PTR
+###############################################################################
+
+# Création de l'enregistrement de recherche inversée
+# pour le serveur SRV-1.
+
+Add-DnsServerResourceRecordPtr `
+    -Name "250" `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -PtrDomainName "SRV-1.Tarantino.Mega"
+
+
+###############################################################################
+# 10. VÉRIFICATION DE L'ENREGISTREMENT PTR
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 11. CRÉATION D'UN ENREGISTREMENT MX
+###############################################################################
+
+# Exemple utilisé dans le laboratoire :
+#
+# Domaine :
+# Tarantino.Mega
+#
+# Serveur de messagerie :
+# SRV-1.Tarantino.Mega
+#
+# Priorité :
+# 10
+
+Add-DnsServerResourceRecordMX `
+    -Preference 10 `
+    -Name "." `
+    -MailExchange "SRV-1.Tarantino.Mega" `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 12. CRÉATION D'UN ALIAS CNAME
+###############################################################################
+
+# Création de l'alias :
+#
+# SRV.Tarantino.Mega
+#
+# pointant vers :
+#
+# SRV-1.Tarantino.Mega
+
+Add-DnsServerResourceRecordCName `
+    -Name "SRV" `
+    -HostNameAlias "SRV-1.Tarantino.Mega" `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 13. VÉRIFICATION DE TOUS LES ENREGISTREMENTS
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 14. CONFIGURATION DES REDIRECTEURS DNS
+###############################################################################
+
+# Ajouter des serveurs DNS externes utilisés lorsque
+# le serveur DNS local ne connaît pas la réponse.
+
+Add-DnsServerForwarder `
+    -IPAddress 8.8.8.8,8.8.4.4,1.1.1.1
+
+
+###############################################################################
+# 15. VÉRIFICATION DES REDIRECTEURS
+###############################################################################
+
+Get-DnsServerForwarder
+
+
+###############################################################################
+# 16. CONFIGURATION DU SERVEUR COMME SON PROPRE DNS
+###############################################################################
+
+# Identifier l'interface réseau :
+
+Get-NetIPInterface
+
+# Dans le laboratoire, l'index utilisé est 3.
+#
+# Adapter l'index si nécessaire.
+
+Set-DnsClientServerAddress `
+    -InterfaceIndex 3 `
+    -ServerAddresses 127.0.0.1
+
+
+###############################################################################
+# 17. VÉRIFICATION DE LA CONFIGURATION DNS DU SERVEUR
+###############################################################################
+
+Get-DnsClientServerAddress
+
+ipconfig /all
+
+
+###############################################################################
+# 18. SYNCHRONISATION DE LA ZONE DNS
+###############################################################################
+
+Sync-DnsServerZone `
+    -Name "Tarantino.Mega" `
+    -PassThru
+
+
+###############################################################################
+# 19. TEST DE RÉSOLUTION DIRECTE
+###############################################################################
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# ou :
+
+nslookup SRV-1.Tarantino.Mega
+
+# Résultat attendu :
+
+192.168.11.250
+
+
+###############################################################################
+# 20. TEST DE RÉSOLUTION INVERSÉE
+###############################################################################
+
+Resolve-DnsName 192.168.11.250
+
+# ou :
+
+nslookup 192.168.11.250
+
+# Résultat attendu :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 21. TEST DU CNAME
+###############################################################################
+
+Resolve-DnsName SRV.Tarantino.Mega
+
+# L'alias doit pointer vers :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 22. TEST DE L'ENREGISTREMENT MX
+###############################################################################
+
+Resolve-DnsName `
+    -Name "Tarantino.Mega" `
+    -Type MX
+
+# ou :
+
+nslookup -type=MX Tarantino.Mega
+
+
+###############################################################################
+# 23. TEST DES REDIRECTEURS DNS
+###############################################################################
+
+Resolve-DnsName google.com
+
+nslookup google.com
+
+# Si le serveur DNS local ne possède pas l'information,
+# la requête doit être transmise à un redirecteur.
+
+
+###############################################################################
+# 24. SUPPRESSION DES ZONES AVANT INSTALLATION D'AD DS
+###############################################################################
+
+# Dans le déroulement du laboratoire, les zones DNS créées
+# manuellement sont supprimées avant la promotion du serveur
+# en contrôleur de domaine.
+#
+# Active Directory recréera ensuite automatiquement la zone
+# directe intégrée à AD.
+
+Remove-DnsServerZone `
+    -Name "Tarantino.Mega"
+
+Remove-DnsServerZone `
+    -Name "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 25. VÉRIFICATION DE LA SUPPRESSION
+###############################################################################
+
+Get-DnsServerZone
+
+
+###############################################################################
+# 26. INSTALLATION D'ACTIVE DIRECTORY
+###############################################################################
+
+# Après suppression des zones DNS manuelles,
+# installer et configurer AD DS.
+#
+# Consulter :
+#
+# commandes/configuration-active-directory.txt
+#
+# Lors de la création du domaine :
+#
+# Tarantino.Mega
+#
+# Active Directory crée automatiquement
+# la zone de recherche directe intégrée au domaine.
+
+
+###############################################################################
+# 27. VÉRIFICATION DE LA ZONE APRÈS AD DS
+###############################################################################
+
+Get-DnsServerZone
+
+# Vérifier que la zone :
+
+Tarantino.Mega
+
+# est de nouveau présente.
+
+
+###############################################################################
+# 28. VÉRIFICATION DES ENREGISTREMENTS ACTIVE DIRECTORY
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# La zone contient désormais également les enregistrements
+# nécessaires au fonctionnement d'Active Directory.
+
+
+###############################################################################
+# 29. VÉRIFICATION DES ENREGISTREMENTS SRV AD DS
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 30. CRÉATION DE LA ZONE INVERSÉE INTÉGRÉE À ACTIVE DIRECTORY
+###############################################################################
+
+# Après la promotion du serveur en contrôleur de domaine,
+# créer une nouvelle zone de recherche inversée depuis
+# la console DNS.
+#
+# Depuis le poste équipé de RSAT :
+#
+# Gestionnaire DNS
+#     └── Zones de recherche inversée
+#         └── Clic droit
+#             └── Nouvelle zone
+
+
+###############################################################################
+# 31. PARAMÈTRES DE LA ZONE INVERSÉE AD
+###############################################################################
+
+# Sélectionner :
+#
+# Zone principale
+#
+# Puis :
+#
+# Enregistrer la zone dans Active Directory
+
+
+###############################################################################
+# 32. ÉTENDUE DE RÉPLICATION DNS
+###############################################################################
+
+# Choisir :
+#
+# Vers tous les serveurs DNS exécutés sur des
+# contrôleurs de domaine dans ce domaine :
+#
+# Tarantino.Mega
+
+
+###############################################################################
+# 33. TYPE DE ZONE INVERSÉE
+###############################################################################
+
+# Sélectionner :
+
+Zone de recherche inversée IPv4
+
+
+###############################################################################
+# 34. IDENTIFIANT DU RÉSEAU
+###############################################################################
+
+# Renseigner :
+
+192.168.11
+
+
+###############################################################################
+# 35. MISES À JOUR DYNAMIQUES SÉCURISÉES
+###############################################################################
+
+# Pour la zone intégrée à Active Directory,
+# sélectionner :
+#
+# N'autoriser que les mises à jour dynamiques sécurisées
+
+
+###############################################################################
+# 36. VÉRIFICATION DE LA ZONE INVERSÉE
+###############################################################################
+
+Get-DnsServerZone
+
+# Vérifier la présence de :
+
+11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 37. INTÉGRATION DHCP / DNS
+###############################################################################
+
+# Le serveur DHCP peut mettre à jour automatiquement
+# le DNS lorsqu'un nouveau client reçoit une adresse IP.
+#
+# Les informations d'identification utilisées pour
+# les mises à jour DNS sont configurées avec :
+
+Set-DhcpServerDnsCredential
+
+# Ne jamais publier le véritable mot de passe
+# du compte utilisé.
+
+
+###############################################################################
+# 38. VÉRIFICATION DES IDENTIFIANTS DHCP / DNS
+###############################################################################
+
+Get-DhcpServerDnsCredential
+
+
+###############################################################################
+# 39. SYNCHRONISATION DE LA ZONE
+###############################################################################
+
+Sync-DnsServerZone `
+    -Name "Tarantino.Mega" `
+    -PassThru
+
+
+###############################################################################
+# 40. TEST DE MISE À JOUR DYNAMIQUE
+###############################################################################
+
+# Depuis un poste client :
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier ensuite les enregistrements DNS :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Le nom du client doit apparaître lorsque
+# la mise à jour dynamique fonctionne.
+
+
+###############################################################################
+# 41. VÉRIFICATION D'UN POSTE CLIENT
+###############################################################################
+
+# Exemple observé dans le laboratoire :
+#
+# DESKTOP-4BT1478
+#
+# Sa présence dans la zone DNS indique que le serveur DHCP
+# a transmis les informations du client au serveur DNS.
+
+
+###############################################################################
+# 42. TEST DE RÉSOLUTION D'UN CLIENT
+###############################################################################
+
+# Adapter le nom au client réellement enregistré :
+
+Resolve-DnsName DESKTOP-4BT1478.Tarantino.Mega
+
+nslookup DESKTOP-4BT1478.Tarantino.Mega
+
+
+###############################################################################
+# 43. VÉRIFICATION DE LA ZONE DIRECTE
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier notamment :
+#
+# - le serveur SRV-1 ;
+# - les postes clients ;
+# - les enregistrements Active Directory ;
+# - les éventuels alias.
+
+
+###############################################################################
+# 44. VÉRIFICATION DE LA ZONE INVERSÉE
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 45. VÉRIFICATION DU SERVICE DNS
+###############################################################################
+
+Get-Service DNS
+
+# Redémarrer si nécessaire :
+
+Restart-Service DNS
+
+
+###############################################################################
+# 46. VÉRIFICATION DES PORTS DNS
+###############################################################################
+
+netstat -an | findstr ":53"
+
+# Le serveur DNS utilise :
+#
+# UDP 53
+# TCP 53
+
+
+###############################################################################
+# 47. VIDAGE DU CACHE DNS CLIENT
+###############################################################################
+
+ipconfig /flushdns
+
+
+###############################################################################
+# 48. VIDAGE DU CACHE DU SERVEUR DNS
+###############################################################################
+
+Clear-DnsServerCache -Force
+
+
+###############################################################################
+# 49. CONSULTATION DU CACHE DNS
+###############################################################################
+
+Show-DnsServerCache
+
+
+###############################################################################
+# 50. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier les zones :
+
+Get-DnsServerZone
+
+
+# Vérifier les enregistrements :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+# Vérifier la résolution :
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+
+# Vérifier le service :
+
+Get-Service DNS
+
+
+# Redémarrer le service :
+
+Restart-Service DNS
+
+
+# Vérifier la configuration réseau :
+
+ipconfig /all
+
+
+###############################################################################
+# 51. VALIDATION FINALE
+###############################################################################
+
+# Le serveur DNS est correctement configuré si :
+#
+# [ ] Le rôle DNS est installé.
+#
+# [ ] Le service DNS fonctionne.
+#
+# [ ] La zone Tarantino.Mega existe.
+#
+# [ ] La zone inverse 11.168.192.in-addr.arpa existe.
+#
+# [ ] SRV-1.Tarantino.Mega correspond à 192.168.11.250.
+#
+# [ ] La résolution directe fonctionne.
+#
+# [ ] La résolution inversée fonctionne.
+#
+# [ ] Les redirecteurs DNS fonctionnent.
+#
+# [ ] Le serveur utilise 127.0.0.1 comme DNS local.
+#
+# [ ] La zone DNS est correctement intégrée à Active Directory.
+#
+# [ ] Les enregistrements SRV Active Directory sont présents.
+#
+# [ ] Les mises à jour dynamiques sécurisées sont activées.
+#
+# [ ] Le serveur DHCP peut mettre à jour le DNS.
+#
+# [ ] Les postes clients apparaissent automatiquement
+#     dans la zone DNS.
+#
+# [ ] Les clients peuvent résoudre les noms du domaine.
+#
+# [ ] Le service DNS est opérationnel.
+###############################################################################

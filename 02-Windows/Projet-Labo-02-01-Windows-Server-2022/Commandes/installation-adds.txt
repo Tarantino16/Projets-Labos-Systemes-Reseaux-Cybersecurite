@@ -1,0 +1,592 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Installation du rôle Active Directory Domain Services (AD DS)
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Nom NetBIOS :
+# - TARANTINO
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉREQUIS
+###############################################################################
+
+# Avant d'installer Active Directory Domain Services, vérifier :
+#
+# - que Windows Server 2022 Core est installé ;
+# - que le serveur possède une adresse IPv4 statique ;
+# - que le nom du serveur est correctement défini ;
+# - que la passerelle réseau fonctionne ;
+# - que le serveur DNS est correctement configuré ;
+# - que le serveur utilise son propre service DNS.
+#
+# Configuration du laboratoire :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# DNS :
+# 127.0.0.1
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ipconfig /all
+
+# Vérifier que l'adresse IP du serveur est bien :
+
+192.168.11.250
+
+
+###############################################################################
+# 3. VÉRIFICATION DU NOM DU SERVEUR
+###############################################################################
+
+hostname
+
+# Le serveur peut être nommé par exemple :
+
+SRV-1
+
+
+###############################################################################
+# 4. VÉRIFICATION DE LA CONNECTIVITÉ
+###############################################################################
+
+# Tester la passerelle :
+
+ping 192.168.11.254
+
+# Tester une adresse IP externe :
+
+ping 8.8.8.8
+
+
+###############################################################################
+# 5. RECHERCHE DU RÔLE AD DS
+###############################################################################
+
+Get-WindowsFeature *AD*
+
+# ou :
+
+Get-WindowsFeature AD-Domain-Services
+
+# Vérifier que le rôle n'est pas encore installé.
+
+
+###############################################################################
+# 6. INSTALLATION DU RÔLE AD DS
+###############################################################################
+
+Install-WindowsFeature `
+    -Name AD-Domain-Services
+
+# Vérifier le résultat de l'installation.
+
+
+###############################################################################
+# 7. VÉRIFICATION DU RÔLE INSTALLÉ
+###############################################################################
+
+Get-WindowsFeature AD-Domain-Services
+
+# La colonne Install State doit indiquer :
+
+Installed
+
+
+###############################################################################
+# 8. CHARGEMENT DU MODULE ADDSDEPLOYMENT
+###############################################################################
+
+Import-Module ADDSDeployment
+
+# Ce module permet d'utiliser les commandes nécessaires
+# à la promotion du serveur en contrôleur de domaine.
+
+
+###############################################################################
+# 9. VÉRIFICATION DES COMMANDES AD DS
+###############################################################################
+
+Get-Command -Module ADDSDeployment
+
+
+###############################################################################
+# 10. CRÉATION DE LA NOUVELLE FORÊT ACTIVE DIRECTORY
+###############################################################################
+
+# Création d'une nouvelle forêt Active Directory.
+#
+# Domaine :
+# Tarantino.Mega
+#
+# Nom NetBIOS :
+# TARANTINO
+
+Install-ADDSForest `
+    -DomainName "Tarantino.Mega" `
+    -CreateDnsDelegation:$false `
+    -DomainNetbiosName "TARANTINO" `
+    -DomainMode Win2012R2 `
+    -ForestMode Win2012R2 `
+    -Confirm
+
+
+###############################################################################
+# 11. MOT DE PASSE DSRM
+###############################################################################
+
+# Pendant l'installation, PowerShell demande de saisir
+# le mot de passe du mode de restauration des services
+# d'annuaire :
+#
+# Directory Services Restore Mode (DSRM)
+#
+# Saisir un mot de passe sécurisé.
+#
+# Ne jamais publier le véritable mot de passe dans GitHub.
+
+
+###############################################################################
+# 12. CONFIRMATION DE L'INSTALLATION
+###############################################################################
+
+# Confirmer la création de la forêt lorsque PowerShell
+# demande de poursuivre l'installation.
+#
+# Le serveur sera ensuite promu en contrôleur de domaine.
+
+
+###############################################################################
+# 13. REDÉMARRAGE DU SERVEUR
+###############################################################################
+
+# Après la promotion, le serveur redémarre automatiquement.
+#
+# Si nécessaire :
+
+Restart-Computer
+
+
+###############################################################################
+# 14. CONNEXION APRÈS REDÉMARRAGE
+###############################################################################
+
+# Après le redémarrage, se reconnecter avec un compte
+# disposant des droits d'administration du domaine.
+#
+# Le serveur fait maintenant partie du domaine :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 15. VÉRIFICATION DU DOMAINE
+###############################################################################
+
+Get-ADDomain
+
+# Vérifier notamment :
+
+# DNSRoot :
+# Tarantino.Mega
+
+# NetBIOSName :
+# TARANTINO
+
+
+###############################################################################
+# 16. VÉRIFICATION DE LA FORÊT
+###############################################################################
+
+Get-ADForest
+
+# Vérifier que la forêt utilise le domaine :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 17. VÉRIFICATION DU CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+Get-ADDomainController
+
+# ou :
+
+Get-ADDomainController -Filter *
+
+# Le serveur doit apparaître comme contrôleur
+# du domaine Tarantino.Mega.
+
+
+###############################################################################
+# 18. VÉRIFICATION DES SERVICES ACTIVE DIRECTORY
+###############################################################################
+
+Get-Service NTDS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+Get-Service DNS
+
+# Les services doivent être démarrés.
+
+
+###############################################################################
+# 19. VÉRIFICATION DU SERVICE NTDS
+###############################################################################
+
+Get-Service NTDS
+
+# NTDS correspond au service Active Directory Domain Services.
+
+
+###############################################################################
+# 20. VÉRIFICATION DU SERVICE NETLOGON
+###############################################################################
+
+Get-Service Netlogon
+
+# Netlogon permet notamment l'authentification
+# des machines et utilisateurs du domaine.
+
+
+###############################################################################
+# 21. VÉRIFICATION DU SERVICE KERBEROS
+###############################################################################
+
+Get-Service KDC
+
+# Le service KDC est utilisé par Kerberos pour
+# l'authentification sécurisée dans le domaine.
+
+
+###############################################################################
+# 22. VÉRIFICATION DU DNS APRÈS PROMOTION
+###############################################################################
+
+Get-DnsServerZone
+
+# Active Directory crée automatiquement la zone DNS :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 23. VÉRIFICATION DES ENREGISTREMENTS DNS ACTIVE DIRECTORY
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 24. VÉRIFICATION DES ENREGISTREMENTS SRV
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 25. TEST DE RÉSOLUTION DU DOMAINE
+###############################################################################
+
+Resolve-DnsName Tarantino.Mega
+
+# ou :
+
+nslookup Tarantino.Mega
+
+
+###############################################################################
+# 26. VÉRIFICATION AVEC DCDIAG
+###############################################################################
+
+dcdiag
+
+# Cette commande permet de vérifier l'état général
+# du contrôleur de domaine.
+
+
+###############################################################################
+# 27. VÉRIFICATION DNS AVEC DCDIAG
+###############################################################################
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 28. VÉRIFICATION DE LA FORÊT ET DU DOMAINE
+###############################################################################
+
+(Get-ADForest).RootDomain
+
+(Get-ADDomain).DNSRoot
+
+(Get-ADDomain).NetBIOSName
+
+
+###############################################################################
+# 29. VÉRIFICATION DE L'INTÉGRATION DU SERVEUR
+###############################################################################
+
+systeminfo
+
+# Vérifier la ligne correspondant au domaine.
+#
+# Le serveur doit appartenir à :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 30. AUTORISATION DU SERVEUR DHCP DANS ACTIVE DIRECTORY
+###############################################################################
+
+# Le serveur hébergeant également le rôle DHCP,
+# il doit être autorisé dans Active Directory.
+
+Add-DhcpServerInDC `
+    -DnsName "Tarantino.Mega" `
+    -IPAddress 192.168.11.250
+
+
+###############################################################################
+# 31. VÉRIFICATION DE L'AUTORISATION DHCP
+###############################################################################
+
+Get-DhcpServerInDC
+
+# Le serveur DHCP doit apparaître comme autorisé.
+
+
+###############################################################################
+# 32. CONFIGURATION DES IDENTIFIANTS DHCP / DNS
+###############################################################################
+
+# Afin de permettre au serveur DHCP de mettre à jour
+# dynamiquement les enregistrements DNS :
+
+Set-DhcpServerDnsCredential
+
+# Utiliser un compte autorisé du domaine.
+#
+# Ne pas publier les identifiants réels.
+
+
+###############################################################################
+# 33. VÉRIFICATION DES IDENTIFIANTS DHCP / DNS
+###############################################################################
+
+Get-DhcpServerDnsCredential
+
+
+###############################################################################
+# 34. INSTALLATION DES OUTILS RSAT SUR LE POSTE CLIENT
+###############################################################################
+
+# Sur le poste Windows 10 utilisé pour administrer
+# le serveur à distance :
+
+Get-WindowsCapability -Name RSAT* -Online |
+Add-WindowsCapability -Online
+
+
+###############################################################################
+# 35. OUVERTURE DES OUTILS ACTIVE DIRECTORY
+###############################################################################
+
+# Depuis le poste client équipé de RSAT :
+#
+# Utilisateurs et ordinateurs Active Directory :
+
+dsa.msc
+
+# Gestion DNS :
+
+dnsmgmt.msc
+
+# Gestion DHCP :
+
+dhcpmgmt.msc
+
+
+###############################################################################
+# 36. VÉRIFICATION DE L'ACCÈS DISTANT
+###############################################################################
+
+# Depuis les outils RSAT, vérifier que le domaine :
+
+Tarantino.Mega
+
+# peut être administré depuis le poste client.
+
+
+###############################################################################
+# 37. SUITE DE LA CONFIGURATION
+###############################################################################
+
+# Après l'installation d'AD DS, poursuivre avec :
+#
+# commandes/configuration-active-directory.txt
+#
+# Ce fichier permet de configurer :
+#
+# - les unités d'organisation ;
+# - les groupes ;
+# - les utilisateurs ;
+# - les scripts PowerShell ;
+# - l'importation des fichiers CSV.
+
+
+###############################################################################
+# 38. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Configuration Active Directory :
+#
+# commandes/configuration-active-directory.txt
+#
+# Configuration DNS :
+#
+# commandes/configuration-dns.txt
+#
+# Configuration DHCP :
+#
+# commandes/configuration-dhcp.txt
+#
+# Scripts :
+#
+# scripts/powershell/creation-ou-groupes.ps1
+# scripts/powershell/creation-utilisateurs.ps1
+#
+# Données CSV :
+#
+# scripts/csv/OU.csv
+# scripts/csv/users.csv
+
+
+###############################################################################
+# 39. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier :
+#
+# - le mot de passe DSRM réel ;
+# - le mot de passe Administrateur ;
+# - les identifiants sensibles du domaine ;
+# - les mots de passe contenus dans users.csv.
+#
+# Utiliser uniquement des données fictives
+# dans un dépôt GitHub public.
+
+
+###############################################################################
+# 40. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier le rôle :
+
+Get-WindowsFeature AD-Domain-Services
+
+
+# Vérifier le domaine :
+
+Get-ADDomain
+
+
+# Vérifier la forêt :
+
+Get-ADForest
+
+
+# Vérifier le contrôleur de domaine :
+
+Get-ADDomainController
+
+
+# Vérifier les services :
+
+Get-Service NTDS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+Get-Service DNS
+
+
+# Diagnostic du contrôleur :
+
+dcdiag
+
+
+# Diagnostic DNS :
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 41. VALIDATION FINALE
+###############################################################################
+
+# L'installation d'AD DS est terminée si :
+#
+# [ ] Le rôle AD-Domain-Services est installé.
+#
+# [ ] Le module ADDSDeployment est disponible.
+#
+# [ ] Le serveur a été promu en contrôleur de domaine.
+#
+# [ ] La forêt Tarantino.Mega existe.
+#
+# [ ] Le domaine Tarantino.Mega existe.
+#
+# [ ] Le nom NetBIOS est TARANTINO.
+#
+# [ ] Le serveur a redémarré correctement.
+#
+# [ ] Le service NTDS est actif.
+#
+# [ ] Le service Netlogon est actif.
+#
+# [ ] Le service KDC est actif.
+#
+# [ ] Le service DNS est actif.
+#
+# [ ] La zone DNS Tarantino.Mega existe.
+#
+# [ ] Les enregistrements SRV Active Directory sont présents.
+#
+# [ ] Le serveur DHCP est autorisé dans Active Directory.
+#
+# [ ] Les outils RSAT permettent d'administrer le domaine.
+#
+# [ ] Le contrôleur de domaine est opérationnel.
+###############################################################################

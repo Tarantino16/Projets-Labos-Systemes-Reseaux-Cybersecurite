@@ -1,0 +1,330 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Installation du rôle DHCP
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Serveur :
+# - 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉREQUIS
+###############################################################################
+
+# Avant d'installer le rôle DHCP, vérifier :
+#
+# - que Windows Server 2022 Core est installé ;
+# - que le serveur possède une adresse IPv4 statique ;
+# - que la passerelle réseau est configurée ;
+# - que le serveur est joignable sur le réseau.
+#
+# Configuration du laboratoire :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ipconfig /all
+
+# Vérifier que le serveur utilise bien une configuration IPv4 statique.
+
+
+###############################################################################
+# 3. TEST DE LA PASSERELLE
+###############################################################################
+
+ping 192.168.11.254
+
+# La passerelle doit répondre.
+
+
+###############################################################################
+# 4. RECHERCHE DU RÔLE DHCP
+###############################################################################
+
+# Rechercher les fonctionnalités liées à DHCP :
+
+Get-WindowsFeature *DHCP*
+
+# ou :
+
+Get-WindowsFeature DHCP
+
+
+###############################################################################
+# 5. INSTALLATION DU RÔLE DHCP
+###############################################################################
+
+Install-WindowsFeature -Name DHCP
+
+# Vérifier le résultat affiché par PowerShell.
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'INSTALLATION
+###############################################################################
+
+Get-WindowsFeature DHCP
+
+# La colonne Install State doit indiquer :
+
+Installed
+
+
+###############################################################################
+# 7. VÉRIFICATION DU SERVICE DHCP
+###############################################################################
+
+Get-Service DHCPServer
+
+# Le service DHCPServer doit être présent.
+
+
+###############################################################################
+# 8. DÉMARRAGE DU SERVICE DHCP
+###############################################################################
+
+Start-Service DHCPServer
+
+# Configurer le démarrage automatique :
+
+Set-Service DHCPServer -StartupType Automatic
+
+
+###############################################################################
+# 9. VÉRIFICATION DE L'ÉTAT DU SERVICE
+###############################################################################
+
+Get-Service DHCPServer
+
+# L'état attendu est :
+
+Running
+
+
+###############################################################################
+# 10. VÉRIFICATION DES PORTS UDP
+###############################################################################
+
+netstat -an -p udp
+
+# Le serveur DHCP utilise principalement :
+#
+# UDP 67 : serveur DHCP
+# UDP 68 : client DHCP
+#
+# La présence du port UDP 67 indique que le service DHCP
+# est à l'écoute.
+
+
+###############################################################################
+# 11. VÉRIFICATION DU MODULE POWERSHELL DHCP
+###############################################################################
+
+Get-Module -ListAvailable DHCPServer
+
+# Importer le module si nécessaire :
+
+Import-Module DHCPServer
+
+
+###############################################################################
+# 12. AFFICHAGE DES COMMANDES DHCP DISPONIBLES
+###############################################################################
+
+Get-Command -Module DHCPServer
+
+
+###############################################################################
+# 13. VÉRIFICATION AVANT CONFIGURATION
+###############################################################################
+
+# Afficher les étendues existantes :
+
+Get-DhcpServerv4Scope
+
+# À ce stade, aucune étendue ne doit nécessairement être configurée.
+
+
+###############################################################################
+# 14. CRÉATION DE L'ÉTENDUE
+###############################################################################
+
+# L'installation du rôle est maintenant terminée.
+#
+# La création et la configuration de l'étendue sont documentées dans :
+#
+# commandes/configuration-dhcp.txt
+
+
+###############################################################################
+# 15. RÉSUMÉ DE LA CONFIGURATION À VENIR
+###############################################################################
+
+# Le serveur DHCP sera ensuite configuré pour distribuer :
+#
+# - des adresses IPv4 sur le réseau 192.168.11.0/24 ;
+# - la passerelle 192.168.11.254 ;
+# - le serveur DNS 192.168.11.250 ;
+# - le suffixe DNS Tarantino.Mega.
+#
+# Des classes utilisateurs seront également créées :
+#
+# - salle-1 ;
+# - salle-2.
+#
+# Des stratégies DHCP spécifiques seront ensuite associées
+# à ces classes.
+
+
+###############################################################################
+# 16. VÉRIFICATION SUR UN POSTE CLIENT
+###############################################################################
+
+# Après configuration du serveur DHCP, depuis un poste Windows client :
+
+ipconfig /release
+
+ipconfig /renew
+
+ipconfig /all
+
+# Le poste doit recevoir automatiquement une configuration IPv4.
+
+
+###############################################################################
+# 17. AUTORISATION DANS ACTIVE DIRECTORY
+###############################################################################
+
+# Après installation et configuration d'Active Directory,
+# le serveur DHCP devra être autorisé dans le domaine.
+#
+# Cette étape est réalisée plus tard avec :
+
+Add-DhcpServerInDC `
+    -DnsName "Tarantino.Mega" `
+    -IPAddress 192.168.11.250
+
+
+###############################################################################
+# 18. VÉRIFICATION DE L'AUTORISATION DHCP
+###############################################################################
+
+Get-DhcpServerInDC
+
+# Cette étape n'est nécessaire qu'après la mise en place d'AD DS.
+
+
+###############################################################################
+# 19. ADMINISTRATION DISTANTE AVEC RSAT
+###############################################################################
+
+# Le rôle DHCP peut également être administré depuis
+# un poste Windows équipé des outils RSAT.
+#
+# Sur le poste client :
+
+Get-WindowsCapability -Name RSAT* -Online |
+Add-WindowsCapability -Online
+
+# Puis ouvrir la console DHCP :
+
+dhcpmgmt.msc
+
+
+###############################################################################
+# 20. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier le rôle :
+
+Get-WindowsFeature DHCP
+
+
+# Vérifier le service :
+
+Get-Service DHCPServer
+
+
+# Redémarrer le service :
+
+Restart-Service DHCPServer
+
+
+# Vérifier les étendues :
+
+Get-DhcpServerv4Scope
+
+
+# Vérifier la configuration réseau :
+
+ipconfig /all
+
+
+# Vérifier les ports UDP :
+
+netstat -an -p udp
+
+
+###############################################################################
+# 21. SUITE DU PROJET
+###############################################################################
+
+# Après l'installation du rôle DHCP, consulter :
+#
+# commandes/configuration-dhcp.txt
+#
+# Ce fichier contient :
+#
+# - la création de l'étendue ;
+# - la configuration des options DHCP ;
+# - la passerelle ;
+# - le serveur DNS ;
+# - le suffixe DNS ;
+# - les classes salle-1 et salle-2 ;
+# - les stratégies DHCP ;
+# - l'intégration DHCP / DNS ;
+# - l'autorisation dans Active Directory.
+
+
+###############################################################################
+# 22. VALIDATION FINALE
+###############################################################################
+
+# L'installation du rôle DHCP est terminée si :
+#
+# [ ] Le rôle DHCP est installé.
+#
+# [ ] Get-WindowsFeature DHCP indique Installed.
+#
+# [ ] Le service DHCPServer existe.
+#
+# [ ] Le service DHCPServer est démarré.
+#
+# [ ] Le démarrage automatique est configuré.
+#
+# [ ] Le port UDP 67 est à l'écoute.
+#
+# [ ] Le module PowerShell DHCPServer est disponible.
+#
+# [ ] Les commandes DHCP PowerShell sont accessibles.
+#
+# [ ] Le serveur est prêt pour la création de l'étendue.
+###############################################################################

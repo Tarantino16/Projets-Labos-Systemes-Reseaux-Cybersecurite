@@ -1,0 +1,932 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Vérification globale de l'infrastructure
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+# - Active Directory Domain Services (AD DS)
+# - DNS
+# - DHCP
+# - RSAT
+#
+# Serveur :
+# - Nom : SRV-1
+# - IPv4 : 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Passerelle :
+# - 192.168.11.254
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Nom NetBIOS :
+# - TARANTINO
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DU SYSTÈME
+###############################################################################
+
+# Afficher les informations du système :
+
+systeminfo
+
+# Vérifier notamment :
+#
+# - la version de Windows Server ;
+# - le nom du serveur ;
+# - le domaine ;
+# - la configuration système.
+
+
+###############################################################################
+# 2. VÉRIFICATION DU NOM DU SERVEUR
+###############################################################################
+
+hostname
+
+# Résultat attendu :
+
+SRV-1
+
+
+###############################################################################
+# 3. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ipconfig /all
+
+# Vérifier :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# DNS :
+# 127.0.0.1
+
+
+###############################################################################
+# 4. VÉRIFICATION POWERSHELL DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+Get-NetIPConfiguration
+
+Get-NetIPAddress -AddressFamily IPv4
+
+Get-DnsClientServerAddress
+
+Get-NetRoute -AddressFamily IPv4
+
+
+###############################################################################
+# 5. VÉRIFICATION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+Get-NetAdapter
+
+# Vérifier que l'interface Ethernet utilisée
+# par le serveur est active.
+
+
+###############################################################################
+# 6. TEST DE LA PASSERELLE
+###############################################################################
+
+ping 192.168.11.254
+
+# ou :
+
+Test-Connection 192.168.11.254
+
+# La passerelle doit répondre.
+
+
+###############################################################################
+# 7. TEST DE LA CONNECTIVITÉ IP
+###############################################################################
+
+ping 8.8.8.8
+
+# Ce test permet de vérifier la connectivité IP
+# indépendamment de la résolution DNS.
+
+
+###############################################################################
+# 8. VÉRIFICATION DES RÔLES INSTALLÉS
+###############################################################################
+
+Get-WindowsFeature |
+Where-Object InstallState -eq "Installed"
+
+# Vérifier notamment la présence de :
+#
+# - DHCP ;
+# - DNS ;
+# - AD-Domain-Services.
+
+
+###############################################################################
+# 9. VÉRIFICATION DU RÔLE DHCP
+###############################################################################
+
+Get-WindowsFeature DHCP
+
+# L'état attendu est :
+
+Installed
+
+
+###############################################################################
+# 10. VÉRIFICATION DU SERVICE DHCP
+###############################################################################
+
+Get-Service DHCPServer
+
+# L'état attendu est :
+
+Running
+
+
+###############################################################################
+# 11. VÉRIFICATION DES ÉTENDUES DHCP
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# Vérifier la présence de l'étendue correspondant au réseau :
+
+192.168.11.0/24
+
+# Vérifier que son état est :
+
+Active
+
+
+###############################################################################
+# 12. VÉRIFICATION DES OPTIONS DHCP
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+# Vérifier notamment :
+#
+# Option 003 - Routeur :
+# 192.168.11.254
+#
+# Option 006 - Serveur DNS :
+# 192.168.11.250
+#
+# Option 015 - Domaine DNS :
+# Tarantino.Mega
+
+
+###############################################################################
+# 13. VÉRIFICATION DES BAUX DHCP
+###############################################################################
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Vérifier que les postes clients ayant effectué
+# une demande DHCP apparaissent dans la liste.
+
+
+###############################################################################
+# 14. VÉRIFICATION DU SERVEUR DHCP DANS ACTIVE DIRECTORY
+###############################################################################
+
+Get-DhcpServerInDC
+
+# Vérifier que le serveur DHCP est autorisé
+# dans Active Directory.
+
+
+###############################################################################
+# 15. TEST DHCP DEPUIS UN POSTE CLIENT
+###############################################################################
+
+# Depuis le poste client Windows :
+
+ipconfig /release
+
+ipconfig /renew
+
+ipconfig /all
+
+# Vérifier que le client reçoit :
+#
+# - une adresse IPv4 de l'étendue ;
+# - le masque 255.255.255.0 ;
+# - la passerelle 192.168.11.254 ;
+# - le serveur DNS 192.168.11.250 ;
+# - le suffixe DNS Tarantino.Mega.
+
+
+###############################################################################
+# 16. VÉRIFICATION DES CLASSES DHCP
+###############################################################################
+
+# Depuis la console DHCP RSAT :
+#
+# IPv4
+#     └── Définir les classes des utilisateurs
+#
+# Vérifier la présence des classes :
+#
+# - salle-1 ;
+# - salle-2.
+
+
+###############################################################################
+# 17. TEST DE LA CLASSE DHCP SALLE-1
+###############################################################################
+
+# Depuis un poste client :
+
+ipconfig /setclassid Ethernet salle-1
+
+ipconfig /release
+
+ipconfig /renew
+
+ipconfig /all
+
+# Vérifier que le client reçoit les paramètres
+# associés à la stratégie salle-1.
+
+
+###############################################################################
+# 18. TEST DE LA CLASSE DHCP SALLE-2
+###############################################################################
+
+ipconfig /setclassid Ethernet salle-2
+
+ipconfig /release
+
+ipconfig /renew
+
+ipconfig /all
+
+# Vérifier que le client reçoit les paramètres
+# associés à la stratégie salle-2.
+
+
+###############################################################################
+# 19. SUPPRESSION DE LA CLASSE DHCP DU CLIENT
+###############################################################################
+
+ipconfig /setclassid Ethernet
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 20. VÉRIFICATION DU RÔLE DNS
+###############################################################################
+
+Get-WindowsFeature DNS
+
+# L'état attendu est :
+
+Installed
+
+
+###############################################################################
+# 21. VÉRIFICATION DU SERVICE DNS
+###############################################################################
+
+Get-Service DNS
+
+# L'état attendu est :
+
+Running
+
+
+###############################################################################
+# 22. VÉRIFICATION DES ZONES DNS
+###############################################################################
+
+Get-DnsServerZone
+
+# Vérifier notamment la présence de :
+#
+# Zone directe :
+# Tarantino.Mega
+#
+# Zone inversée :
+# 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 23. VÉRIFICATION DES ENREGISTREMENTS DNS
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier la présence des enregistrements
+# nécessaires au fonctionnement du domaine.
+
+
+###############################################################################
+# 24. VÉRIFICATION DE LA ZONE INVERSÉE
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 25. TEST DE RÉSOLUTION DNS DIRECTE
+###############################################################################
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# ou :
+
+nslookup SRV-1.Tarantino.Mega
+
+# Résultat attendu :
+
+192.168.11.250
+
+
+###############################################################################
+# 26. TEST DE RÉSOLUTION DNS INVERSÉE
+###############################################################################
+
+Resolve-DnsName 192.168.11.250
+
+# ou :
+
+nslookup 192.168.11.250
+
+# Vérifier que l'adresse est associée au nom
+# du serveur correspondant.
+
+
+###############################################################################
+# 27. TEST DE RÉSOLUTION DNS EXTERNE
+###############################################################################
+
+Resolve-DnsName google.com
+
+# ou :
+
+nslookup google.com
+
+# Ce test permet notamment de vérifier le fonctionnement
+# de la résolution DNS externe et des redirecteurs.
+
+
+###############################################################################
+# 28. VÉRIFICATION DES REDIRECTEURS DNS
+###############################################################################
+
+Get-DnsServerForwarder
+
+
+###############################################################################
+# 29. VÉRIFICATION DES ENREGISTREMENTS SRV ACTIVE DIRECTORY
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+# Ces enregistrements sont nécessaires pour permettre
+# aux clients de localiser les services Active Directory.
+
+
+###############################################################################
+# 30. VÉRIFICATION DU RÔLE AD DS
+###############################################################################
+
+Get-WindowsFeature AD-Domain-Services
+
+# L'état attendu est :
+
+Installed
+
+
+###############################################################################
+# 31. VÉRIFICATION DU DOMAINE
+###############################################################################
+
+Get-ADDomain
+
+# Vérifier notamment :
+
+# DNSRoot :
+# Tarantino.Mega
+
+# NetBIOSName :
+# TARANTINO
+
+
+###############################################################################
+# 32. VÉRIFICATION DE LA FORÊT
+###############################################################################
+
+Get-ADForest
+
+# Vérifier que le domaine racine est :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 33. VÉRIFICATION DU CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+Get-ADDomainController
+
+# ou :
+
+Get-ADDomainController -Filter *
+
+# Vérifier que SRV-1 apparaît comme contrôleur
+# de domaine.
+
+
+###############################################################################
+# 34. VÉRIFICATION DES SERVICES ACTIVE DIRECTORY
+###############################################################################
+
+Get-Service NTDS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+Get-Service DNS
+
+# Vérifier que les services nécessaires sont démarrés.
+
+
+###############################################################################
+# 35. DIAGNOSTIC DU CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+dcdiag
+
+# Examiner les résultats afin d'identifier
+# d'éventuelles erreurs.
+
+
+###############################################################################
+# 36. DIAGNOSTIC DNS D'ACTIVE DIRECTORY
+###############################################################################
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 37. VÉRIFICATION DES UNITÉS D'ORGANISATION
+###############################################################################
+
+Get-ADOrganizationalUnit `
+    -Filter *
+
+# Affichage simplifié :
+
+Get-ADOrganizationalUnit `
+    -Filter * |
+Select-Object Name, DistinguishedName
+
+
+###############################################################################
+# 38. VÉRIFICATION DES GROUPES ACTIVE DIRECTORY
+###############################################################################
+
+Get-ADGroup `
+    -Filter *
+
+# Vérifier que les groupes globaux créés
+# par le script sont présents.
+
+
+###############################################################################
+# 39. VÉRIFICATION DES UTILISATEURS ACTIVE DIRECTORY
+###############################################################################
+
+Get-ADUser `
+    -Filter *
+
+# Vérifier que les utilisateurs importés
+# depuis users.csv sont présents.
+
+
+###############################################################################
+# 40. VÉRIFICATION D'UN UTILISATEUR
+###############################################################################
+
+# Exemple :
+
+Get-ADUser `
+    -Identity "b.dylan" `
+    -Properties *
+
+# Adapter l'identifiant à un utilisateur réellement
+# présent dans votre environnement.
+
+
+###############################################################################
+# 41. VÉRIFICATION DE L'APPARTENANCE AUX GROUPES
+###############################################################################
+
+# Exemple :
+
+Get-ADPrincipalGroupMembership `
+    -Identity "b.dylan"
+
+# Vérifier que l'utilisateur appartient au groupe
+# correspondant à son service.
+
+
+###############################################################################
+# 42. VÉRIFICATION DES MEMBRES D'UN GROUPE
+###############################################################################
+
+Get-ADGroupMember `
+    -Identity "gg_NomDuGroupe"
+
+# Adapter le nom au groupe réellement créé
+# dans Active Directory.
+
+
+###############################################################################
+# 43. VÉRIFICATION DE L'INTÉGRATION DHCP / DNS
+###############################################################################
+
+# Depuis un poste client :
+
+ipconfig /release
+
+ipconfig /renew
+
+# Sur le serveur DHCP :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Sur le serveur DNS :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier que le client apparaît :
+#
+# - dans les baux DHCP ;
+# - dans la zone DNS lorsque les mises à jour
+#   dynamiques sont correctement configurées.
+
+
+###############################################################################
+# 44. TEST DE RÉSOLUTION DU POSTE CLIENT
+###############################################################################
+
+# Adapter le nom du poste :
+
+Resolve-DnsName NOM-DU-CLIENT.Tarantino.Mega
+
+# ou :
+
+nslookup NOM-DU-CLIENT.Tarantino.Mega
+
+
+###############################################################################
+# 45. VÉRIFICATION DES OUTILS RSAT
+###############################################################################
+
+# Depuis le poste client d'administration :
+
+Get-WindowsCapability `
+    -Name RSAT* `
+    -Online
+
+# Vérifier que les composants nécessaires
+# sont installés.
+
+
+###############################################################################
+# 46. TEST DE LA CONSOLE ACTIVE DIRECTORY
+###############################################################################
+
+# Depuis le poste équipé de RSAT :
+
+dsa.msc
+
+# Vérifier que le domaine suivant est accessible :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 47. TEST DE LA CONSOLE DNS
+###############################################################################
+
+dnsmgmt.msc
+
+# Vérifier que le serveur DNS et les zones
+# peuvent être administrés à distance.
+
+
+###############################################################################
+# 48. TEST DE LA CONSOLE DHCP
+###############################################################################
+
+dhcpmgmt.msc
+
+# Vérifier que le serveur DHCP et son étendue
+# peuvent être administrés à distance.
+
+
+###############################################################################
+# 49. VÉRIFICATION DES PORTS PRINCIPAUX
+###############################################################################
+
+# DNS :
+
+netstat -an | findstr ":53"
+
+# Kerberos :
+
+netstat -an | findstr ":88"
+
+# LDAP :
+
+netstat -an | findstr ":389"
+
+# DHCP :
+
+netstat -an -p udp
+
+# Ports principaux :
+#
+# DNS      : TCP/UDP 53
+# Kerberos : TCP/UDP 88
+# DHCP     : UDP 67/68
+# LDAP     : TCP/UDP 389
+
+
+###############################################################################
+# 50. VÉRIFICATION GLOBALE DES SERVICES
+###############################################################################
+
+Get-Service DHCPServer
+
+Get-Service DNS
+
+Get-Service NTDS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+# Tous les services nécessaires doivent
+# être dans un état opérationnel.
+
+
+###############################################################################
+# 51. COMMANDES DE DIAGNOSTIC RAPIDE
+###############################################################################
+
+# Configuration réseau :
+
+ipconfig /all
+
+
+# Test de la passerelle :
+
+ping 192.168.11.254
+
+
+# Test DNS :
+
+nslookup Tarantino.Mega
+
+
+# Test du serveur :
+
+nslookup SRV-1.Tarantino.Mega
+
+
+# État DHCP :
+
+Get-Service DHCPServer
+
+
+# État DNS :
+
+Get-Service DNS
+
+
+# État AD DS :
+
+Get-Service NTDS
+
+
+# Domaine :
+
+Get-ADDomain
+
+
+# Forêt :
+
+Get-ADForest
+
+
+# Contrôleur de domaine :
+
+Get-ADDomainController
+
+
+# Diagnostic AD DS :
+
+dcdiag
+
+
+# Diagnostic DNS :
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 52. ORDRE DE VÉRIFICATION CONSEILLÉ
+###############################################################################
+
+# En cas de problème, vérifier dans cet ordre :
+#
+# 1. Interface réseau
+#        |
+#        v
+# 2. Adresse IPv4
+#        |
+#        v
+# 3. Passerelle
+#        |
+#        v
+# 4. Service DHCP
+#        |
+#        v
+# 5. Attribution d'une adresse au client
+#        |
+#        v
+# 6. Service DNS
+#        |
+#        v
+# 7. Résolution DNS
+#        |
+#        v
+# 8. Active Directory
+#        |
+#        v
+# 9. Authentification du domaine
+#        |
+#        v
+# 10. Administration distante avec RSAT
+
+
+###############################################################################
+# 53. VALIDATION FINALE DE L'INFRASTRUCTURE
+###############################################################################
+
+# WINDOWS SERVER
+#
+# [ ] Windows Server 2022 Core est opérationnel.
+#
+# [ ] Le serveur est nommé SRV-1.
+#
+# [ ] L'adresse IPv4 est 192.168.11.250/24.
+#
+# [ ] La passerelle est 192.168.11.254.
+#
+# [ ] Le serveur utilise son service DNS local.
+
+
+# DHCP
+#
+# [ ] Le rôle DHCP est installé.
+#
+# [ ] Le service DHCPServer fonctionne.
+#
+# [ ] L'étendue 192.168.11.0/24 est active.
+#
+# [ ] Les options DHCP sont correctement configurées.
+#
+# [ ] Les clients reçoivent une configuration IPv4.
+#
+# [ ] Les classes salle-1 et salle-2 fonctionnent.
+#
+# [ ] Le serveur DHCP est autorisé dans Active Directory.
+
+
+# DNS
+#
+# [ ] Le rôle DNS est installé.
+#
+# [ ] Le service DNS fonctionne.
+#
+# [ ] La zone Tarantino.Mega existe.
+#
+# [ ] La zone de recherche inversée existe.
+#
+# [ ] La résolution directe fonctionne.
+#
+# [ ] La résolution inversée fonctionne.
+#
+# [ ] Les enregistrements SRV Active Directory sont présents.
+#
+# [ ] Les requêtes DNS externes fonctionnent.
+
+
+# ACTIVE DIRECTORY
+#
+# [ ] Le rôle AD DS est installé.
+#
+# [ ] Le domaine Tarantino.Mega existe.
+#
+# [ ] Le nom NetBIOS est TARANTINO.
+#
+# [ ] SRV-1 fonctionne comme contrôleur de domaine.
+#
+# [ ] Les services NTDS, Netlogon et KDC fonctionnent.
+#
+# [ ] Les unités d'organisation sont présentes.
+#
+# [ ] Les groupes globaux sont présents.
+#
+# [ ] Les utilisateurs sont présents.
+#
+# [ ] Les utilisateurs sont affectés aux bons groupes.
+
+
+# INTÉGRATION DHCP / DNS
+#
+# [ ] Les clients obtiennent leur configuration via DHCP.
+#
+# [ ] Les clients utilisent le serveur DNS 192.168.11.250.
+#
+# [ ] Les mises à jour DNS dynamiques fonctionnent.
+#
+# [ ] Les postes clients apparaissent dans le DNS.
+#
+# [ ] Les noms des postes clients peuvent être résolus.
+
+
+# RSAT
+#
+# [ ] Les outils RSAT sont installés sur le poste client.
+#
+# [ ] Active Directory peut être administré à distance.
+#
+# [ ] DNS peut être administré à distance.
+#
+# [ ] DHCP peut être administré à distance.
+
+
+###############################################################################
+# 54. RÉSULTAT ATTENDU
+###############################################################################
+
+# À l'issue des vérifications, l'infrastructure doit permettre :
+#
+# - l'attribution automatique des configurations réseau avec DHCP ;
+#
+# - la résolution des noms avec DNS ;
+#
+# - la résolution directe et inversée ;
+#
+# - la gestion centralisée des utilisateurs avec Active Directory ;
+#
+# - la gestion des unités d'organisation et des groupes ;
+#
+# - l'authentification des utilisateurs du domaine ;
+#
+# - l'intégration entre DHCP, DNS et Active Directory ;
+#
+# - l'administration distante du serveur Windows Server 2022 Core
+#   depuis un poste équipé des outils RSAT.
+#
+# L'infrastructure Windows Server 2022 est alors considérée
+# comme opérationnelle.
+###############################################################################

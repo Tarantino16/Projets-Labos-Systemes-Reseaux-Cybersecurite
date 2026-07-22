@@ -1,0 +1,508 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration réseau du serveur Windows Server 2022 Core
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+# - SConfig
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Serveur :
+# - 192.168.11.250
+#
+# Passerelle :
+# - 192.168.11.254
+#
+# DNS :
+# - 127.0.0.1
+###############################################################################
+
+
+###############################################################################
+# 1. AFFICHAGE DE LA CONFIGURATION ACTUELLE
+###############################################################################
+
+ipconfig /all
+
+# Cette commande permet d'afficher :
+#
+# - l'adresse IPv4 ;
+# - le masque de sous-réseau ;
+# - la passerelle ;
+# - les serveurs DNS ;
+# - l'état DHCP ;
+# - les informations de l'interface réseau.
+
+
+###############################################################################
+# 2. CONFIGURATION AVEC SCONFIG
+###############################################################################
+
+# Depuis Windows Server Core, lancer :
+
+SConfig
+
+# Dans le menu principal :
+#
+# Choisir :
+#
+# 8 - Paramètres réseau
+
+
+###############################################################################
+# 3. SÉLECTION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+# Dans SConfig :
+#
+# Sélectionner l'index correspondant à la carte réseau.
+#
+# L'index peut varier selon la machine virtuelle.
+#
+# Vérifier soigneusement l'interface avant de continuer.
+
+
+###############################################################################
+# 4. CONFIGURATION D'UNE ADRESSE IP STATIQUE AVEC SCONFIG
+###############################################################################
+
+# Sélectionner :
+#
+# 1 - Définir l'adresse de la carte réseau
+#
+# Choisir :
+#
+# S - Statique
+#
+# Adresse IPv4 :
+
+192.168.11.250
+
+# Masque :
+#
+# 255.255.255.0
+#
+# ou laisser vide si SConfig propose automatiquement
+# le masque correspondant au /24.
+#
+# Passerelle :
+
+192.168.11.254
+
+
+###############################################################################
+# 5. CONFIGURATION DU SERVEUR DNS AVEC SCONFIG
+###############################################################################
+
+# Toujours dans les paramètres réseau :
+#
+# Sélectionner :
+#
+# 2 - Définir les serveurs DNS
+#
+# Serveur DNS :
+
+127.0.0.1
+
+# Le serveur utilise ici son adresse de bouclage
+# car il hébergera également le rôle DNS.
+
+
+###############################################################################
+# 6. MÉTHODE POWERSHELL - COLLECTE DES INFORMATIONS
+###############################################################################
+
+# Quitter SConfig vers PowerShell :
+#
+# Option 15
+#
+# Afficher la configuration IP :
+
+Get-NetIPConfiguration
+
+# Afficher les interfaces réseau :
+
+Get-NetIPInterface
+
+
+###############################################################################
+# 7. IDENTIFICATION DE L'INDEX DE L'INTERFACE
+###############################################################################
+
+# Repérer la carte réseau utilisée.
+#
+# Exemple du laboratoire :
+#
+# InterfaceIndex : 3
+#
+# Adapter cette valeur si nécessaire.
+
+
+###############################################################################
+# 8. CONFIGURATION DE L'ADRESSE IP AVEC POWERSHELL
+###############################################################################
+
+New-NetIPAddress `
+    -InterfaceIndex 3 `
+    -IPAddress 192.168.11.250 `
+    -PrefixLength 24 `
+    -DefaultGateway 192.168.11.254
+
+
+###############################################################################
+# 9. CONFIGURATION DU DNS AVEC POWERSHELL
+###############################################################################
+
+Set-DnsClientServerAddress `
+    -InterfaceIndex 3 `
+    -ServerAddresses 127.0.0.1
+
+# Le serveur utilise ainsi son propre service DNS.
+
+
+###############################################################################
+# 10. VÉRIFICATION DE LA CONFIGURATION IP
+###############################################################################
+
+Get-NetIPConfiguration
+
+# Vérification complète :
+
+ipconfig /all
+
+
+###############################################################################
+# 11. VÉRIFICATION DE LA ROUTE PAR DÉFAUT
+###############################################################################
+
+Get-NetRoute `
+    -DestinationPrefix "0.0.0.0/0"
+
+# La passerelle attendue est :
+
+192.168.11.254
+
+
+###############################################################################
+# 12. TEST DE LA PASSERELLE
+###############################################################################
+
+ping 192.168.11.254
+
+# La passerelle doit répondre.
+
+
+###############################################################################
+# 13. TEST DE LA CONNECTIVITÉ IP
+###############################################################################
+
+# Tester une adresse IP externe :
+
+ping 8.8.8.8
+
+# Si la réponse fonctionne, la connectivité IP
+# vers l'extérieur est opérationnelle.
+
+
+###############################################################################
+# 14. TEST DE LA RÉSOLUTION DNS
+###############################################################################
+
+ping google.com
+
+# ou :
+
+Resolve-DnsName google.com
+
+# La résolution DNS peut dépendre de l'installation
+# et de la configuration du rôle DNS.
+
+
+###############################################################################
+# 15. AFFICHAGE DE LA CONFIGURATION DNS
+###############################################################################
+
+Get-DnsClientServerAddress
+
+# Vérifier que l'interface utilise :
+
+127.0.0.1
+
+
+###############################################################################
+# 16. DÉSACTIVATION D'IPV6
+###############################################################################
+
+# Afficher les bindings réseau :
+
+Get-NetAdapterBinding
+
+# Repérer le composant :
+
+ms_tcpip6
+
+# Dans le laboratoire, IPv6 est désactivé
+# sur l'interface Ethernet :
+
+Disable-NetAdapterBinding `
+    -Name "Ethernet" `
+    -ComponentID ms_tcpip6 `
+    -PassThru
+
+
+###############################################################################
+# 17. VÉRIFICATION DE LA DÉSACTIVATION D'IPV6
+###############################################################################
+
+Get-NetAdapterBinding `
+    -Name "Ethernet"
+
+# Vérifier que le composant ms_tcpip6
+# est désactivé.
+
+
+###############################################################################
+# 18. VÉRIFICATION DE L'INTERFACE
+###############################################################################
+
+Get-NetAdapter
+
+# Vérifier :
+#
+# - le nom de l'interface ;
+# - son statut ;
+# - sa vitesse ;
+# - son index.
+
+
+###############################################################################
+# 19. VÉRIFICATION COMPLÈTE
+###############################################################################
+
+ipconfig /all
+
+Get-NetIPConfiguration
+
+Get-NetIPInterface
+
+Get-DnsClientServerAddress
+
+Get-NetRoute
+
+
+###############################################################################
+# 20. ATTENTION - NE PAS UTILISER LES DEUX MÉTHODES SIMULTANÉMENT
+###############################################################################
+
+# La configuration réseau peut être réalisée :
+#
+# - soit avec SConfig ;
+# - soit avec PowerShell.
+#
+# Il est déconseillé de configurer deux adresses IPv4 différentes
+# sur la même interface en utilisant successivement les deux méthodes.
+#
+# Vérifier la configuration existante avant d'ajouter une nouvelle
+# adresse IP.
+
+
+###############################################################################
+# 21. SUPPRESSION D'UNE ADRESSE IP ERRONÉE
+###############################################################################
+
+# Afficher les adresses configurées :
+
+Get-NetIPAddress `
+    -AddressFamily IPv4
+
+# Supprimer une adresse si nécessaire :
+
+Remove-NetIPAddress `
+    -IPAddress ADRESSE-IP-A-SUPPRIMER `
+    -Confirm:$false
+
+
+###############################################################################
+# 22. SUPPRESSION D'UNE ROUTE PAR DÉFAUT ERRONÉE
+###############################################################################
+
+# Afficher les routes :
+
+Get-NetRoute `
+    -AddressFamily IPv4
+
+# Supprimer une route si nécessaire :
+
+Remove-NetRoute `
+    -DestinationPrefix "0.0.0.0/0" `
+    -NextHop ADRESSE-PASSERELLE-A-SUPPRIMER `
+    -Confirm:$false
+
+
+###############################################################################
+# 23. MODIFICATION DU NOM DU SERVEUR
+###############################################################################
+
+# Afficher le nom actuel :
+
+hostname
+
+# ou :
+
+$env:COMPUTERNAME
+
+# Renommer le serveur si nécessaire :
+
+Rename-Computer `
+    -NewName "SRV-1" `
+    -Restart
+
+# Le redémarrage permet d'appliquer le nouveau nom.
+
+
+###############################################################################
+# 24. VÉRIFICATION DU NOM APRÈS REDÉMARRAGE
+###############################################################################
+
+hostname
+
+# Résultat attendu :
+
+SRV-1
+
+
+###############################################################################
+# 25. TEST DE COMMUNICATION AVEC LE POSTE CLIENT
+###############################################################################
+
+# Depuis le poste Windows 10 :
+
+ping 192.168.11.250
+
+# Le serveur doit être joignable.
+
+
+###############################################################################
+# 26. TEST DE COMMUNICATION DEPUIS LE SERVEUR
+###############################################################################
+
+# Depuis Windows Server :
+
+ping ADRESSE-IP-CLIENT
+
+# Adapter l'adresse au poste client utilisé
+# dans le laboratoire.
+
+
+###############################################################################
+# 27. VÉRIFICATION DU DNS LOCAL APRÈS INSTALLATION DU RÔLE DNS
+###############################################################################
+
+Resolve-DnsName localhost
+
+# Vérifier également :
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 28. VÉRIFICATION DE LA CONFIGURATION AVANT AD DS
+###############################################################################
+
+# Avant d'installer Active Directory :
+#
+# [ ] Adresse IP statique : 192.168.11.250
+#
+# [ ] Masque : 255.255.255.0
+#
+# [ ] Passerelle : 192.168.11.254
+#
+# [ ] DNS : 127.0.0.1
+#
+# [ ] Nom du serveur correctement configuré
+#
+# [ ] Connectivité réseau fonctionnelle
+
+
+###############################################################################
+# 29. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Configuration IP :
+
+ipconfig /all
+
+
+# Interfaces :
+
+Get-NetAdapter
+
+
+# Configuration IP détaillée :
+
+Get-NetIPConfiguration
+
+
+# Interfaces IP :
+
+Get-NetIPInterface
+
+
+# Adresses IPv4 :
+
+Get-NetIPAddress `
+    -AddressFamily IPv4
+
+
+# Serveurs DNS :
+
+Get-DnsClientServerAddress
+
+
+# Routes :
+
+Get-NetRoute `
+    -AddressFamily IPv4
+
+
+# Test passerelle :
+
+Test-Connection 192.168.11.254
+
+
+# Test Internet :
+
+Test-Connection 8.8.8.8
+
+
+###############################################################################
+# 30. VALIDATION FINALE
+###############################################################################
+
+# La configuration réseau est correcte si :
+#
+# [ ] L'interface réseau est active.
+#
+# [ ] Le serveur possède l'adresse IPv4 192.168.11.250.
+#
+# [ ] Le masque réseau correspond à /24.
+#
+# [ ] La passerelle est 192.168.11.254.
+#
+# [ ] Le DNS configuré est 127.0.0.1.
+#
+# [ ] IPv6 est désactivé sur l'interface Ethernet
+#     conformément au laboratoire.
+#
+# [ ] Le serveur peut joindre la passerelle.
+#
+# [ ] Le serveur peut communiquer avec les postes clients.
+#
+# [ ] La configuration reste valide après redémarrage.
+#
+# [ ] Le serveur est prêt pour l'installation des rôles
+#     DHCP, DNS et AD DS.
+###############################################################################

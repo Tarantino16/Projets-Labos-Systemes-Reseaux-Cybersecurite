@@ -1,0 +1,773 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration d'Active Directory Domain Services (AD DS)
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Nom NetBIOS :
+# - TARANTINO
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉREQUIS
+###############################################################################
+
+# Avant de configurer Active Directory, vérifier :
+#
+# - que Windows Server 2022 est correctement installé ;
+# - que le serveur dispose d'une adresse IPv4 statique ;
+# - que la configuration DNS pointe vers le serveur lui-même ;
+# - que le rôle DNS est disponible ;
+# - que le serveur peut communiquer avec le réseau.
+#
+# Dans ce laboratoire, le serveur héberge notamment :
+#
+# - DHCP ;
+# - DNS ;
+# - AD DS.
+#
+# Le serveur DNS et le contrôleur de domaine sont donc présents
+# sur le même serveur.
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ipconfig /all
+
+# Vérifier notamment :
+#
+# Adresse IPv4 :
+# 192.168.11.250
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# DNS :
+# 127.0.0.1
+
+
+###############################################################################
+# 3. RECHERCHE DU RÔLE AD DS
+###############################################################################
+
+# Rechercher les fonctionnalités liées à Active Directory :
+
+Get-WindowsFeature *AD*
+
+
+###############################################################################
+# 4. INSTALLATION DU RÔLE AD DS
+###############################################################################
+
+Install-WindowsFeature -Name AD-Domain-Services
+
+# Vérifier que l'installation s'est correctement terminée :
+
+Get-WindowsFeature AD-Domain-Services
+
+
+###############################################################################
+# 5. CHARGEMENT DU MODULE AD DS
+###############################################################################
+
+Import-Module ADDSDeployment
+
+
+###############################################################################
+# 6. CRÉATION DE LA FORÊT ACTIVE DIRECTORY
+###############################################################################
+
+# Création d'une nouvelle forêt Active Directory avec :
+#
+# Domaine :
+# Tarantino.Mega
+#
+# Nom NetBIOS :
+# TARANTINO
+
+Install-ADDSForest `
+    -DomainName "Tarantino.Mega" `
+    -CreateDnsDelegation:$false `
+    -DomainNetbiosName "TARANTINO" `
+    -DomainMode Win2012R2 `
+    -ForestMode Win2012R2 `
+    -Confirm
+
+# La commande demande ensuite de définir le mot de passe
+# du mode de restauration des services d'annuaire (DSRM).
+#
+# Ne pas publier le mot de passe réel utilisé dans le laboratoire
+# dans un dépôt GitHub public.
+#
+# Le serveur redémarre après la promotion en contrôleur de domaine.
+
+
+###############################################################################
+# 7. VÉRIFICATION APRÈS REDÉMARRAGE
+###############################################################################
+
+# Se reconnecter au serveur.
+
+# Vérifier le domaine :
+
+Get-ADDomain
+
+# Vérifier la forêt :
+
+Get-ADForest
+
+# Vérifier le contrôleur de domaine :
+
+Get-ADDomainController
+
+
+###############################################################################
+# 8. VÉRIFICATION DU DOMAINE
+###############################################################################
+
+(Get-ADDomain).DNSRoot
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+# Vérifier le nom NetBIOS :
+
+(Get-ADDomain).NetBIOSName
+
+# Résultat attendu :
+
+TARANTINO
+
+
+###############################################################################
+# 9. VÉRIFICATION DU RÔLE DE CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+Get-ADDomainController -Filter *
+
+# Le serveur doit apparaître comme contrôleur
+# du domaine Tarantino.Mega.
+
+
+###############################################################################
+# 10. VÉRIFICATION DES SERVICES ACTIVE DIRECTORY
+###############################################################################
+
+Get-Service NTDS
+
+Get-Service DNS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+# Les services nécessaires doivent être démarrés.
+
+
+###############################################################################
+# 11. VÉRIFICATION DNS APRÈS INSTALLATION D'AD DS
+###############################################################################
+
+# Active Directory utilise DNS pour localiser les différents
+# services et contrôleurs de domaine.
+
+Get-DnsServerZone
+
+# Vérifier la présence de la zone :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 12. VÉRIFICATION DE LA RÉSOLUTION DU DOMAINE
+###############################################################################
+
+Resolve-DnsName Tarantino.Mega
+
+nslookup Tarantino.Mega
+
+
+###############################################################################
+# 13. VÉRIFICATION DES ENREGISTREMENTS ACTIVE DIRECTORY
+###############################################################################
+
+# Vérifier les enregistrements SRV utilisés par Active Directory :
+
+nslookup -type=SRV _ldap._tcp.dc._msdcs.Tarantino.Mega
+
+nslookup -type=SRV _kerberos._tcp.Tarantino.Mega
+
+
+###############################################################################
+# 14. INSTALLATION DES OUTILS RSAT SUR LE POSTE CLIENT
+###############################################################################
+
+# Sur le poste Windows 10 utilisé pour administrer le serveur :
+
+Get-WindowsCapability -Name RSAT* -Online |
+Add-WindowsCapability -Online
+
+# Ces outils permettent d'administrer à distance :
+#
+# - Active Directory ;
+# - DHCP ;
+# - DNS ;
+# - les stratégies de groupe.
+
+
+###############################################################################
+# 15. OUVERTURE DE LA CONSOLE ACTIVE DIRECTORY
+###############################################################################
+
+# Depuis le poste d'administration équipé de RSAT :
+#
+# Ouvrir :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# ou lancer :
+
+dsa.msc
+
+# Le domaine Tarantino.Mega doit apparaître dans l'arborescence.
+
+
+###############################################################################
+# 16. STRUCTURE PAR DÉFAUT DU DOMAINE
+###############################################################################
+
+# Après la création du domaine, plusieurs conteneurs sont disponibles :
+#
+# Computers
+#     Contient par défaut les ordinateurs joints au domaine.
+#
+# Domain Controllers
+#     Contient les contrôleurs de domaine.
+#
+# Users
+#     Contient les comptes et groupes créés dans
+#     les conteneurs par défaut.
+#
+# Pour organiser correctement l'annuaire, le laboratoire
+# utilise ensuite des unités d'organisation (OU).
+
+
+###############################################################################
+# 17. CRÉATION D'UNE UNITÉ D'ORGANISATION EN INTERFACE GRAPHIQUE
+###############################################################################
+
+# Depuis :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# Faire un clic droit sur :
+#
+# Tarantino.Mega
+#
+# Puis :
+#
+# Nouveau
+#     └── Unité d'organisation
+#
+# Donner un nom à l'OU.
+
+
+###############################################################################
+# 18. CRÉATION D'UNE OU AVEC POWERSHELL
+###############################################################################
+
+# Exemple :
+
+New-ADOrganizationalUnit `
+    -Name "Nom-OU" `
+    -Path "DC=Tarantino,DC=Mega"
+
+# Vérification :
+
+Get-ADOrganizationalUnit -Filter *
+
+
+###############################################################################
+# 19. CRÉATION DE LA STRUCTURE DES OU
+###############################################################################
+
+# Dans le laboratoire, la création de la structure Active Directory
+# est automatisée à partir du fichier :
+#
+# scripts/csv/OU.csv
+#
+# Le fichier contient notamment une relation :
+#
+# parent
+# enfant
+#
+# Le script correspondant est :
+#
+# scripts/powershell/creation-ou-groupes.ps1
+#
+# Il permet de créer automatiquement :
+#
+# - les unités d'organisation ;
+# - les sous-unités d'organisation ;
+# - les groupes globaux de sécurité.
+
+
+###############################################################################
+# 20. IMPORTATION DU FICHIER OU.CSV
+###############################################################################
+
+$unite = Import-Csv `
+    -Delimiter ";" `
+    -Path "C:\Users\Administrateur\Desktop\OU.csv"
+
+# Vérifier les données importées :
+
+$unite
+
+
+###############################################################################
+# 21. CRÉATION AUTOMATIQUE DES OU
+###############################################################################
+
+# Exemple de logique utilisée dans le script :
+
+foreach ($element in $unite) {
+
+    if ($element.parent -eq "") {
+
+        New-ADOrganizationalUnit `
+            -Name $element.enfant
+
+    }
+
+}
+
+
+###############################################################################
+# 22. RECHERCHE D'UNE UNITÉ D'ORGANISATION
+###############################################################################
+
+Get-ADOrganizationalUnit `
+    -Filter "Name -like 'Nom-OU'"
+
+# Cette commande permet notamment de récupérer
+# le DistinguishedName de l'OU afin d'y créer
+# d'autres objets.
+
+
+###############################################################################
+# 23. CRÉATION DES GROUPES GLOBAUX
+###############################################################################
+
+# Exemple :
+
+New-ADGroup `
+    -Name "gg_NomDuGroupe" `
+    -Path "OU=Nom-OU,DC=Tarantino,DC=Mega" `
+    -GroupScope Global
+
+# Vérifier les groupes :
+
+Get-ADGroup -Filter *
+
+
+###############################################################################
+# 24. ORGANISATION HIÉRARCHIQUE DES GROUPES
+###############################################################################
+
+# Le laboratoire utilise une organisation basée sur
+# les groupes globaux.
+#
+# Exemple d'ajout d'un groupe enfant dans un groupe parent :
+
+Add-ADGroupMember `
+    -Identity "gg_GroupeParent" `
+    -Members "gg_GroupeEnfant"
+
+# Cette organisation permet de préparer une gestion
+# structurée des droits et autorisations.
+
+
+###############################################################################
+# 25. CRÉATION MANUELLE D'UN UTILISATEUR
+###############################################################################
+
+# Depuis :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# Faire un clic droit sur l'OU concernée :
+#
+# Nouveau
+#     └── Utilisateur
+#
+# Renseigner :
+#
+# - prénom ;
+# - nom ;
+# - identifiant de connexion ;
+# - mot de passe.
+#
+# Puis activer les options souhaitées.
+
+
+###############################################################################
+# 26. CRÉATION D'UTILISATEURS AVEC POWERSHELL ET CSV
+###############################################################################
+
+# Le fichier utilisé est :
+
+C:\Users\Administrateur\Desktop\users.csv
+
+# Importation :
+
+$fichier = Import-Csv `
+    -Delimiter ";" `
+    -Path "C:\Users\Administrateur\Desktop\users.csv"
+
+
+###############################################################################
+# 27. RÉCUPÉRATION DU NOM DE DOMAINE
+###############################################################################
+
+$domain = (Get-ADDomain).DNSRoot
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 28. CRÉATION DU NOM COMPLET
+###############################################################################
+
+# Dans le script :
+
+$nom_complet = $element.prenom + " " + $element.nom
+
+# Exemple :
+#
+# Prénom : Bob
+# Nom    : Dylan
+#
+# Résultat :
+#
+# Bob Dylan
+
+
+###############################################################################
+# 29. CRÉATION DU LOGIN
+###############################################################################
+
+# Création d'un identifiant avec :
+#
+# première lettre du prénom + "." + nom
+
+$login = $element.prenom.Substring(0,1) + "." + $element.nom
+
+# Exemple :
+#
+# Bob Dylan
+#
+# devient :
+#
+# b.dylan
+
+
+###############################################################################
+# 30. RECHERCHE DE L'OU DE L'UTILISATEUR
+###############################################################################
+
+$OU = Get-ADOrganizationalUnit `
+    -Filter "Name -like '$($element.service)'"
+
+# L'utilisateur sera placé dans l'OU correspondant
+# au service indiqué dans users.csv.
+
+
+###############################################################################
+# 31. CONVERSION DU MOT DE PASSE
+###############################################################################
+
+$pass = ConvertTo-SecureString `
+    -AsPlainText $element.pass `
+    -Force
+
+
+###############################################################################
+# 32. CRÉATION DU COMPTE UTILISATEUR
+###############################################################################
+
+New-ADUser `
+    -Name $nom_complet `
+    -DisplayName $nom_complet `
+    -Surname $element.nom `
+    -GivenName $element.prenom `
+    -AccountPassword $pass `
+    -Path "OU=utilisateurs,$($OU.DistinguishedName)" `
+    -UserPrincipalName ($login + "@" + $domain) `
+    -SamAccountName $login `
+    -Enabled $true `
+    -ChangePasswordAtLogon $true
+
+# Exemple d'UPN :
+#
+# b.dylan@Tarantino.Mega
+
+
+###############################################################################
+# 33. AJOUT DE L'UTILISATEUR DANS SON GROUPE
+###############################################################################
+
+# Ajouter l'utilisateur au groupe global correspondant à son service :
+
+Add-ADGroupMember `
+    -Identity "gg_$($element.service)" `
+    -Members $login
+
+
+###############################################################################
+# 34. VÉRIFICATION DES UTILISATEURS
+###############################################################################
+
+Get-ADUser -Filter *
+
+# Affichage détaillé :
+
+Get-ADUser -Filter * -Properties *
+
+
+###############################################################################
+# 35. VÉRIFICATION DES GROUPES
+###############################################################################
+
+Get-ADGroup -Filter *
+
+# Vérifier les membres d'un groupe :
+
+Get-ADGroupMember `
+    -Identity "gg_NomDuGroupe"
+
+
+###############################################################################
+# 36. VÉRIFICATION DES UNITÉS D'ORGANISATION
+###############################################################################
+
+Get-ADOrganizationalUnit -Filter *
+
+# Affichage du nom et du chemin :
+
+Get-ADOrganizationalUnit -Filter * |
+Select-Object Name, DistinguishedName
+
+
+###############################################################################
+# 37. VÉRIFICATION D'UN UTILISATEUR
+###############################################################################
+
+Get-ADUser `
+    -Identity "b.dylan" `
+    -Properties *
+
+# Vérifier notamment :
+#
+# - Enabled ;
+# - DistinguishedName ;
+# - UserPrincipalName ;
+# - SamAccountName.
+
+
+###############################################################################
+# 38. VÉRIFICATION DE L'APPARTENANCE AUX GROUPES
+###############################################################################
+
+Get-ADPrincipalGroupMembership `
+    -Identity "b.dylan"
+
+# Vérifier que l'utilisateur appartient au groupe
+# correspondant à son service.
+
+
+###############################################################################
+# 39. VÉRIFICATION DE LA SANTÉ DU CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+dcdiag
+
+# Analyse DNS :
+
+dcdiag /test:dns
+
+# Vérifier la réplication si plusieurs contrôleurs
+# de domaine sont présents :
+
+repadmin /replsummary
+
+
+###############################################################################
+# 40. VÉRIFICATION DU SERVICE KERBEROS
+###############################################################################
+
+Get-Service KDC
+
+# Kerberos est utilisé pour l'authentification
+# des utilisateurs et des services du domaine.
+
+
+###############################################################################
+# 41. VÉRIFICATION DU SERVICE LDAP
+###############################################################################
+
+# Active Directory utilise LDAP pour permettre
+# l'accès et la gestion des objets de l'annuaire.
+
+netstat -an | findstr ":389"
+
+# Le port 389 correspond au service LDAP standard.
+
+
+###############################################################################
+# 42. VÉRIFICATION DE LA CONFIGURATION GLOBALE
+###############################################################################
+
+Get-ADDomain
+
+Get-ADForest
+
+Get-ADDomainController
+
+Get-ADOrganizationalUnit -Filter *
+
+Get-ADGroup -Filter *
+
+Get-ADUser -Filter *
+
+
+###############################################################################
+# 43. STRUCTURE LOGIQUE DU LABORATOIRE
+###############################################################################
+
+# Exemple de structure :
+#
+# Tarantino.Mega
+# │
+# ├── OU
+# │   ├── Service-1
+# │   │   ├── utilisateurs
+# │   │   └── ordinateurs
+# │   │
+# │   └── Service-2
+# │       ├── utilisateurs
+# │       └── ordinateurs
+# │
+# ├── Groupes globaux
+# │   ├── gg_Service-1
+# │   └── gg_Service-2
+# │
+# └── Utilisateurs
+#     ├── utilisateur-1
+#     └── utilisateur-2
+#
+# La structure exacte dépend du contenu du fichier OU.csv.
+
+
+###############################################################################
+# 44. FICHIERS ASSOCIÉS AU PROJET
+###############################################################################
+
+# Configuration du domaine :
+#
+# configurations/active-directory/domaine.txt
+#
+# Unités d'organisation :
+#
+# configurations/active-directory/unites-organisation.txt
+#
+# Groupes :
+#
+# configurations/active-directory/groupes-securite.txt
+#
+# Utilisateurs :
+#
+# configurations/active-directory/utilisateurs.txt
+#
+# Script de création des OU et groupes :
+#
+# scripts/powershell/creation-ou-groupes.ps1
+#
+# Script de création des utilisateurs :
+#
+# scripts/powershell/creation-utilisateurs.ps1
+#
+# Données :
+#
+# scripts/csv/OU.csv
+# scripts/csv/users.csv
+
+
+###############################################################################
+# 45. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier dans un dépôt GitHub public :
+#
+# - les mots de passe administrateurs réels ;
+# - les mots de passe des comptes utilisateurs ;
+# - les identifiants sensibles ;
+# - les secrets d'administration.
+#
+# Les fichiers CSV publiés doivent utiliser uniquement
+# des données fictives ou anonymisées.
+
+
+###############################################################################
+# 46. VALIDATION FINALE
+###############################################################################
+
+# Active Directory est correctement configuré si :
+#
+# [ ] Le rôle AD DS est installé.
+#
+# [ ] Le serveur est contrôleur de domaine.
+#
+# [ ] Le domaine Tarantino.Mega existe.
+#
+# [ ] Le nom NetBIOS TARANTINO est correctement configuré.
+#
+# [ ] Le service DNS fonctionne.
+#
+# [ ] Les enregistrements DNS Active Directory sont présents.
+#
+# [ ] Les services NTDS, Netlogon et KDC sont démarrés.
+#
+# [ ] Les outils RSAT permettent d'administrer le domaine.
+#
+# [ ] Les unités d'organisation sont créées.
+#
+# [ ] Les groupes globaux sont créés.
+#
+# [ ] Les utilisateurs sont créés dans les bonnes OU.
+#
+# [ ] Les utilisateurs appartiennent aux groupes correspondant
+#     à leurs services.
+#
+# [ ] Les scripts PowerShell permettent d'automatiser
+#     la création des objets Active Directory.
+#
+# [ ] Le contrôleur de domaine ne présente aucune erreur critique.
+#
+# [ ] L'infrastructure Active Directory est opérationnelle.
+###############################################################################

@@ -1,0 +1,642 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration du serveur DHCP
+#
+# Environnement :
+# - Windows Server 2022 Core
+# - PowerShell
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Serveur DHCP / DNS / AD DS :
+# - 192.168.11.250
+#
+# Passerelle :
+# - 192.168.11.254
+#
+# Domaine :
+# - Tarantino.Mega
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DU RÔLE DHCP
+###############################################################################
+
+# Vérifier que le rôle DHCP est installé :
+
+Get-WindowsFeature DHCP
+
+# Vérifier l'état du service DHCP :
+
+Get-Service DHCPServer
+
+
+###############################################################################
+# 2. DÉMARRAGE DU SERVICE DHCP
+###############################################################################
+
+Start-Service DHCPServer
+
+# Configurer le démarrage automatique :
+
+Set-Service DHCPServer -StartupType Automatic
+
+# Vérification :
+
+Get-Service DHCPServer
+
+
+###############################################################################
+# 3. AFFICHAGE DES COMMANDES DHCP DISPONIBLES
+###############################################################################
+
+Get-Command *DhcpServer*
+
+
+###############################################################################
+# 4. CRÉATION DE L'ÉTENDUE DHCP
+###############################################################################
+
+# Création d'une nouvelle étendue IPv4 appelée "Etendue".
+
+# Dans le laboratoire, le réseau utilisé est :
+
+# 192.168.11.0/24
+
+# Adapter StartRange et EndRange à la plage définie
+# dans votre environnement.
+
+Add-DhcpServerv4Scope `
+    -Name "Etendue" `
+    -StartRange 192.168.11.1 `
+    -EndRange 192.168.11.100 `
+    -SubnetMask 255.255.255.0
+
+
+###############################################################################
+# 5. VÉRIFICATION DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# Vérifier :
+#
+# - ScopeId ;
+# - nom de l'étendue ;
+# - plage d'adresses ;
+# - masque ;
+# - état.
+
+
+###############################################################################
+# 6. CONFIGURATION DE LA PASSERELLE
+###############################################################################
+
+# Option DHCP 3 :
+# Routeur / passerelle par défaut.
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 3 `
+    -Value 192.168.11.254 `
+    -Force
+
+
+###############################################################################
+# 7. CONFIGURATION DU SERVEUR DNS
+###############################################################################
+
+# Option DHCP 6 :
+# Serveur DNS.
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 6 `
+    -Value 192.168.11.250 `
+    -Force
+
+
+###############################################################################
+# 8. CONFIGURATION DU NOM DE DOMAINE
+###############################################################################
+
+# Option DHCP 15 :
+# Nom de domaine DNS.
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 15 `
+    -Value "Tarantino.Mega" `
+    -Force
+
+
+###############################################################################
+# 9. VÉRIFICATION DES OPTIONS DHCP
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+# Résultats attendus :
+#
+# Option 003 :
+# 192.168.11.254
+#
+# Option 006 :
+# 192.168.11.250
+#
+# Option 015 :
+# Tarantino.Mega
+
+
+###############################################################################
+# 10. ACTIVATION DE L'ÉTENDUE
+###############################################################################
+
+Set-DhcpServerv4Scope `
+    -ScopeId 192.168.11.0 `
+    -State Active
+
+
+###############################################################################
+# 11. VÉRIFICATION DE L'ÉTAT DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# L'état doit être :
+
+Active
+
+
+###############################################################################
+# 12. VÉRIFICATION DU SERVICE DHCP
+###############################################################################
+
+Get-Service DHCPServer
+
+# Vérifier les ports UDP utilisés :
+
+netstat -an -p udp
+
+# Le serveur DHCP utilise notamment :
+#
+# UDP 67 : serveur DHCP
+# UDP 68 : client DHCP
+
+
+###############################################################################
+# 13. TEST SUR UN POSTE CLIENT
+###############################################################################
+
+# Depuis le poste Windows client :
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier la configuration reçue :
+
+ipconfig /all
+
+# Le client doit recevoir :
+#
+# - une adresse IPv4 de l'étendue DHCP ;
+# - le masque 255.255.255.0 ;
+# - la passerelle 192.168.11.254 ;
+# - le serveur DNS 192.168.11.250 ;
+# - le suffixe DNS Tarantino.Mega.
+
+
+###############################################################################
+# 14. CONSULTATION DES BAUX DHCP
+###############################################################################
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Cette commande permet de visualiser les machines
+# ayant obtenu une adresse depuis le serveur DHCP.
+
+
+###############################################################################
+# 15. INSTALLATION DES OUTILS RSAT SUR LE POSTE CLIENT
+###############################################################################
+
+# Les outils RSAT permettent d'administrer graphiquement
+# le serveur DHCP depuis un poste Windows.
+
+Get-WindowsCapability -Name RSAT* -Online |
+Add-WindowsCapability -Online
+
+# Ouvrir ensuite la console DHCP :
+
+dhcpmgmt.msc
+
+
+###############################################################################
+# 16. CRÉATION D'UNE CLASSE UTILISATEUR
+###############################################################################
+
+# Depuis la console DHCP :
+#
+# IPv4
+#     └── Clic droit
+#         └── Définir les classes des utilisateurs
+#
+# Cliquer sur :
+#
+# Ajouter
+#
+# Créer la classe :
+#
+# Nom complet :
+# salle-1
+#
+# Valeur ASCII :
+# salle-1
+
+
+###############################################################################
+# 17. CRÉATION DE LA CLASSE SALLE-2
+###############################################################################
+
+# Reproduire la même procédure pour :
+
+salle-2
+
+# Les deux classes présentes dans le laboratoire sont :
+#
+# salle-1
+# salle-2
+
+
+###############################################################################
+# 18. VÉRIFICATION DES CLASSES DHCP
+###############################################################################
+
+# Depuis la console DHCP :
+#
+# IPv4
+#     └── Définir les classes des utilisateurs
+#
+# Vérifier la présence de :
+#
+# - salle-1 ;
+# - salle-2.
+
+
+###############################################################################
+# 19. CRÉATION D'UNE STRATÉGIE DHCP POUR SALLE-1
+###############################################################################
+
+# Depuis la console DHCP :
+#
+# IPv4
+#     └── Etendue
+#         └── Stratégies
+#
+# Faire un clic droit :
+#
+# Nouvelle stratégie
+#
+# Nom :
+#
+# Salle-1
+
+
+###############################################################################
+# 20. CONFIGURATION DE LA CONDITION SALLE-1
+###############################################################################
+
+# Critère :
+
+Classe d'utilisateur
+
+# Opérateur :
+
+Est égal à
+
+# Valeur :
+
+salle-1
+
+
+###############################################################################
+# 21. CONFIGURATION DE LA PLAGE SALLE-1
+###############################################################################
+
+# Dans le laboratoire, la stratégie salle-1 utilise
+# une plage spécifique de l'étendue.
+
+# Exemple présenté :
+
+Adresse de début :
+192.168.11.1
+
+Adresse de fin :
+192.168.11.50
+
+
+###############################################################################
+# 22. OPTIONS DHCP DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Option 003 - Routeur :
+
+192.168.11.254
+
+# Option 006 - Serveurs DNS :
+
+192.168.11.250
+
+# Un serveur DNS secondaire peut également être configuré :
+
+8.8.8.8
+
+# Option 015 - Nom de domaine DNS :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 23. CRÉATION DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Reproduire la procédure utilisée pour salle-1.
+#
+# Condition :
+#
+# Classe d'utilisateur
+# Est égal à
+# salle-2
+#
+# Définir ensuite la plage d'adresses correspondant
+# à cette stratégie.
+
+
+###############################################################################
+# 24. VÉRIFICATION DES STRATÉGIES DHCP
+###############################################################################
+
+# Depuis la console DHCP :
+#
+# IPv4
+#     └── Etendue
+#         └── Stratégies
+#
+# Vérifier la présence :
+#
+# Salle-1
+# Salle-2
+
+
+###############################################################################
+# 25. ATTRIBUTION DE LA CLASSE SALLE-1 À UN CLIENT
+###############################################################################
+
+# Sur le poste client Windows :
+
+ipconfig /setclassid Ethernet salle-1
+
+# Cette commande affecte la classe utilisateur
+# salle-1 à l'interface réseau Ethernet.
+
+
+###############################################################################
+# 26. RENOUVELLEMENT DE LA CONFIGURATION DHCP
+###############################################################################
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier :
+
+ipconfig /all
+
+# Le client doit recevoir les paramètres associés
+# à la stratégie salle-1.
+
+
+###############################################################################
+# 27. ATTRIBUTION DE LA CLASSE SALLE-2 À UN CLIENT
+###############################################################################
+
+ipconfig /setclassid Ethernet salle-2
+
+# Renouveler ensuite le bail :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 28. SUPPRESSION DE LA CLASSE UTILISATEUR DU CLIENT
+###############################################################################
+
+# Pour retirer une classe utilisateur :
+
+ipconfig /setclassid Ethernet
+
+# Renouveler ensuite :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 29. AUTORISATION DU SERVEUR DHCP DANS ACTIVE DIRECTORY
+###############################################################################
+
+# Après l'installation d'Active Directory,
+# le serveur DHCP doit être autorisé dans le domaine.
+
+Add-DhcpServerInDC `
+    -DnsName "Tarantino.Mega" `
+    -IPAddress 192.168.11.250
+
+
+###############################################################################
+# 30. VÉRIFICATION DE L'AUTORISATION DHCP
+###############################################################################
+
+Get-DhcpServerInDC
+
+# Le serveur DHCP 192.168.11.250 doit apparaître
+# comme serveur autorisé.
+
+
+###############################################################################
+# 31. CONFIGURATION DES IDENTIFIANTS DHCP/DNS
+###############################################################################
+
+# Afin de permettre les mises à jour DNS dynamiques
+# réalisées par le serveur DHCP :
+
+Set-DhcpServerDnsCredential
+
+# Une fenêtre d'authentification est ouverte.
+#
+# Utiliser un compte autorisé du domaine.
+#
+# Ne jamais publier le mot de passe réel dans GitHub.
+
+
+###############################################################################
+# 32. VÉRIFICATION DES IDENTIFIANTS DHCP/DNS
+###############################################################################
+
+Get-DhcpServerDnsCredential
+
+
+###############################################################################
+# 33. VÉRIFICATION DES MISES À JOUR DNS
+###############################################################################
+
+# Vérifier les paramètres DNS du serveur DHCP :
+
+Get-DhcpServerv4DnsSetting
+
+# Vérifier les paramètres de l'étendue :
+
+Get-DhcpServerv4DnsSetting `
+    -ScopeId 192.168.11.0
+
+
+###############################################################################
+# 34. SYNCHRONISATION DU DNS
+###############################################################################
+
+# Sur le serveur DNS :
+
+Sync-DnsServerZone `
+    -Name "Tarantino.Mega" `
+    -PassThru
+
+
+###############################################################################
+# 35. TEST DE L'INTÉGRATION DHCP / DNS
+###############################################################################
+
+# Depuis un poste client :
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier ensuite sur le serveur DHCP :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Puis sur le serveur DNS :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier que les machines clientes sont correctement
+# enregistrées dans le DNS lorsque les mises à jour
+# dynamiques sont activées.
+
+
+###############################################################################
+# 36. VÉRIFICATION DU CLIENT
+###############################################################################
+
+# Sur le poste Windows client :
+
+ipconfig /all
+
+# Vérifier notamment :
+#
+# [ ] DHCP activé.
+#
+# [ ] Adresse IPv4 attribuée.
+#
+# [ ] Passerelle : 192.168.11.254.
+#
+# [ ] Serveur DHCP : 192.168.11.250.
+#
+# [ ] Serveur DNS : 192.168.11.250.
+#
+# [ ] Suffixe DNS : Tarantino.Mega.
+
+
+###############################################################################
+# 37. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier le service DHCP :
+
+Get-Service DHCPServer
+
+# Redémarrer le service :
+
+Restart-Service DHCPServer
+
+# Afficher les étendues :
+
+Get-DhcpServerv4Scope
+
+# Afficher les baux :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Afficher les options :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+# Vérifier les serveurs DHCP autorisés :
+
+Get-DhcpServerInDC
+
+# Vérifier la configuration réseau :
+
+ipconfig /all
+
+
+###############################################################################
+# 38. VALIDATION FINALE
+###############################################################################
+
+# Le serveur DHCP est correctement configuré si :
+#
+# [ ] Le rôle DHCP est installé.
+#
+# [ ] Le service DHCPServer est démarré.
+#
+# [ ] L'étendue 192.168.11.0/24 existe.
+#
+# [ ] L'étendue est active.
+#
+# [ ] Les clients reçoivent une adresse IPv4.
+#
+# [ ] La passerelle distribuée est 192.168.11.254.
+#
+# [ ] Le serveur DNS distribué est 192.168.11.250.
+#
+# [ ] Le suffixe DNS distribué est Tarantino.Mega.
+#
+# [ ] Les classes salle-1 et salle-2 existent.
+#
+# [ ] Les stratégies salle-1 et salle-2 fonctionnent.
+#
+# [ ] Les clients peuvent utiliser ipconfig /setclassid.
+#
+# [ ] Le serveur DHCP est autorisé dans Active Directory.
+#
+# [ ] L'intégration DHCP / DNS fonctionne.
+#
+# [ ] Les baux DHCP sont visibles sur le serveur.
+#
+# [ ] Les clients reçoivent correctement leur configuration réseau.
+#
+# [ ] Le service DHCP est opérationnel.
+###############################################################################
