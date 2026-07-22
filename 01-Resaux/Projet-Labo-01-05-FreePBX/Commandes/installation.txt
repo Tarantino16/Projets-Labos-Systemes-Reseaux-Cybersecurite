@@ -1,0 +1,592 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Installation du laboratoire FreePBX
+#
+# Environnement :
+# - FreePBX 15
+# - Asterisk 16
+# - VirtualBox
+#
+# Objectif :
+# Déployer un serveur de téléphonie IP FreePBX/Asterisk
+# et configurer plusieurs softphones pour réaliser
+# des communications internes.
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉPARATION DU LABORATOIRE
+###############################################################################
+
+# Le laboratoire nécessite :
+#
+# - une machine virtuelle FreePBX ;
+# - un poste pour le Standard ;
+# - un poste pour Bob ;
+# - un poste pour Alice ;
+# - plusieurs softphones.
+#
+# Extensions prévues :
+#
+# 100 - Standard
+# 101 - Bob
+# 102 - Alice
+#
+# Ring Group :
+#
+# 6000
+#
+# Membres :
+#
+# 101 - Bob
+# 102 - Alice
+
+
+###############################################################################
+# 2. CRÉATION DE LA MACHINE VIRTUELLE
+###############################################################################
+
+# Créer une nouvelle machine virtuelle dans VirtualBox.
+#
+# Paramètres utilisés pour le laboratoire :
+#
+# Mémoire RAM :
+# 2048 Mo
+#
+# Disque dur :
+# 10 Go
+#
+# Carte réseau :
+# Mode pont (Bridged Adapter)
+#
+# Monter ensuite l'image ISO de FreePBX
+# sur le lecteur optique virtuel.
+
+
+###############################################################################
+# 3. DÉMARRAGE DE L'INSTALLATION
+###############################################################################
+
+# Démarrer la machine virtuelle.
+#
+# L'installation de FreePBX démarre depuis l'image ISO.
+#
+# Suivre les différentes étapes proposées par
+# l'assistant d'installation.
+
+
+###############################################################################
+# 4. INSTALLATION DE FREEPBX
+###############################################################################
+
+# Installer :
+#
+# FreePBX 15
+#
+# avec :
+#
+# Asterisk 16
+#
+# Suivre les instructions affichées à l'écran
+# jusqu'à la fin de l'installation.
+
+
+###############################################################################
+# 5. CONFIGURATION DU MOT DE PASSE ROOT
+###############################################################################
+
+# Durant l'installation, définir le mot de passe
+# du compte administrateur root.
+#
+# Conserver ce mot de passe dans un emplacement sécurisé.
+#
+# Ne jamais publier de mot de passe réel dans le dépôt GitHub.
+
+
+###############################################################################
+# 6. FIN DE L'INSTALLATION
+###############################################################################
+
+# Une fois l'installation terminée :
+#
+# - redémarrer la machine virtuelle ;
+# - retirer l'image ISO du lecteur virtuel si nécessaire ;
+# - démarrer le système installé.
+
+
+###############################################################################
+# 7. CONNEXION AU SERVEUR
+###############################################################################
+
+# Se connecter au serveur avec le compte administrateur :
+#
+# Utilisateur :
+#
+# root
+#
+# Mot de passe :
+#
+# MOT-DE-PASSE-ROOT
+
+
+###############################################################################
+# 8. IDENTIFICATION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+# Afficher les interfaces réseau :
+
+ip address
+
+# ou :
+
+ip addr
+
+# Afficher les interfaces disponibles :
+
+ip link
+
+# Identifier l'interface réseau utilisée par FreePBX.
+#
+# Dans le laboratoire, l'interface peut apparaître sous le nom :
+#
+# eth0
+#
+# Vérifier systématiquement le nom réel avant
+# de modifier la configuration réseau.
+
+
+###############################################################################
+# 9. CONFIGURATION RÉSEAU
+###############################################################################
+
+# Modifier le fichier de configuration réseau :
+
+nano /etc/sysconfig/network-scripts/ifcfg-eth0
+
+# Utiliser la configuration présente dans :
+#
+# configurations/freepbx/ifcfg-eth0
+#
+# Configurer notamment :
+#
+# - l'adresse IPv4 statique ;
+# - le masque de sous-réseau ;
+# - la passerelle ;
+# - le serveur DNS.
+
+
+###############################################################################
+# 10. REDÉMARRAGE DU RÉSEAU
+###############################################################################
+
+# Appliquer la nouvelle configuration :
+
+systemctl restart network
+
+# Vérifier l'adresse IP :
+
+ip address
+
+# Vérifier la table de routage :
+
+ip route
+
+# Afficher rapidement l'adresse du serveur :
+
+hostname -I
+
+
+###############################################################################
+# 11. TEST DE LA CONNECTIVITÉ
+###############################################################################
+
+# Tester la passerelle :
+
+ping -c 4 ADRESSE-PASSERELLE
+
+# Tester une adresse IP externe :
+
+ping -c 4 8.8.8.8
+
+# Tester la résolution DNS :
+
+ping -c 4 google.com
+
+
+###############################################################################
+# 12. ACCÈS DISTANT EN SSH
+###############################################################################
+
+# Depuis un poste client, se connecter au serveur :
+
+ssh root@ADRESSE-IP-FREEPBX
+
+# Vérifier que l'administration distante fonctionne.
+
+
+###############################################################################
+# 13. ACCÈS À L'INTERFACE WEB
+###############################################################################
+
+# Depuis un ordinateur situé sur le même réseau,
+# ouvrir un navigateur Web.
+#
+# Saisir l'adresse IP du serveur :
+#
+# http://ADRESSE-IP-FREEPBX
+#
+# L'assistant de configuration initiale de FreePBX
+# doit apparaître.
+
+
+###############################################################################
+# 14. CRÉATION DU COMPTE ADMINISTRATEUR FREEPBX
+###############################################################################
+
+# Lors du premier accès à l'interface Web :
+#
+# créer le compte administrateur FreePBX.
+#
+# Définir :
+#
+# - le nom d'utilisateur administrateur ;
+# - le mot de passe administrateur ;
+# - les informations demandées par l'assistant.
+#
+# Ne jamais publier les identifiants réels
+# dans le dépôt GitHub.
+
+
+###############################################################################
+# 15. ACCÈS À L'ADMINISTRATION FREEPBX
+###############################################################################
+
+# Après la configuration initiale :
+#
+# accéder à :
+#
+# FreePBX Administration
+#
+# Se connecter avec le compte administrateur
+# précédemment créé.
+
+
+###############################################################################
+# 16. VÉRIFICATION DE FREEPBX ET ASTERISK
+###############################################################################
+
+# Depuis le terminal du serveur :
+
+fwconsole status
+
+# Vérifier Asterisk :
+
+asterisk -rvvv
+
+# Dans la console Asterisk :
+
+core show version
+
+core show uptime
+
+# Quitter :
+
+exit
+
+
+###############################################################################
+# 17. VÉRIFICATION DES SERVICES RÉSEAU
+###############################################################################
+
+# Afficher les ports en écoute :
+
+ss -lntup
+
+# Vérifier les services nécessaires au fonctionnement
+# du serveur FreePBX.
+
+
+###############################################################################
+# 18. CRÉATION DES EXTENSIONS
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Extensions
+#
+# Créer les extensions suivantes :
+#
+# 100 - Standard
+# 101 - Bob
+# 102 - Alice
+#
+# Définir pour chaque extension :
+#
+# - le numéro d'extension ;
+# - le nom d'affichage ;
+# - le mot de passe SIP/PJSIP.
+#
+# Après chaque configuration :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 19. INSTALLATION DES SOFTPHONES
+###############################################################################
+
+# Installer les softphones utilisés pour le laboratoire
+# sur les différents postes clients.
+#
+# Les logiciels utilisés peuvent notamment être :
+#
+# - 3CXPhone ;
+# - Zoiper.
+#
+# Chaque poste doit pouvoir communiquer avec
+# le serveur FreePBX sur le réseau.
+
+
+###############################################################################
+# 20. CONFIGURATION DES SOFTPHONES
+###############################################################################
+
+# Configurer chaque softphone avec :
+#
+# Serveur :
+# ADRESSE-IP-FREEPBX
+#
+# Utilisateur :
+# NUMERO-EXTENSION
+#
+# Auth ID :
+# NUMERO-EXTENSION
+#
+# Mot de passe :
+# MOT-DE-PASSE-SIP
+
+
+# Standard :
+#
+# Extension : 100
+
+
+# Bob :
+#
+# Extension : 101
+
+
+# Alice :
+#
+# Extension : 102
+
+
+###############################################################################
+# 21. CONFIGURATION DU CODEC
+###############################################################################
+
+# Vérifier les codecs disponibles sur les softphones.
+#
+# Codec utilisé dans le laboratoire :
+#
+# PCMA / G.711A
+#
+# Activer ce codec dans les paramètres audio
+# des softphones.
+
+
+###############################################################################
+# 22. VÉRIFICATION DE L'ENREGISTREMENT DES SOFTPHONES
+###############################################################################
+
+# Depuis le serveur FreePBX :
+
+asterisk -rx "pjsip show endpoints"
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier la présence des extensions :
+#
+# 100
+# 101
+# 102
+
+
+###############################################################################
+# 23. PREMIERS TESTS D'APPELS
+###############################################################################
+
+# Depuis Bob (101), appeler :
+
+102
+
+# Alice doit recevoir l'appel.
+
+
+# Depuis Alice (102), appeler :
+
+101
+
+# Bob doit recevoir l'appel.
+
+
+# Vérifier :
+#
+# - la sonnerie ;
+# - l'établissement de l'appel ;
+# - la communication audio dans les deux sens.
+
+
+###############################################################################
+# 24. CONFIGURATION DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis :
+#
+# Applications
+#     └── Extensions
+#
+# Sélectionner l'extension concernée.
+#
+# Activer la messagerie vocale.
+#
+# Définir :
+#
+# - le mot de passe de messagerie ;
+# - les paramètres de la boîte vocale ;
+# - le comportement en cas de non-réponse.
+#
+# Appliquer la configuration.
+
+
+###############################################################################
+# 25. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis un softphone :
+#
+# Composer :
+
+*97
+
+# Vérifier l'accès à la boîte vocale.
+
+
+###############################################################################
+# 26. CRÉATION DU RING GROUP
+###############################################################################
+
+# Depuis :
+#
+# Applications
+#     └── Ring Groups
+#
+# Créer le groupe :
+#
+# Ring Group Number :
+# 6000
+#
+# Ring Strategy :
+# ringall
+#
+# Membres :
+#
+# 101
+# 102
+#
+# Appliquer la configuration.
+
+
+###############################################################################
+# 27. TEST DU RING GROUP
+###############################################################################
+
+# Depuis le Standard (100), composer :
+
+6000
+
+# Vérifier que :
+#
+# - Bob (101) sonne ;
+# - Alice (102) sonne ;
+# - les deux extensions sonnent simultanément ;
+# - le premier utilisateur qui décroche récupère l'appel.
+
+
+###############################################################################
+# 28. VÉRIFICATION FINALE DES SERVICES
+###############################################################################
+
+fwconsole status
+
+asterisk -rx "core show version"
+
+asterisk -rx "pjsip show endpoints"
+
+asterisk -rx "pjsip show contacts"
+
+asterisk -rx "core show channels"
+
+
+###############################################################################
+# 29. FICHIERS DU PROJET À CONSULTER
+###############################################################################
+
+# Configuration du serveur FreePBX :
+#
+# commandes/configuration-freepbx.txt
+#
+# Configuration réseau :
+#
+# commandes/configuration-reseau.txt
+#
+# Configuration des softphones :
+#
+# commandes/configuration-softphones.txt
+#
+# Vérification finale :
+#
+# commandes/verification.txt
+
+
+###############################################################################
+# 30. VALIDATION DE L'INSTALLATION
+###############################################################################
+
+# L'installation du laboratoire est terminée lorsque :
+#
+# [ ] La machine virtuelle FreePBX démarre correctement.
+#
+# [ ] FreePBX 15 et Asterisk 16 sont opérationnels.
+#
+# [ ] Le serveur possède une adresse IPv4 statique.
+#
+# [ ] Le serveur est accessible depuis le réseau.
+#
+# [ ] L'interface Web FreePBX est accessible.
+#
+# [ ] L'administration distante en SSH fonctionne.
+#
+# [ ] Les extensions 100, 101 et 102 sont créées.
+#
+# [ ] Les softphones sont installés et configurés.
+#
+# [ ] Les extensions sont enregistrées auprès de FreePBX.
+#
+# [ ] Les appels internes fonctionnent.
+#
+# [ ] La communication audio fonctionne dans les deux sens.
+#
+# [ ] La messagerie vocale est opérationnelle.
+#
+# [ ] Le Ring Group 6000 fonctionne.
+#
+# [ ] Bob et Alice sonnent simultanément lors d'un appel vers 6000.
+#
+# [ ] L'infrastructure VoIP est opérationnelle.
+###############################################################################

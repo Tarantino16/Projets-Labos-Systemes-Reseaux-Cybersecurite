@@ -1,0 +1,572 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration du serveur FreePBX
+#
+# Environnement :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Extensions :
+# - 100 : Standard
+# - 101 : Bob
+# - 102 : Alice
+#
+# Ring Group :
+# - 6000
+# - Membres : 101 et 102
+###############################################################################
+
+
+###############################################################################
+# 1. ACCÈS À L'INTERFACE WEB FREEPBX
+###############################################################################
+
+# Vérifier l'adresse IP du serveur FreePBX :
+
+ip address
+
+# Depuis un poste client, ouvrir un navigateur Web et saisir
+# l'adresse IP du serveur FreePBX.
+
+# Exemple :
+#
+# http://ADRESSE-IP-FREEPBX
+#
+# Se connecter ensuite avec le compte administrateur créé
+# lors de la configuration initiale.
+
+
+###############################################################################
+# 2. VÉRIFICATION DU SERVEUR
+###############################################################################
+
+# Vérifier l'état d'Asterisk :
+
+asterisk -rvvv
+
+# Une fois dans la console Asterisk :
+
+core show version
+core show uptime
+
+# Quitter la console :
+
+exit
+
+
+###############################################################################
+# 3. CRÉATION DE L'EXTENSION 100 - STANDARD
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Extensions
+#
+# Créer une nouvelle extension SIP/PJSIP.
+#
+# Configuration :
+#
+# User Extension : 100
+# Display Name    : Standard
+#
+# Définir un mot de passe SIP pour l'authentification du softphone.
+#
+# Enregistrer la configuration.
+#
+# Cliquer ensuite sur :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 4. CRÉATION DE L'EXTENSION 101 - BOB
+###############################################################################
+
+# Depuis :
+#
+# Applications
+#     └── Extensions
+#
+# Créer une nouvelle extension SIP/PJSIP.
+#
+# Configuration :
+#
+# User Extension : 101
+# Display Name    : Bob
+#
+# Définir un mot de passe SIP.
+#
+# Enregistrer avec :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 5. CRÉATION DE L'EXTENSION 102 - ALICE
+###############################################################################
+
+# Depuis :
+#
+# Applications
+#     └── Extensions
+#
+# Créer une nouvelle extension SIP/PJSIP.
+#
+# Configuration :
+#
+# User Extension : 102
+# Display Name    : Alice
+#
+# Définir un mot de passe SIP.
+#
+# Enregistrer avec :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 6. RÉCAPITULATIF DES EXTENSIONS
+###############################################################################
+
+# Extension 100
+# Nom : Standard
+#
+# Extension 101
+# Nom : Bob
+#
+# Extension 102
+# Nom : Alice
+
+
+###############################################################################
+# 7. CONFIGURATION DES SOFTPHONES
+###############################################################################
+
+# Configurer chaque softphone avec les informations de son extension.
+#
+# Paramètres nécessaires :
+#
+# Serveur / Domaine :
+# Adresse IP du serveur FreePBX
+#
+# Nom d'utilisateur :
+# Numéro de l'extension
+#
+# Mot de passe :
+# Mot de passe SIP défini dans FreePBX
+
+
+# Exemple pour Standard :
+#
+# Extension       : 100
+# Nom utilisateur : 100
+# Serveur         : ADRESSE-IP-FREEPBX
+# Mot de passe    : MOT-DE-PASSE-SIP
+
+
+# Exemple pour Bob :
+#
+# Extension       : 101
+# Nom utilisateur : 101
+# Serveur         : ADRESSE-IP-FREEPBX
+# Mot de passe    : MOT-DE-PASSE-SIP
+
+
+# Exemple pour Alice :
+#
+# Extension       : 102
+# Nom utilisateur : 102
+# Serveur         : ADRESSE-IP-FREEPBX
+# Mot de passe    : MOT-DE-PASSE-SIP
+
+
+###############################################################################
+# 8. CONFIGURATION DU CODEC
+###############################################################################
+
+# Dans la configuration des softphones, vérifier l'activation
+# du codec utilisé dans le laboratoire.
+#
+# Codec :
+#
+# PCMA / G.711A
+#
+# Vérifier que le codec est disponible et activé sur les postes.
+
+
+###############################################################################
+# 9. VÉRIFICATION DES EXTENSIONS PJSIP
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Afficher les endpoints PJSIP :
+
+pjsip show endpoints
+
+# Afficher les contacts enregistrés :
+
+pjsip show contacts
+
+# Vérifier une extension spécifique :
+
+pjsip show endpoint 100
+
+pjsip show endpoint 101
+
+pjsip show endpoint 102
+
+
+###############################################################################
+# 10. TEST DES APPELS INTERNES
+###############################################################################
+
+# Test 1 :
+#
+# Depuis l'extension 101 (Bob)
+# appeler l'extension 102 (Alice).
+
+
+# Test 2 :
+#
+# Depuis l'extension 102 (Alice)
+# appeler l'extension 101 (Bob).
+
+
+# Test 3 :
+#
+# Depuis l'extension 100 (Standard)
+# appeler l'extension 101 (Bob).
+
+
+# Vérifier :
+#
+# - la sonnerie du poste appelé ;
+# - l'affichage du numéro ou du nom de l'appelant ;
+# - l'établissement de la communication ;
+# - la transmission de la voix dans les deux sens.
+
+
+###############################################################################
+# 11. CONFIGURATION DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Extensions
+#
+# Sélectionner l'extension concernée.
+#
+# Accéder aux paramètres de messagerie vocale.
+#
+# Activer :
+#
+# Voicemail : Yes
+#
+# Configurer :
+#
+# - le mot de passe de la messagerie vocale ;
+# - les paramètres de la boîte vocale ;
+# - le message en cas de non-réponse.
+#
+# Enregistrer :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 12. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis le softphone de l'utilisateur :
+#
+# Composer :
+#
+# *97
+#
+# Suivre ensuite les instructions vocales pour accéder
+# à la messagerie.
+
+
+###############################################################################
+# 13. CRÉATION DU RING GROUP
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Ring Groups
+#
+# Créer un nouveau groupe d'appel.
+#
+# Configuration :
+#
+# Ring Group Number : 6000
+#
+# Ring Strategy :
+#
+# ringall
+#
+# Extensions membres :
+#
+# 101
+# 102
+#
+# Le groupe doit faire sonner simultanément :
+#
+# - Bob (101)
+# - Alice (102)
+
+
+###############################################################################
+# 14. CONFIGURATION DU DESTINATION IF NO ANSWER
+###############################################################################
+
+# Configurer l'action à effectuer lorsqu'aucun membre
+# du Ring Group ne répond.
+#
+# La destination dépend de la configuration réalisée
+# dans le laboratoire.
+#
+# Exemple :
+#
+# - messagerie vocale ;
+# - extension ;
+# - autre destination disponible dans FreePBX.
+#
+# Enregistrer ensuite :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 15. TEST DU RING GROUP
+###############################################################################
+
+# Depuis l'extension 100 (Standard) :
+#
+# Composer :
+#
+# 6000
+#
+# Vérifier que :
+#
+# - l'extension 101 sonne ;
+# - l'extension 102 sonne ;
+# - les deux extensions sonnent simultanément ;
+# - le premier utilisateur qui décroche prend l'appel.
+
+
+###############################################################################
+# 16. VÉRIFICATION DU RING GROUP
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Afficher le dialplan correspondant au numéro 6000 :
+
+dialplan show 6000
+
+# Observer la console pendant un appel pour vérifier
+# le traitement de l'appel par Asterisk.
+
+
+###############################################################################
+# 17. VÉRIFICATION DES PORTS
+###############################################################################
+
+# Afficher les ports en écoute :
+
+ss -lntup
+
+# Vérifier notamment les services utilisés par FreePBX
+# et Asterisk.
+
+# SIP/PJSIP utilise généralement le port 5060 selon
+# la configuration du serveur.
+
+ss -lntup | grep 5060
+
+
+###############################################################################
+# 18. VÉRIFICATION DES COMMUNICATIONS RTP
+###############################################################################
+
+# Depuis la console Asterisk :
+
+asterisk -rvvv
+
+# Activer temporairement le débogage RTP :
+
+rtp set debug on
+
+# Effectuer un appel entre deux extensions.
+
+# Observer les échanges RTP.
+
+# Désactiver ensuite le débogage :
+
+rtp set debug off
+
+
+###############################################################################
+# 19. VÉRIFICATION DES COMMUNICATIONS PJSIP
+###############################################################################
+
+# Depuis la console Asterisk :
+
+pjsip set logger on
+
+# Effectuer un appel entre deux extensions.
+
+# Observer les messages de signalisation SIP/PJSIP.
+
+# Désactiver ensuite le logger :
+
+pjsip set logger off
+
+
+###############################################################################
+# 20. VÉRIFICATION GÉNÉRALE
+###############################################################################
+
+# Vérifier les extensions :
+
+pjsip show endpoints
+
+# Vérifier les softphones enregistrés :
+
+pjsip show contacts
+
+# Vérifier l'état général d'Asterisk :
+
+core show uptime
+
+# Vérifier les canaux actifs :
+
+core show channels
+
+# Vérifier les appels actifs :
+
+core show channels verbose
+
+
+###############################################################################
+# 21. RECHARGEMENT DE LA CONFIGURATION
+###############################################################################
+
+# Depuis l'interface Web :
+#
+# Utiliser le bouton :
+#
+# Apply Config
+#
+# afin d'appliquer les modifications réalisées.
+
+
+###############################################################################
+# 22. REDÉMARRAGE D'ASTERISK
+###############################################################################
+
+# À utiliser uniquement si nécessaire :
+
+fwconsole restart
+
+# Vérifier ensuite :
+
+fwconsole status
+
+
+###############################################################################
+# 23. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier l'état de FreePBX :
+
+fwconsole status
+
+# Vérifier les extensions :
+
+asterisk -rx "pjsip show endpoints"
+
+# Vérifier les contacts :
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier une extension :
+
+asterisk -rx "pjsip show endpoint 101"
+
+# Vérifier les canaux actifs :
+
+asterisk -rx "core show channels"
+
+# Redémarrer les services FreePBX :
+
+fwconsole restart
+
+
+###############################################################################
+# 24. VALIDATION FINALE
+###############################################################################
+
+# Le serveur FreePBX est correctement configuré si :
+#
+# [ ] L'interface Web FreePBX est accessible.
+#
+# [ ] Asterisk fonctionne correctement.
+#
+# [ ] L'extension 100 - Standard est créée.
+#
+# [ ] L'extension 101 - Bob est créée.
+#
+# [ ] L'extension 102 - Alice est créée.
+#
+# [ ] Les trois softphones sont enregistrés auprès de FreePBX.
+#
+# [ ] Bob peut appeler Alice.
+#
+# [ ] Alice peut appeler Bob.
+#
+# [ ] Standard peut appeler les autres extensions.
+#
+# [ ] La communication audio fonctionne dans les deux sens.
+#
+# [ ] La messagerie vocale fonctionne.
+#
+# [ ] La messagerie est accessible avec *97.
+#
+# [ ] Le Ring Group 6000 est configuré.
+#
+# [ ] Un appel vers 6000 fait sonner Bob et Alice simultanément.
+#
+# [ ] Le premier utilisateur qui décroche récupère l'appel.
+#
+# [ ] L'infrastructure VoIP fonctionne correctement.
+###############################################################################

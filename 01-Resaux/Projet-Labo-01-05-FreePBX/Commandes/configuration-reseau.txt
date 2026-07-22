@@ -1,0 +1,455 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration réseau du serveur FreePBX
+#
+# Environnement :
+# - FreePBX 15
+# - Asterisk 16
+# - Machine virtuelle
+###############################################################################
+
+
+###############################################################################
+# 1. IDENTIFICATION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+# Afficher les interfaces réseau disponibles :
+
+ip address
+
+# ou :
+
+ip addr
+
+# Afficher uniquement les interfaces :
+
+ip link
+
+# Identifier l'interface réseau utilisée par le serveur FreePBX.
+#
+# Selon l'installation, le nom de l'interface peut être par exemple :
+#
+# eth0
+#
+# ou :
+#
+# enp0s3
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONFIGURATION ACTUELLE
+###############################################################################
+
+ip address
+
+ip route
+
+# Afficher l'adresse IP du serveur :
+
+hostname -I
+
+# Vérifier la route par défaut :
+
+ip route | grep default
+
+
+###############################################################################
+# 3. CONFIGURATION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+# Éditer le fichier de configuration de l'interface :
+
+nano /etc/sysconfig/network-scripts/ifcfg-eth0
+
+# Copier la configuration présente dans :
+#
+# configurations/freepbx/ifcfg-eth0
+#
+# Adapter si nécessaire :
+#
+# - l'adresse IP ;
+# - le masque de sous-réseau ;
+# - la passerelle ;
+# - le serveur DNS.
+
+
+###############################################################################
+# 4. EXEMPLE DE CONFIGURATION STATIQUE
+###############################################################################
+
+# Exemple de structure du fichier ifcfg-eth0 :
+#
+# TYPE=Ethernet
+# BOOTPROTO=none
+# NAME=eth0
+# DEVICE=eth0
+# ONBOOT=yes
+# IPADDR=ADRESSE-IP-FREEPBX
+# PREFIX=24
+# GATEWAY=ADRESSE-PASSERELLE
+# DNS1=ADRESSE-DNS
+
+
+###############################################################################
+# 5. REDÉMARRAGE DU SERVICE RÉSEAU
+###############################################################################
+
+# Après modification de la configuration :
+
+systemctl restart network
+
+# Vérifier l'état du service :
+
+systemctl status network
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'ADRESSE IP
+###############################################################################
+
+ip address
+
+hostname -I
+
+# Vérifier que l'adresse IPv4 statique configurée
+# est correctement appliquée à l'interface réseau.
+
+
+###############################################################################
+# 7. VÉRIFICATION DE LA TABLE DE ROUTAGE
+###############################################################################
+
+ip route
+
+# Vérifier la présence :
+#
+# - du réseau local ;
+# - de la route par défaut ;
+# - de la passerelle.
+
+
+###############################################################################
+# 8. TEST DE LA PASSERELLE
+###############################################################################
+
+# Remplacer ADRESSE-PASSERELLE par l'adresse réelle
+# de la passerelle du laboratoire.
+
+ping -c 4 ADRESSE-PASSERELLE
+
+
+###############################################################################
+# 9. TEST DE LA CONNECTIVITÉ IP
+###############################################################################
+
+# Tester une adresse IP externe :
+
+ping -c 4 8.8.8.8
+
+# Si le ping fonctionne, la connectivité IP
+# vers l'extérieur est opérationnelle.
+
+
+###############################################################################
+# 10. TEST DE LA RÉSOLUTION DNS
+###############################################################################
+
+ping -c 4 google.com
+
+# ou :
+
+nslookup google.com
+
+# ou :
+
+dig google.com
+
+
+###############################################################################
+# 11. VÉRIFICATION DE LA CONFIGURATION DNS
+###############################################################################
+
+cat /etc/resolv.conf
+
+# Vérifier qu'un serveur DNS est correctement défini.
+
+
+###############################################################################
+# 12. TEST DEPUIS UN POSTE CLIENT
+###############################################################################
+
+# Depuis un ordinateur situé sur le même réseau que FreePBX,
+# tester la communication avec le serveur :
+
+ping -c 4 ADRESSE-IP-FREEPBX
+
+# Le serveur FreePBX doit répondre au ping si ICMP
+# est autorisé par le pare-feu.
+
+
+###############################################################################
+# 13. ACCÈS À L'INTERFACE WEB FREEPBX
+###############################################################################
+
+# Depuis un poste client, ouvrir un navigateur Web.
+
+# Saisir l'adresse IP du serveur FreePBX :
+#
+# http://ADRESSE-IP-FREEPBX
+#
+# ou, si HTTPS est configuré :
+#
+# https://ADRESSE-IP-FREEPBX
+
+# Vérifier que l'interface d'administration FreePBX est accessible.
+
+
+###############################################################################
+# 14. TEST DE L'ACCÈS SSH
+###############################################################################
+
+# Depuis un poste client :
+
+ssh root@ADRESSE-IP-FREEPBX
+
+# Accepter l'empreinte du serveur lors de la première connexion
+# si celle-ci correspond bien au serveur FreePBX.
+
+
+###############################################################################
+# 15. VÉRIFICATION DES PORTS EN ÉCOUTE
+###############################################################################
+
+ss -lntup
+
+# Vérifier les services réseau actifs sur le serveur.
+
+
+###############################################################################
+# 16. VÉRIFICATION DU SERVICE SIP/PJSIP
+###############################################################################
+
+# Vérifier si le port SIP/PJSIP configuré est en écoute.
+
+ss -lntup | grep 5060
+
+# Le port exact dépend de la configuration FreePBX/Asterisk.
+
+
+###############################################################################
+# 17. VÉRIFICATION DEPUIS ASTERISK
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Afficher les transports PJSIP :
+
+pjsip show transports
+
+# Afficher les endpoints :
+
+pjsip show endpoints
+
+# Afficher les contacts enregistrés :
+
+pjsip show contacts
+
+# Quitter la console :
+
+exit
+
+
+###############################################################################
+# 18. TEST DES SOFTPHONES
+###############################################################################
+
+# Sur chaque softphone, renseigner :
+#
+# Serveur / Domaine :
+# ADRESSE-IP-FREEPBX
+#
+# Nom d'utilisateur :
+# Numéro de l'extension
+#
+# Mot de passe :
+# Mot de passe SIP/PJSIP configuré dans FreePBX.
+
+
+# Extensions du laboratoire :
+#
+# 100 - Standard
+# 101 - Bob
+# 102 - Alice
+
+
+###############################################################################
+# 19. TEST DE COMMUNICATION ENTRE LES POSTES
+###############################################################################
+
+# Depuis le poste Standard (100) :
+
+ping ADRESSE-IP-FREEPBX
+
+# Depuis le poste Bob (101) :
+
+ping ADRESSE-IP-FREEPBX
+
+# Depuis le poste Alice (102) :
+
+ping ADRESSE-IP-FREEPBX
+
+# Chaque poste doit pouvoir communiquer avec le serveur
+# avant de tenter l'enregistrement SIP/PJSIP.
+
+
+###############################################################################
+# 20. VÉRIFICATION DES ENREGISTREMENTS
+###############################################################################
+
+# Sur le serveur FreePBX :
+
+asterisk -rx "pjsip show endpoints"
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier que les softphones apparaissent correctement
+# auprès du serveur.
+
+
+###############################################################################
+# 21. DIAGNOSTIC RÉSEAU
+###############################################################################
+
+# Afficher les interfaces :
+
+ip address
+
+# Afficher les routes :
+
+ip route
+
+# Afficher les voisins réseau :
+
+ip neigh
+
+# Afficher les ports ouverts :
+
+ss -lntup
+
+# Tester la passerelle :
+
+ping -c 4 ADRESSE-PASSERELLE
+
+# Tester Internet par adresse IP :
+
+ping -c 4 8.8.8.8
+
+# Tester la résolution DNS :
+
+ping -c 4 google.com
+
+
+###############################################################################
+# 22. OBSERVATION DU TRAFIC SIP
+###############################################################################
+
+# Observer le trafic sur le port SIP/PJSIP configuré :
+
+tcpdump -ni any port 5060
+
+# Effectuer ensuite un enregistrement ou un appel
+# depuis un softphone pour observer le trafic.
+
+
+###############################################################################
+# 23. OBSERVATION DU TRAFIC RTP
+###############################################################################
+
+# Le trafic audio RTP utilise une plage de ports UDP
+# configurée dans Asterisk/FreePBX.
+
+# Pour observer le trafic UDP :
+
+tcpdump -ni any udp
+
+# Il est également possible d'utiliser la console Asterisk :
+
+asterisk -rvvv
+
+# Puis :
+
+rtp set debug on
+
+# Effectuer un appel entre deux extensions.
+
+# Désactiver ensuite le débogage :
+
+rtp set debug off
+
+
+###############################################################################
+# 24. VÉRIFICATION DU PARE-FEU FREEPBX
+###############################################################################
+
+# Vérifier l'état général de FreePBX :
+
+fwconsole status
+
+# La configuration du pare-feu doit permettre les communications
+# nécessaires entre le serveur FreePBX et les softphones du laboratoire.
+
+# Vérifier notamment que les postes clients autorisés peuvent :
+#
+# - accéder à l'interface Web ;
+# - enregistrer leurs extensions SIP/PJSIP ;
+# - établir des appels ;
+# - transmettre et recevoir le flux audio RTP.
+
+
+###############################################################################
+# 25. REDÉMARRAGE DES SERVICES
+###############################################################################
+
+# Si nécessaire, redémarrer FreePBX/Asterisk :
+
+fwconsole restart
+
+# Vérifier ensuite :
+
+fwconsole status
+
+
+###############################################################################
+# 26. VALIDATION FINALE
+###############################################################################
+
+# La configuration réseau est fonctionnelle si :
+#
+# [ ] L'interface réseau possède l'adresse IPv4 prévue.
+#
+# [ ] L'adresse IPv4 reste configurée après redémarrage.
+#
+# [ ] La route par défaut est présente.
+#
+# [ ] La passerelle répond.
+#
+# [ ] La résolution DNS fonctionne.
+#
+# [ ] Le serveur FreePBX est joignable depuis les postes clients.
+#
+# [ ] L'interface Web FreePBX est accessible.
+#
+# [ ] L'accès SSH au serveur fonctionne.
+#
+# [ ] Les softphones peuvent joindre le serveur.
+#
+# [ ] Les extensions 100, 101 et 102 peuvent s'enregistrer.
+#
+# [ ] Les appels entre les extensions fonctionnent.
+#
+# [ ] Le flux audio fonctionne dans les deux sens.
+#
+# [ ] L'infrastructure VoIP est opérationnelle.
+###############################################################################

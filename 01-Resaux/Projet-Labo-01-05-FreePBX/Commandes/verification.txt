@@ -1,0 +1,733 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Vérification complète du laboratoire FreePBX
+#
+# Environnement :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Extensions :
+# - 100 : Standard
+# - 101 : Bob
+# - 102 : Alice
+#
+# Ring Group :
+# - 6000
+# - Membres : 101 et 102
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+# Afficher les interfaces réseau :
+
+ip address
+
+# Afficher l'adresse IP du serveur :
+
+hostname -I
+
+# Afficher la table de routage :
+
+ip route
+
+# Vérifier la présence d'une route par défaut :
+
+ip route | grep default
+
+
+###############################################################################
+# 2. TEST DE LA PASSERELLE
+###############################################################################
+
+# Remplacer ADRESSE-PASSERELLE par l'adresse réelle
+# de la passerelle du laboratoire.
+
+ping -c 4 ADRESSE-PASSERELLE
+
+
+###############################################################################
+# 3. TEST DE LA CONNECTIVITÉ IP
+###############################################################################
+
+# Tester une adresse IP externe :
+
+ping -c 4 8.8.8.8
+
+# Vérifier que le serveur dispose d'une connectivité réseau fonctionnelle.
+
+
+###############################################################################
+# 4. TEST DE LA RÉSOLUTION DNS
+###############################################################################
+
+ping -c 4 google.com
+
+# Si les outils sont disponibles :
+
+nslookup google.com
+
+dig google.com
+
+
+###############################################################################
+# 5. VÉRIFICATION DE LA CONFIGURATION DNS
+###############################################################################
+
+cat /etc/resolv.conf
+
+
+###############################################################################
+# 6. VÉRIFICATION DE FREEPBX
+###############################################################################
+
+# Vérifier l'état général de FreePBX :
+
+fwconsole status
+
+# Les différents services nécessaires au fonctionnement
+# de FreePBX doivent être opérationnels.
+
+
+###############################################################################
+# 7. VÉRIFICATION D'ASTERISK
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Vérifier la version :
+
+core show version
+
+# Vérifier la durée de fonctionnement :
+
+core show uptime
+
+# Vérifier les canaux actifs :
+
+core show channels
+
+# Quitter la console :
+
+exit
+
+
+###############################################################################
+# 8. VÉRIFICATION DES PORTS EN ÉCOUTE
+###############################################################################
+
+ss -lntup
+
+# Vérifier notamment les services utilisés par :
+#
+# - l'interface Web FreePBX ;
+# - SSH ;
+# - SIP/PJSIP ;
+# - les autres services nécessaires au laboratoire.
+
+
+###############################################################################
+# 9. VÉRIFICATION DE L'INTERFACE WEB
+###############################################################################
+
+# Depuis un poste client, ouvrir un navigateur Web.
+#
+# Accéder à :
+#
+# http://ADRESSE-IP-FREEPBX
+#
+# ou, selon la configuration :
+#
+# https://ADRESSE-IP-FREEPBX
+#
+# Vérifier que :
+#
+# [ ] L'interface Web est accessible.
+# [ ] La page d'authentification s'affiche.
+# [ ] La connexion administrateur fonctionne.
+# [ ] L'interface d'administration FreePBX est accessible.
+
+
+###############################################################################
+# 10. VÉRIFICATION DE L'ACCÈS SSH
+###############################################################################
+
+# Depuis un poste client :
+
+ssh root@ADRESSE-IP-FREEPBX
+
+# Vérifier que l'accès distant au serveur fonctionne.
+
+
+###############################################################################
+# 11. VÉRIFICATION DES EXTENSIONS
+###############################################################################
+
+# Depuis la console du serveur :
+
+asterisk -rx "pjsip show endpoints"
+
+# Vérifier la présence des extensions :
+#
+# 100 - Standard
+# 101 - Bob
+# 102 - Alice
+
+
+###############################################################################
+# 12. VÉRIFICATION DÉTAILLÉE DES EXTENSIONS
+###############################################################################
+
+asterisk -rx "pjsip show endpoint 100"
+
+asterisk -rx "pjsip show endpoint 101"
+
+asterisk -rx "pjsip show endpoint 102"
+
+# Vérifier que chaque endpoint possède la configuration attendue.
+
+
+###############################################################################
+# 13. VÉRIFICATION DES SOFTPHONES ENREGISTRÉS
+###############################################################################
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier que les softphones correspondant aux extensions
+# 100, 101 et 102 sont enregistrés auprès du serveur FreePBX.
+
+
+###############################################################################
+# 14. TEST DE CONNECTIVITÉ DES POSTES
+###############################################################################
+
+# Depuis chaque poste client, tester le serveur :
+
+ping -c 4 ADRESSE-IP-FREEPBX
+
+# Le serveur doit être joignable depuis :
+#
+# - le poste Standard ;
+# - le poste Bob ;
+# - le poste Alice.
+
+
+###############################################################################
+# 15. TEST D'APPEL BOB VERS ALICE
+###############################################################################
+
+# Depuis le softphone de Bob (101) :
+#
+# Composer :
+
+102
+
+# Vérifier que :
+#
+# [ ] Le softphone d'Alice sonne.
+# [ ] Alice peut décrocher.
+# [ ] L'appel est établi.
+# [ ] Bob entend Alice.
+# [ ] Alice entend Bob.
+
+
+###############################################################################
+# 16. TEST D'APPEL ALICE VERS BOB
+###############################################################################
+
+# Depuis le softphone d'Alice (102) :
+#
+# Composer :
+
+101
+
+# Vérifier que :
+#
+# [ ] Le softphone de Bob sonne.
+# [ ] Bob peut décrocher.
+# [ ] L'appel est établi.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 17. TEST DU STANDARD
+###############################################################################
+
+# Depuis l'extension Standard (100) :
+#
+# Appeler Bob :
+
+101
+
+# Puis appeler Alice :
+
+102
+
+# Vérifier que les deux utilisateurs sont joignables.
+
+
+###############################################################################
+# 18. VÉRIFICATION DES APPELS EN TEMPS RÉEL
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Effectuer un appel entre deux extensions.
+#
+# Observer le traitement de l'appel dans la console.
+
+
+###############################################################################
+# 19. VÉRIFICATION DES CANAUX ACTIFS
+###############################################################################
+
+# Pendant un appel :
+
+asterisk -rx "core show channels"
+
+# Affichage détaillé :
+
+asterisk -rx "core show channels verbose"
+
+
+###############################################################################
+# 20. VÉRIFICATION DE LA SIGNALISATION PJSIP
+###############################################################################
+
+# Ouvrir la console :
+
+asterisk -rvvv
+
+# Activer le logger PJSIP :
+
+pjsip set logger on
+
+# Effectuer un appel entre deux extensions.
+#
+# Observer la signalisation de l'appel.
+
+# Désactiver ensuite le logger :
+
+pjsip set logger off
+
+
+###############################################################################
+# 21. VÉRIFICATION DU FLUX AUDIO RTP
+###############################################################################
+
+# Depuis la console Asterisk :
+
+rtp set debug on
+
+# Effectuer un appel entre deux extensions.
+#
+# Vérifier la présence des échanges RTP correspondant
+# au transport du flux audio.
+
+# Désactiver ensuite :
+
+rtp set debug off
+
+
+###############################################################################
+# 22. VÉRIFICATION DU CODEC
+###############################################################################
+
+# Pendant un appel, vérifier les informations du canal
+# depuis la console Asterisk.
+#
+# Le codec utilisé dans le laboratoire est :
+#
+# PCMA / G.711A
+#
+# Vérifier également la configuration audio
+# directement dans les softphones.
+
+
+###############################################################################
+# 23. TEST DE LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis une extension disposant de la messagerie vocale :
+#
+# Composer :
+
+*97
+
+# Vérifier que :
+#
+# [ ] Le service de messagerie répond.
+# [ ] L'utilisateur peut saisir son mot de passe.
+# [ ] L'utilisateur peut accéder à sa boîte vocale.
+# [ ] Les messages peuvent être consultés.
+
+
+###############################################################################
+# 24. TEST DE DÉPÔT D'UN MESSAGE VOCAL
+###############################################################################
+
+# Depuis une extension :
+#
+# Appeler une autre extension.
+#
+# Ne pas répondre à l'appel.
+#
+# Attendre le délai de non-réponse.
+#
+# Vérifier que l'appel est transféré vers la messagerie
+# si cette destination est configurée.
+#
+# Laisser un message vocal.
+#
+# Depuis l'extension appelée, composer :
+
+*97
+
+# Vérifier que le nouveau message peut être écouté.
+
+
+###############################################################################
+# 25. TEST DU RING GROUP
+###############################################################################
+
+# Depuis le Standard (100), composer :
+
+6000
+
+# Vérifier que :
+#
+# [ ] Bob (101) sonne.
+# [ ] Alice (102) sonne.
+# [ ] Les deux extensions sonnent simultanément.
+# [ ] La stratégie Ring All fonctionne.
+# [ ] Le premier utilisateur qui décroche récupère l'appel.
+
+
+###############################################################################
+# 26. TEST DU RING GROUP AVEC BOB
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer 6000.
+#
+# Faire décrocher Bob (101).
+#
+# Vérifier que :
+#
+# [ ] L'appel est établi avec Bob.
+# [ ] Alice cesse de sonner.
+# [ ] La communication audio fonctionne.
+
+
+###############################################################################
+# 27. TEST DU RING GROUP AVEC ALICE
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer 6000.
+#
+# Faire décrocher Alice (102).
+#
+# Vérifier que :
+#
+# [ ] L'appel est établi avec Alice.
+# [ ] Bob cesse de sonner.
+# [ ] La communication audio fonctionne.
+
+
+###############################################################################
+# 28. VÉRIFICATION DU DIALPLAN DU RING GROUP
+###############################################################################
+
+asterisk -rx "dialplan show 6000"
+
+# Vérifier que le numéro 6000 est présent dans le dialplan.
+
+
+###############################################################################
+# 29. TEST DE NON-RÉPONSE DU RING GROUP
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer 6000.
+#
+# Ne pas répondre depuis Bob ou Alice.
+#
+# Vérifier que l'appel est dirigé vers la destination
+# configurée dans "Destination if no answer".
+
+
+###############################################################################
+# 30. OBSERVATION DU TRAFIC SIP/PJSIP
+###############################################################################
+
+# Observer le trafic réseau associé à la signalisation :
+
+tcpdump -ni any port 5060
+
+# Effectuer ensuite un appel entre deux extensions.
+#
+# Le port réellement utilisé doit correspondre à la
+# configuration SIP/PJSIP du serveur.
+
+
+###############################################################################
+# 31. OBSERVATION DU TRAFIC RTP
+###############################################################################
+
+# Observer le trafic UDP pendant un appel :
+
+tcpdump -ni any udp
+
+# Pour une analyse depuis Asterisk :
+
+asterisk -rvvv
+
+# Puis :
+
+rtp set debug on
+
+
+###############################################################################
+# 32. VÉRIFICATION APRÈS REDÉMARRAGE
+###############################################################################
+
+# Redémarrer le serveur :
+
+reboot
+
+# Après redémarrage, vérifier :
+
+fwconsole status
+
+asterisk -rx "core show version"
+
+asterisk -rx "pjsip show endpoints"
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier également que :
+#
+# - l'adresse IP du serveur est toujours configurée ;
+# - l'interface Web est accessible ;
+# - les softphones se réenregistrent ;
+# - les appels fonctionnent toujours.
+
+
+###############################################################################
+# 33. DÉPANNAGE - FREEPBX
+###############################################################################
+
+# Vérifier l'état des services :
+
+fwconsole status
+
+# Redémarrer les services FreePBX :
+
+fwconsole restart
+
+# Vérifier de nouveau :
+
+fwconsole status
+
+
+###############################################################################
+# 34. DÉPANNAGE - EXTENSION NON ENREGISTRÉE
+###############################################################################
+
+# Vérifier les endpoints :
+
+asterisk -rx "pjsip show endpoints"
+
+# Vérifier les contacts :
+
+asterisk -rx "pjsip show contacts"
+
+# Vérifier une extension spécifique :
+
+asterisk -rx "pjsip show endpoint 100"
+
+asterisk -rx "pjsip show endpoint 101"
+
+asterisk -rx "pjsip show endpoint 102"
+
+# Vérifier ensuite :
+#
+# - l'adresse IP du serveur renseignée dans le softphone ;
+# - le numéro de l'extension ;
+# - le mot de passe SIP/PJSIP ;
+# - la connectivité réseau.
+
+
+###############################################################################
+# 35. DÉPANNAGE - APPEL IMPOSSIBLE
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Activer temporairement le logger :
+
+pjsip set logger on
+
+# Effectuer l'appel problématique.
+
+# Désactiver ensuite :
+
+pjsip set logger off
+
+
+###############################################################################
+# 36. DÉPANNAGE - ABSENCE DE SON
+###############################################################################
+
+# Si l'appel est établi mais que le son ne fonctionne pas :
+#
+# - vérifier le microphone ;
+# - vérifier les haut-parleurs ;
+# - vérifier les paramètres audio des softphones ;
+# - vérifier le codec ;
+# - vérifier le pare-feu ;
+# - vérifier le trafic RTP.
+
+# Activer le débogage RTP :
+
+asterisk -rvvv
+
+# Puis :
+
+rtp set debug on
+
+
+###############################################################################
+# 37. DÉPANNAGE - AUDIO DANS UN SEUL SENS
+###############################################################################
+
+# Si un seul utilisateur entend l'autre :
+#
+# - vérifier la connectivité réseau ;
+# - vérifier les règles du pare-feu ;
+# - vérifier la configuration NAT si elle est utilisée ;
+# - vérifier le flux RTP dans les deux directions.
+
+
+###############################################################################
+# 38. RÉCAPITULATIF DES TESTS
+###############################################################################
+
+# Test 1 :
+#
+# Standard (100) -------> Bob (101)
+
+
+# Test 2 :
+#
+# Standard (100) -------> Alice (102)
+
+
+# Test 3 :
+#
+# Bob (101) ------------> Alice (102)
+
+
+# Test 4 :
+#
+# Alice (102) ----------> Bob (101)
+
+
+# Test 5 :
+#
+# Extension ------------> *97
+#                          |
+#                          └──> Messagerie vocale
+
+
+# Test 6 :
+#
+# Standard (100) -------> 6000
+#                          |
+#                          ├──> Bob (101)
+#                          │
+#                          └──> Alice (102)
+
+
+###############################################################################
+# 39. CHECK-LIST DE VALIDATION FINALE
+###############################################################################
+
+# INFRASTRUCTURE
+#
+# [ ] Le serveur FreePBX démarre correctement.
+# [ ] La configuration réseau est fonctionnelle.
+# [ ] Le serveur possède une adresse IPv4 statique.
+# [ ] La passerelle est accessible.
+# [ ] La résolution DNS fonctionne.
+# [ ] L'interface Web FreePBX est accessible.
+# [ ] L'accès SSH fonctionne.
+
+
+# FREEPBX / ASTERISK
+#
+# [ ] FreePBX fonctionne correctement.
+# [ ] Asterisk fonctionne correctement.
+# [ ] Les services démarrent après un redémarrage.
+
+
+# EXTENSIONS
+#
+# [ ] Extension 100 - Standard configurée.
+# [ ] Extension 101 - Bob configurée.
+# [ ] Extension 102 - Alice configurée.
+
+
+# SOFTPHONES
+#
+# [ ] Standard est enregistré.
+# [ ] Bob est enregistré.
+# [ ] Alice est enregistrée.
+
+
+# APPELS
+#
+# [ ] Standard peut appeler Bob.
+# [ ] Standard peut appeler Alice.
+# [ ] Bob peut appeler Alice.
+# [ ] Alice peut appeler Bob.
+# [ ] Les appels sont établis correctement.
+# [ ] L'audio fonctionne dans les deux sens.
+
+
+# MESSAGERIE VOCALE
+#
+# [ ] La messagerie vocale est activée.
+# [ ] La messagerie est accessible avec *97.
+# [ ] Un message vocal peut être déposé.
+# [ ] Un message vocal peut être consulté.
+
+
+# RING GROUP
+#
+# [ ] Le Ring Group 6000 existe.
+# [ ] Bob (101) appartient au Ring Group.
+# [ ] Alice (102) appartient au Ring Group.
+# [ ] La stratégie Ring All fonctionne.
+# [ ] Bob et Alice sonnent simultanément.
+# [ ] Le premier utilisateur qui décroche récupère l'appel.
+
+
+# VALIDATION GLOBALE
+#
+# [ ] L'infrastructure FreePBX est opérationnelle.
+# [ ] Les communications VoIP fonctionnent.
+# [ ] Les fonctionnalités demandées dans le laboratoire sont validées.
+###############################################################################
