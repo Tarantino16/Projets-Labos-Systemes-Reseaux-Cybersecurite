@@ -1,0 +1,103 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Configuration du serveur DHCP avec DDNS
+###############################################################################
+
+# Installation du serveur DHCP
+
+sudo apt update
+sudo apt install isc-dhcp-server -y
+
+
+###############################################################################
+# Génération de la clé TSIG
+###############################################################################
+
+sudo tsig-keygen -a hmac-sha256 cle_dhcp
+
+# Copier la clé générée dans :
+# /etc/bind/cle.txt
+# /etc/dhcp/dhcpd.conf
+
+
+###############################################################################
+# Configuration du serveur DHCP
+###############################################################################
+
+sudo nano /etc/default/isc-dhcp-server
+sudo nano /etc/dhcp/dhcpd.conf
+
+
+###############################################################################
+# Vérification de la configuration
+###############################################################################
+
+sudo dhcpd -t -cf /etc/dhcp/dhcpd.conf
+
+
+###############################################################################
+# Redémarrage du service
+###############################################################################
+
+sudo systemctl restart isc-dhcp-server
+sudo systemctl enable isc-dhcp-server
+
+
+###############################################################################
+# Vérification de l'état du service
+###############################################################################
+
+sudo systemctl status isc-dhcp-server
+
+
+###############################################################################
+# Consultation des baux DHCP
+###############################################################################
+
+cat /var/lib/dhcp/dhcpd.leases
+
+
+###############################################################################
+# Vérification des mises à jour DNS dynamiques
+###############################################################################
+
+sudo tail -f /var/log/syslog
+
+# ou
+
+journalctl -u isc-dhcp-server -f
+
+
+###############################################################################
+# Vérification des enregistrements DNS
+###############################################################################
+
+dig megatech-1.tarantino.family
+
+dig -x 192.168.11.6
+
+host megatech-1.tarantino.family
+
+nslookup megatech-1.tarantino.family
+
+
+###############################################################################
+# Vérification des zones DNS
+###############################################################################
+
+dig @192.168.11.250 tarantino.family AXFR
+
+dig @192.168.12.250 tarantino.family AXFR
+
+
+###############################################################################
+# Vérification du fonctionnement global
+###############################################################################
+
+# Renouveler un bail DHCP sur un client
+
+sudo dhclient -r
+sudo dhclient
+
+# Vérifier ensuite que le client apparaît
+# automatiquement dans la zone DNS.

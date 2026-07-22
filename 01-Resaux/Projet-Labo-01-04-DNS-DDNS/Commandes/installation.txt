@@ -1,0 +1,403 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Installation des composants du laboratoire DNS, DHCP et DDNS
+#
+# Machines :
+# - Routeur Debian
+# - Serveur DNS primaire DNS-1
+# - Serveur DNS secondaire DNS-2
+# - Serveur DHCP
+# - Machines clientes
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉPARATION DES MACHINES VIRTUELLES
+###############################################################################
+
+# Créer les machines virtuelles Debian nécessaires au laboratoire :
+#
+# - Routeur Debian ;
+# - DNS-1 ;
+# - DNS-2 ;
+# - DHCP ;
+# - un ou plusieurs clients Debian.
+#
+# Répartition des réseaux :
+#
+# Réseau 1 : 192.168.11.0/24
+# Réseau 2 : 192.168.12.0/24
+#
+# Le routeur doit disposer de trois cartes réseau :
+#
+# - une interface WAN pour l'accès à Internet ;
+# - une interface sur le réseau 192.168.11.0/24 ;
+# - une interface sur le réseau 192.168.12.0/24.
+
+
+###############################################################################
+# 2. MISE À JOUR DES MACHINES DEBIAN
+###############################################################################
+
+# À exécuter sur chaque machine :
+
+sudo apt update
+sudo apt upgrade -y
+
+
+###############################################################################
+# 3. INSTALLATION DES OUTILS COMMUNS
+###############################################################################
+
+# À exécuter sur toutes les machines du laboratoire :
+
+sudo apt install -y \
+    nano \
+    vim \
+    curl \
+    wget \
+    net-tools \
+    iproute2 \
+    iputils-ping \
+    traceroute \
+    dnsutils \
+    tcpdump \
+    netcat-openbsd
+
+
+###############################################################################
+# 4. INSTALLATION DU ROUTEUR DEBIAN
+###############################################################################
+
+# À exécuter uniquement sur le routeur :
+
+sudo apt install -y nftables
+
+# Activation de nftables :
+
+sudo systemctl enable nftables
+
+# Vérification :
+
+sudo nft --version
+sudo systemctl status nftables
+
+
+###############################################################################
+# 5. INSTALLATION DU SERVEUR DNS PRIMAIRE DNS-1
+###############################################################################
+
+# À exécuter uniquement sur DNS-1 :
+
+sudo apt install -y \
+    bind9 \
+    bind9-utils \
+    dnsutils
+
+# Activation de Bind9 :
+
+sudo systemctl enable bind9
+
+# Vérification :
+
+named -v
+sudo systemctl status bind9
+
+
+###############################################################################
+# 6. INSTALLATION DU SERVEUR DNS SECONDAIRE DNS-2
+###############################################################################
+
+# À exécuter uniquement sur DNS-2 :
+
+sudo apt install -y \
+    bind9 \
+    bind9-utils \
+    dnsutils
+
+# Activation de Bind9 :
+
+sudo systemctl enable bind9
+
+# Vérification :
+
+named -v
+sudo systemctl status bind9
+
+
+###############################################################################
+# 7. INSTALLATION DU SERVEUR DHCP
+###############################################################################
+
+# À exécuter uniquement sur le serveur DHCP :
+
+sudo apt install -y isc-dhcp-server
+
+# Activation du serveur DHCP :
+
+sudo systemctl enable isc-dhcp-server
+
+# Vérification du paquet installé :
+
+dpkg -l | grep isc-dhcp-server
+
+# Le service peut être en échec tant que les fichiers de configuration
+# et l'interface d'écoute ne sont pas correctement renseignés.
+
+
+###############################################################################
+# 8. INSTALLATION DES OUTILS DNS ET DDNS
+###############################################################################
+
+# À exécuter sur DNS-1 pour disposer de tsig-keygen,
+# named-checkconf, named-checkzone et rndc :
+
+sudo apt install -y bind9-utils
+
+# Vérification de la disponibilité des commandes :
+
+command -v tsig-keygen
+command -v named-checkconf
+command -v named-checkzone
+command -v rndc
+
+
+###############################################################################
+# 9. INSTALLATION DES CLIENTS DHCP
+###############################################################################
+
+# Sur les clients Debian :
+
+sudo apt install -y isc-dhcp-client
+
+# Vérification :
+
+dhclient --version
+
+# Les clients devront être configurés pour obtenir automatiquement :
+#
+# - une adresse IPv4 ;
+# - une passerelle ;
+# - le domaine tarantino.family ;
+# - DNS-1 comme serveur DNS principal ;
+# - DNS-2 comme serveur DNS secondaire.
+
+
+###############################################################################
+# 10. RÉCAPITULATIF DES ADRESSES IP
+###############################################################################
+
+# Routeur, réseau 1 :
+# 192.168.11.254/24
+#
+# Routeur, réseau 2 :
+# 192.168.12.254/24
+#
+# DNS-1 :
+# 192.168.11.250/24
+#
+# DHCP :
+# 192.168.11.251/24
+#
+# DNS-2 :
+# 192.168.12.250/24
+#
+# Domaine DNS :
+# tarantino.family
+#
+# Zone directe :
+# tarantino.family
+#
+# Zone inversée :
+# 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 11. VÉRIFICATION DES INTERFACES
+###############################################################################
+
+# À exécuter sur chaque machine :
+
+ip address
+ip route
+
+# Vérifier le nom réel des interfaces avant de copier les fichiers contenus
+# dans le dossier configurations/.
+#
+# Exemples fréquents :
+#
+# enp0s3
+# enp0s8
+# enp0s9
+#
+# Les noms peuvent varier selon l'hyperviseur et la machine virtuelle.
+
+
+###############################################################################
+# 12. CRÉATION DES RÉPERTOIRES DE CONFIGURATION
+###############################################################################
+
+# Sur DNS-1 et DNS-2 :
+
+sudo mkdir -p /var/cache/bind
+
+sudo chown bind:bind /var/cache/bind
+
+sudo chmod 775 /var/cache/bind
+
+
+###############################################################################
+# 13. VÉRIFICATION DES SERVICES
+###############################################################################
+
+# Routeur :
+
+sudo systemctl status nftables
+
+# DNS-1 et DNS-2 :
+
+sudo systemctl status bind9
+
+# Serveur DHCP :
+
+sudo systemctl status isc-dhcp-server
+
+
+###############################################################################
+# 14. VÉRIFICATION DES PORTS
+###############################################################################
+
+# Sur DNS-1 et DNS-2, Bind9 doit écouter sur le port 53 :
+
+sudo ss -lntup | grep :53
+
+# Sur le serveur DHCP, le service doit utiliser les ports UDP 67 et 68 :
+
+sudo ss -lnup | grep -E ':67|:68'
+
+
+###############################################################################
+# 15. TEST DE COMMUNICATION AVANT CONFIGURATION
+###############################################################################
+
+# Depuis DNS-1 :
+
+ping -c 4 192.168.11.254
+
+# Depuis le serveur DHCP :
+
+ping -c 4 192.168.11.254
+
+# Depuis DNS-2 :
+
+ping -c 4 192.168.12.254
+
+# Après la configuration du routeur, tester la communication entre DNS-1
+# et DNS-2 :
+
+ping -c 4 192.168.12.250
+
+ping -c 4 192.168.11.250
+
+
+###############################################################################
+# 16. ORDRE DE CONFIGURATION RECOMMANDÉ
+###############################################################################
+
+# Étape 1 :
+# Configurer les interfaces réseau du routeur.
+#
+# Étape 2 :
+# Activer le routage IPv4 et configurer nftables.
+#
+# Étape 3 :
+# Configurer DNS-1 comme serveur DNS primaire.
+#
+# Étape 4 :
+# Configurer DNS-2 comme serveur DNS secondaire.
+#
+# Étape 5 :
+# Générer la clé TSIG sur DNS-1.
+#
+# Étape 6 :
+# Copier la même clé TSIG dans la configuration du serveur DHCP.
+#
+# Étape 7 :
+# Configurer le serveur DHCP et activer le DDNS.
+#
+# Étape 8 :
+# Configurer les clients en DHCP.
+#
+# Étape 9 :
+# Vérifier les enregistrements DNS directs et inversés.
+#
+# Étape 10 :
+# Vérifier le transfert des zones entre DNS-1 et DNS-2.
+
+
+###############################################################################
+# 17. FICHIERS DE COMMANDES À CONSULTER
+###############################################################################
+
+# Configuration du routeur :
+# commandes/configuration-routeur.txt
+#
+# Configuration du serveur DNS primaire :
+# commandes/configuration-dns-1.txt
+#
+# Configuration du serveur DNS secondaire :
+# commandes/configuration-dns-2.txt
+#
+# Configuration du serveur DHCP et du DDNS :
+# commandes/configuration-dhcp-ddns.txt
+
+
+###############################################################################
+# 18. FICHIERS DE CONFIGURATION À DÉPLOYER
+###############################################################################
+
+# Routeur :
+#
+# configurations/routeur-debian/interfaces
+# configurations/routeur-debian/sysctl.conf
+# configurations/routeur-debian/nftables.conf
+#
+# DNS-1 :
+#
+# configurations/dns-1/interfaces
+# configurations/dns-1/resolv.conf
+# configurations/dns-1/named
+# configurations/dns-1/named.conf
+# configurations/dns-1/named.conf.local
+# configurations/dns-1/named.conf.options
+# configurations/dns-1/cle.txt
+# configurations/dns-1/tarantino.family.dns
+# configurations/dns-1/11.168.192.in-addr.arpa.dns
+#
+# DNS-2 :
+#
+# configurations/dns-2/interfaces
+# configurations/dns-2/resolv.conf
+# configurations/dns-2/named.conf.local
+# configurations/dns-2/named.conf.options
+#
+# DHCP :
+#
+# configurations/dhcp/interfaces
+# configurations/dhcp/isc-dhcp-server
+# configurations/dhcp/dhcpd.conf
+
+
+###############################################################################
+# 19. VALIDATION DE L'INSTALLATION
+###############################################################################
+
+# L'installation est terminée lorsque :
+#
+# - nftables est installé sur le routeur ;
+# - Bind9 est installé sur DNS-1 et DNS-2 ;
+# - ISC DHCP Server est installé sur le serveur DHCP ;
+# - les outils dig, host, nslookup, named-checkconf et named-checkzone
+#   sont disponibles ;
+# - les clients disposent de la commande dhclient ;
+# - toutes les machines peuvent joindre leur passerelle respective.

@@ -1,0 +1,335 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Configuration du serveur DNS secondaire DNS-2
+#
+# Adresse IP : 192.168.12.250/24
+# Passerelle : 192.168.12.254
+# DNS primaire : 192.168.11.250
+# Domaine : tarantino.family
+###############################################################################
+
+
+###############################################################################
+# 1. CONFIGURATION RÉSEAU
+###############################################################################
+
+sudo nano /etc/network/interfaces
+
+# Copier la configuration présente dans :
+# configurations/dns-2/interfaces
+
+sudo systemctl restart networking
+
+# Vérification de l'interface et de la route par défaut
+
+ip address
+ip route
+
+# Vérification de la communication avec le routeur
+
+ping -c 4 192.168.12.254
+
+# Vérification de la communication avec DNS-1
+
+ping -c 4 192.168.11.250
+
+
+###############################################################################
+# 2. CONFIGURATION DE LA RÉSOLUTION LOCALE
+###############################################################################
+
+sudo nano /etc/resolv.conf
+
+# Copier la configuration présente dans :
+# configurations/dns-2/resolv.conf
+
+cat /etc/resolv.conf
+
+
+###############################################################################
+# 3. INSTALLATION DE BIND9
+###############################################################################
+
+sudo apt update
+sudo apt install bind9 bind9-utils dnsutils -y
+
+# Vérification de l'installation
+
+named -v
+sudo systemctl status bind9
+
+
+###############################################################################
+# 4. CONFIGURATION DU DÉMARRAGE EN IPv4
+###############################################################################
+
+sudo nano /etc/default/named
+
+# Ajouter ou vérifier la ligne suivante :
+#
+# OPTIONS="-u bind -4"
+
+
+###############################################################################
+# 5. CONFIGURATION GÉNÉRALE DE BIND9
+###############################################################################
+
+sudo nano /etc/bind/named.conf.options
+
+# Copier la configuration présente dans :
+# configurations/dns-2/named.conf.options
+
+# Vérifier que Bind9 écoute sur :
+#
+# 192.168.12.250
+
+
+###############################################################################
+# 6. DÉCLARATION DES ZONES SECONDAIRES
+###############################################################################
+
+sudo nano /etc/bind/named.conf.local
+
+# Copier la configuration présente dans :
+# configurations/dns-2/named.conf.local
+
+# Les deux zones doivent être déclarées en tant que zones secondaires :
+#
+# - tarantino.family
+# - 11.168.192.in-addr.arpa
+#
+# Le serveur primaire déclaré doit être :
+#
+# 192.168.11.250
+
+
+###############################################################################
+# 7. VÉRIFICATION DE LA CONFIGURATION
+###############################################################################
+
+sudo named-checkconf
+
+# La commande ne doit retourner aucun message si la syntaxe est correcte.
+
+
+###############################################################################
+# 8. VÉRIFICATION DES DROITS DU RÉPERTOIRE DE CACHE
+###############################################################################
+
+sudo ls -ld /var/cache/bind
+
+# Le service Bind9 doit pouvoir écrire dans ce répertoire.
+# Les fichiers de zones secondaires seront créés automatiquement après
+# le premier transfert depuis DNS-1.
+
+sudo chown bind:bind /var/cache/bind
+sudo chmod 775 /var/cache/bind
+
+
+###############################################################################
+# 9. REDÉMARRAGE DE BIND9
+###############################################################################
+
+sudo systemctl restart bind9
+sudo systemctl enable bind9
+
+# Vérification de l'état du service
+
+sudo systemctl status bind9
+
+# Vérification de l'écoute sur le port DNS 53
+
+sudo ss -lntup | grep :53
+
+
+###############################################################################
+# 10. VÉRIFICATION DU TRANSFERT DES ZONES
+###############################################################################
+
+sudo ls -la /var/cache/bind/
+
+# Après le transfert, le répertoire doit notamment contenir les fichiers :
+#
+# tarantino.family.dns
+# 11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 11. TEST DE LA ZONE DIRECTE
+###############################################################################
+
+dig @127.0.0.1 tarantino.family SOA
+
+dig @127.0.0.1 tarantino.family NS
+
+dig @127.0.0.1 dns-1.tarantino.family A
+
+dig @127.0.0.1 dns-2.tarantino.family A
+
+dig @127.0.0.1 dhcp.tarantino.family A
+
+dig @127.0.0.1 routeur.tarantino.family A
+
+
+###############################################################################
+# 12. TEST DE LA ZONE INVERSÉE
+###############################################################################
+
+dig @127.0.0.1 -x 192.168.11.250
+
+dig @127.0.0.1 -x 192.168.11.251
+
+dig @127.0.0.1 -x 192.168.11.254
+
+
+###############################################################################
+# 13. COMPARAISON AVEC LE SERVEUR PRIMAIRE
+###############################################################################
+
+# Interroger DNS-1
+
+dig @192.168.11.250 tarantino.family SOA
+
+# Interroger DNS-2
+
+dig @192.168.12.250 tarantino.family SOA
+
+# Les deux réponses doivent présenter le même numéro de série SOA.
+
+
+###############################################################################
+# 14. TEST DU TRANSFERT DE ZONE
+###############################################################################
+
+dig @192.168.12.250 tarantino.family AXFR
+
+dig @192.168.12.250 11.168.192.in-addr.arpa AXFR
+
+# Ces commandes permettent de vérifier les données détenues par DNS-2.
+# Selon les règles allow-transfer, un AXFR peut être refusé depuis une machine
+# non autorisée. Cela ne signifie pas forcément que la réplication a échoué.
+
+
+###############################################################################
+# 15. VÉRIFICATION DE LA SYNCHRONISATION
+###############################################################################
+
+# Sur DNS-1, modifier un enregistrement statique ou augmenter le numéro
+# de série SOA, puis recharger la zone :
+
+sudo rndc reload
+
+# Sur DNS-2, vérifier que le numéro de série a été mis à jour :
+
+dig @127.0.0.1 tarantino.family SOA
+
+# Forcer éventuellement un nouveau transfert :
+
+sudo rndc retransfer tarantino.family
+
+sudo rndc retransfer 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 16. VÉRIFICATION DES ENREGISTREMENTS DDNS
+###############################################################################
+
+# Après l'attribution d'un bail DHCP dynamique, vérifier que DNS-2 reçoit
+# les enregistrements créés sur DNS-1.
+
+dig @127.0.0.1 megatech-1.tarantino.family A
+
+dig @127.0.0.1 -x 192.168.11.6
+
+# Comparaison entre les deux serveurs :
+
+dig @192.168.11.250 megatech-1.tarantino.family A
+
+dig @192.168.12.250 megatech-1.tarantino.family A
+
+
+###############################################################################
+# 17. CONSULTATION DES JOURNAUX
+###############################################################################
+
+sudo journalctl -u bind9
+
+sudo journalctl -u bind9 -f
+
+# Afficher les derniers événements liés aux transferts de zones :
+
+sudo journalctl -u bind9 --no-pager | grep -Ei \
+"transfer|transferred|refresh|notify|zone"
+
+
+###############################################################################
+# 18. COMMANDES RNDC
+###############################################################################
+
+# Afficher l'état du serveur
+
+sudo rndc status
+
+# Recharger la configuration
+
+sudo rndc reconfig
+
+# Recharger les zones
+
+sudo rndc reload
+
+# Forcer le transfert de la zone directe
+
+sudo rndc retransfer tarantino.family
+
+# Forcer le transfert de la zone inversée
+
+sudo rndc retransfer 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 19. DÉPANNAGE DU TRANSFERT DE ZONE
+###############################################################################
+
+# Vérifier la communication TCP vers le port DNS du serveur primaire
+
+nc -vz 192.168.11.250 53
+
+# Vérifier la communication UDP vers le port DNS
+
+nc -vzu 192.168.11.250 53
+
+# Interroger directement le SOA du primaire
+
+dig @192.168.11.250 tarantino.family SOA
+
+# Vérifier les dernières erreurs
+
+sudo journalctl -u bind9 -n 50 --no-pager
+
+# Vérifier la syntaxe de la configuration
+
+sudo named-checkconf
+
+# Vérifier les fichiers présents dans le cache
+
+sudo ls -lah /var/cache/bind/
+
+
+###############################################################################
+# 20. TEST DE REDONDANCE
+###############################################################################
+
+# Arrêter temporairement Bind9 sur DNS-1 :
+
+# sudo systemctl stop bind9
+
+# Depuis un client, interroger directement DNS-2 :
+
+dig @192.168.12.250 dns-1.tarantino.family A
+
+dig @192.168.12.250 megatech-1.tarantino.family A
+
+# Lorsque le test est terminé, redémarrer DNS-1 :
+
+# sudo systemctl start bind9

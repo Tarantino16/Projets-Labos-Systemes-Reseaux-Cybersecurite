@@ -1,0 +1,410 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Configuration du routeur Debian
+#
+# Rôle :
+# - assurer le routage entre les réseaux 192.168.11.0/24 et 192.168.12.0/24 ;
+# - fournir un accès à Internet aux machines du laboratoire ;
+# - réaliser la translation d'adresses avec nftables.
+#
+# Réseau 1 : 192.168.11.0/24
+# Réseau 2 : 192.168.12.0/24
+###############################################################################
+
+
+###############################################################################
+# 1. IDENTIFICATION DES INTERFACES RÉSEAU
+###############################################################################
+
+ip address
+
+ip link
+
+# Repérer les trois interfaces du routeur :
+#
+# - interface WAN connectée à Internet ;
+# - interface LAN du réseau 192.168.11.0/24 ;
+# - interface LAN du réseau 192.168.12.0/24.
+#
+# Les noms d'interfaces utilisés dans les fichiers de configuration doivent
+# être adaptés à ceux présents sur la machine virtuelle.
+
+
+###############################################################################
+# 2. CONFIGURATION DES INTERFACES RÉSEAU
+###############################################################################
+
+sudo nano /etc/network/interfaces
+
+# Copier la configuration présente dans :
+# configurations/routeur-debian/interfaces
+
+# Adresses attendues :
+#
+# - réseau 192.168.11.0/24 : 192.168.11.254 ;
+# - réseau 192.168.12.0/24 : 192.168.12.254 ;
+# - interface WAN : configuration DHCP ou configuration fournie par
+#   l'environnement de virtualisation.
+
+
+###############################################################################
+# 3. APPLICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+sudo systemctl restart networking
+
+# En cas de perte de connexion, redémarrer la machine :
+
+sudo reboot
+
+
+###############################################################################
+# 4. VÉRIFICATION DES INTERFACES
+###############################################################################
+
+ip address
+
+ip route
+
+# Vérifier que les deux réseaux sont directement connectés :
+
+ip route | grep 192.168.11.0
+
+ip route | grep 192.168.12.0
+
+# Vérifier la présence d'une route par défaut vers Internet :
+
+ip route | grep default
+
+
+###############################################################################
+# 5. TEST DES INTERFACES DU ROUTEUR
+###############################################################################
+
+ping -c 4 192.168.11.254
+
+ping -c 4 192.168.12.254
+
+# Vérifier l'accès à Internet par adresse IP :
+
+ping -c 4 8.8.8.8
+
+# Vérifier la résolution DNS du routeur :
+
+ping -c 4 debian.org
+
+
+###############################################################################
+# 6. ACTIVATION DU ROUTAGE IPv4
+###############################################################################
+
+sudo nano /etc/sysctl.conf
+
+# Copier ou vérifier la configuration présente dans :
+# configurations/routeur-debian/sysctl.conf
+
+# La ligne suivante doit être présente :
+#
+# net.ipv4.ip_forward=1
+
+
+###############################################################################
+# 7. APPLICATION IMMÉDIATE DU ROUTAGE IPv4
+###############################################################################
+
+sudo sysctl -p
+
+# Vérification :
+
+sysctl net.ipv4.ip_forward
+
+# Le résultat attendu est :
+#
+# net.ipv4.ip_forward = 1
+
+
+###############################################################################
+# 8. INSTALLATION DE NFTABLES
+###############################################################################
+
+sudo apt update
+
+sudo apt install nftables -y
+
+# Vérification de la version installée :
+
+sudo nft --version
+
+
+###############################################################################
+# 9. CONFIGURATION DU PARE-FEU ET DU NAT
+###############################################################################
+
+sudo nano /etc/nftables.conf
+
+# Copier la configuration présente dans :
+# configurations/routeur-debian/nftables.conf
+
+# La configuration doit notamment :
+#
+# - autoriser les connexions déjà établies ;
+# - autoriser le trafic entre les deux réseaux internes ;
+# - autoriser le transfert vers Internet ;
+# - réaliser le masquerading sur l'interface WAN.
+
+
+###############################################################################
+# 10. VÉRIFICATION DE LA SYNTAXE NFTABLES
+###############################################################################
+
+sudo nft -c -f /etc/nftables.conf
+
+# La commande ne doit afficher aucune erreur.
+
+
+###############################################################################
+# 11. APPLICATION DE LA CONFIGURATION NFTABLES
+###############################################################################
+
+sudo nft flush ruleset
+
+sudo nft -f /etc/nftables.conf
+
+# Affichage des règles actuellement chargées :
+
+sudo nft list ruleset
+
+
+###############################################################################
+# 12. ACTIVATION DU SERVICE NFTABLES
+###############################################################################
+
+sudo systemctl enable nftables
+
+sudo systemctl restart nftables
+
+sudo systemctl status nftables
+
+
+###############################################################################
+# 13. VÉRIFICATION DU NAT
+###############################################################################
+
+sudo nft list table ip nat
+
+# Vérifier la présence de la chaîne postrouting et de la règle masquerade.
+
+sudo nft list chain ip nat postrouting
+
+
+###############################################################################
+# 14. VÉRIFICATION DU FILTRAGE
+###############################################################################
+
+sudo nft list table inet filter
+
+sudo nft list chain inet filter forward
+
+# Les règles doivent permettre :
+#
+# - le trafic du réseau 192.168.11.0/24 vers le réseau 192.168.12.0/24 ;
+# - le trafic du réseau 192.168.12.0/24 vers le réseau 192.168.11.0/24 ;
+# - les réponses aux connexions déjà établies ;
+# - l'accès des deux réseaux à Internet.
+
+
+###############################################################################
+# 15. TEST DE COMMUNICATION DEPUIS DNS-1
+###############################################################################
+
+# Depuis DNS-1 :
+
+ping -c 4 192.168.11.254
+
+ping -c 4 192.168.12.254
+
+ping -c 4 192.168.12.250
+
+ping -c 4 8.8.8.8
+
+
+###############################################################################
+# 16. TEST DE COMMUNICATION DEPUIS DNS-2
+###############################################################################
+
+# Depuis DNS-2 :
+
+ping -c 4 192.168.12.254
+
+ping -c 4 192.168.11.254
+
+ping -c 4 192.168.11.250
+
+ping -c 4 8.8.8.8
+
+
+###############################################################################
+# 17. TEST DE ROUTAGE ENTRE LES DEUX RÉSEAUX
+###############################################################################
+
+# Depuis une machine du réseau 192.168.11.0/24 :
+
+traceroute 192.168.12.250
+
+# Depuis une machine du réseau 192.168.12.0/24 :
+
+traceroute 192.168.11.250
+
+# Installation de traceroute si nécessaire :
+
+sudo apt install traceroute -y
+
+
+###############################################################################
+# 18. TEST D'ACCÈS À INTERNET DEPUIS LES CLIENTS
+###############################################################################
+
+# Depuis un client ou un serveur du laboratoire :
+
+ping -c 4 8.8.8.8
+
+ping -c 4 debian.org
+
+curl -I https://www.debian.org
+
+# Installation de curl si nécessaire :
+
+sudo apt install curl -y
+
+
+###############################################################################
+# 19. OBSERVATION DU TRAFIC RÉSEAU
+###############################################################################
+
+sudo apt install tcpdump -y
+
+# Observer le trafic sur l'interface du réseau 192.168.11.0/24 :
+
+sudo tcpdump -ni enp0s8
+
+# Observer le trafic sur l'interface du réseau 192.168.12.0/24 :
+
+sudo tcpdump -ni enp0s9
+
+# Observer le trafic DNS :
+
+sudo tcpdump -ni any port 53
+
+# Observer les transferts de zones DNS en TCP :
+
+sudo tcpdump -ni any tcp port 53
+
+# Adapter les noms enp0s8 et enp0s9 aux interfaces réellement utilisées.
+
+
+###############################################################################
+# 20. AFFICHAGE DES COMPTEURS NFTABLES
+###############################################################################
+
+sudo nft list ruleset
+
+# Les compteurs de paquets et d'octets permettent de vérifier que le trafic
+# traverse les règles attendues.
+
+
+###############################################################################
+# 21. SAUVEGARDE DE LA CONFIGURATION ACTIVE
+###############################################################################
+
+sudo nft list ruleset | sudo tee /etc/nftables.conf
+
+# Attention :
+# cette commande remplace le fichier /etc/nftables.conf par les règles
+# actuellement chargées. L'utiliser seulement après avoir vérifié les règles.
+
+
+###############################################################################
+# 22. REDÉMARRAGE COMPLET DE VALIDATION
+###############################################################################
+
+sudo reboot
+
+# Après le redémarrage, vérifier :
+
+sysctl net.ipv4.ip_forward
+
+sudo systemctl status nftables
+
+sudo nft list ruleset
+
+ip address
+
+ip route
+
+
+###############################################################################
+# 23. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier les erreurs du service réseau :
+
+sudo journalctl -u networking -n 50 --no-pager
+
+# Vérifier les erreurs nftables :
+
+sudo journalctl -u nftables -n 50 --no-pager
+
+# Vérifier le routage IPv4 :
+
+cat /proc/sys/net/ipv4/ip_forward
+
+# Vérifier les routes :
+
+ip route show
+
+# Vérifier les voisins ARP :
+
+ip neigh
+
+# Vérifier si les paquets ICMP arrivent sur le routeur :
+
+sudo tcpdump -ni any icmp
+
+# Vérifier les ports et services à l'écoute :
+
+sudo ss -lntup
+
+# Recharger nftables après une correction :
+
+sudo nft -c -f /etc/nftables.conf
+
+sudo nft -f /etc/nftables.conf
+
+
+###############################################################################
+# 24. RÉINITIALISATION TEMPORAIRE DE NFTABLES
+###############################################################################
+
+# Cette commande supprime toutes les règles actives.
+# Elle doit être utilisée avec prudence.
+
+sudo nft flush ruleset
+
+# Pour restaurer la configuration :
+
+sudo nft -f /etc/nftables.conf
+
+
+###############################################################################
+# 25. VALIDATION FINALE
+###############################################################################
+
+# Le routeur est correctement configuré si :
+#
+# - 192.168.11.254 répond sur le premier réseau ;
+# - 192.168.12.254 répond sur le second réseau ;
+# - DNS-1 et DNS-2 peuvent communiquer ;
+# - les machines des deux réseaux peuvent communiquer entre elles ;
+# - les machines internes peuvent accéder à Internet ;
+# - le routage IPv4 reste actif après redémarrage ;
+# - les règles nftables sont chargées automatiquement au démarrage.

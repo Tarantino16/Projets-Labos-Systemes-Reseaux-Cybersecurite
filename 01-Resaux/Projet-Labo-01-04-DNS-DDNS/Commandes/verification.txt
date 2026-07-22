@@ -1,0 +1,353 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Vérification complète du laboratoire
+#
+# Ce document permet de contrôler l'ensemble du laboratoire une fois
+# toutes les configurations terminées.
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DES INTERFACES RÉSEAU
+###############################################################################
+
+ip address
+
+ip route
+
+hostname -I
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA CONNECTIVITÉ
+###############################################################################
+
+# Depuis DNS-1
+
+ping -c 4 192.168.11.254
+ping -c 4 192.168.12.250
+
+# Depuis DNS-2
+
+ping -c 4 192.168.12.254
+ping -c 4 192.168.11.250
+
+# Depuis DHCP
+
+ping -c 4 192.168.11.250
+ping -c 4 192.168.12.250
+
+# Depuis un client
+
+ping -c 4 192.168.11.254
+ping -c 4 192.168.12.254
+
+
+###############################################################################
+# 3. TEST DU ROUTAGE
+###############################################################################
+
+traceroute 192.168.12.250
+
+traceroute 192.168.11.250
+
+
+###############################################################################
+# 4. TEST DE L'ACCÈS INTERNET
+###############################################################################
+
+ping -c 4 8.8.8.8
+
+ping -c 4 debian.org
+
+curl -I https://www.debian.org
+
+
+###############################################################################
+# 5. VÉRIFICATION DES SERVICES
+###############################################################################
+
+# Routeur
+
+sudo systemctl status nftables
+
+# DNS-1
+
+sudo systemctl status bind9
+
+# DNS-2
+
+sudo systemctl status bind9
+
+# DHCP
+
+sudo systemctl status isc-dhcp-server
+
+
+###############################################################################
+# 6. VÉRIFICATION DES PORTS
+###############################################################################
+
+# DNS
+
+sudo ss -lntup | grep :53
+
+# DHCP
+
+sudo ss -lnup | grep -E ':67|:68'
+
+
+###############################################################################
+# 7. VALIDATION DE LA CONFIGURATION BIND9
+###############################################################################
+
+sudo named-checkconf
+
+sudo named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+sudo named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 8. VÉRIFICATION DE LA ZONE DIRECTE
+###############################################################################
+
+dig @127.0.0.1 tarantino.family SOA
+
+dig @127.0.0.1 tarantino.family NS
+
+dig @127.0.0.1 dns-1.tarantino.family A
+
+dig @127.0.0.1 dns-2.tarantino.family A
+
+dig @127.0.0.1 dhcp.tarantino.family A
+
+dig @127.0.0.1 routeur.tarantino.family A
+
+
+###############################################################################
+# 9. VÉRIFICATION DE LA ZONE INVERSÉE
+###############################################################################
+
+dig @127.0.0.1 -x 192.168.11.250
+
+dig @127.0.0.1 -x 192.168.11.251
+
+dig @127.0.0.1 -x 192.168.11.254
+
+
+###############################################################################
+# 10. TESTS AVEC HOST
+###############################################################################
+
+host dns-1.tarantino.family 127.0.0.1
+
+host dns-2.tarantino.family 127.0.0.1
+
+host dhcp.tarantino.family 127.0.0.1
+
+host 192.168.11.250 127.0.0.1
+
+
+###############################################################################
+# 11. TESTS AVEC NSLOOKUP
+###############################################################################
+
+nslookup dns-1.tarantino.family 127.0.0.1
+
+nslookup dns-2.tarantino.family 127.0.0.1
+
+nslookup dhcp.tarantino.family 127.0.0.1
+
+
+###############################################################################
+# 12. TRANSFERT DE ZONES
+###############################################################################
+
+dig @192.168.11.250 tarantino.family AXFR
+
+dig @192.168.12.250 tarantino.family SOA
+
+dig @192.168.12.250 11.168.192.in-addr.arpa SOA
+
+# Les deux serveurs doivent posséder le même numéro de série SOA.
+
+
+###############################################################################
+# 13. VÉRIFICATION DE LA SYNCHRONISATION
+###############################################################################
+
+sudo rndc status
+
+sudo rndc reload
+
+sudo rndc retransfer tarantino.family
+
+sudo rndc retransfer 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 14. TEST DU DHCP
+###############################################################################
+
+# Depuis un client
+
+sudo dhclient -r
+
+sudo dhclient
+
+ip address
+
+ip route
+
+cat /etc/resolv.conf
+
+
+###############################################################################
+# 15. VÉRIFICATION DU DDNS
+###############################################################################
+
+dig @192.168.11.250 megatech-1.tarantino.family
+
+dig @192.168.12.250 megatech-1.tarantino.family
+
+dig @192.168.11.250 -x 192.168.11.6
+
+dig @192.168.12.250 -x 192.168.11.6
+
+
+###############################################################################
+# 16. CONSULTATION DES BAUX DHCP
+###############################################################################
+
+sudo cat /var/lib/dhcp/dhcpd.leases
+
+
+###############################################################################
+# 17. CONSULTATION DES JOURNAUX
+###############################################################################
+
+# DNS
+
+sudo journalctl -u bind9 -n 50
+
+# DHCP
+
+sudo journalctl -u isc-dhcp-server -n 50
+
+# Réseau
+
+sudo journalctl -u networking -n 50
+
+
+###############################################################################
+# 18. OBSERVATION DU TRAFIC
+###############################################################################
+
+sudo tcpdump -ni any port 53
+
+sudo tcpdump -ni any port 67
+
+sudo tcpdump -ni any port 68
+
+
+###############################################################################
+# 19. VÉRIFICATION DES RÈGLES NFTABLES
+###############################################################################
+
+sudo nft list ruleset
+
+sudo nft list table ip nat
+
+sudo nft list table inet filter
+
+
+###############################################################################
+# 20. TESTS DE RÉSOLUTION DNS
+###############################################################################
+
+dig google.com
+
+dig debian.org
+
+host openai.com
+
+nslookup github.com
+
+
+###############################################################################
+# 21. VÉRIFICATION DES FICHIERS DE ZONES
+###############################################################################
+
+ls -lah /var/cache/bind/
+
+cat /var/cache/bind/tarantino.family.dns
+
+cat /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 22. REDÉMARRAGE DES SERVICES
+###############################################################################
+
+sudo systemctl restart bind9
+
+sudo systemctl restart isc-dhcp-server
+
+sudo systemctl restart nftables
+
+
+###############################################################################
+# 23. REDÉMARRAGE COMPLET
+###############################################################################
+
+sudo reboot
+
+
+###############################################################################
+# 24. CHECK-LIST DE VALIDATION
+###############################################################################
+
+[ ] Toutes les interfaces réseau sont configurées.
+[ ] Toutes les machines répondent au ping.
+[ ] Les deux réseaux communiquent.
+[ ] L'accès Internet fonctionne.
+[ ] Le routage IPv4 est actif.
+[ ] Les règles nftables sont chargées.
+[ ] Bind9 démarre correctement.
+[ ] Les zones DNS sont valides.
+[ ] Les zones sont transférées sur DNS-2.
+[ ] Les clients obtiennent une adresse DHCP.
+[ ] Les mises à jour DDNS fonctionnent.
+[ ] Les enregistrements directs sont créés.
+[ ] Les enregistrements inversés sont créés.
+[ ] DNS-2 reçoit automatiquement les mises à jour.
+[ ] Les services démarrent automatiquement après redémarrage.
+
+
+###############################################################################
+# 25. COMMANDES DE DÉPANNAGE RAPIDE
+###############################################################################
+
+sudo systemctl status bind9
+
+sudo systemctl status isc-dhcp-server
+
+sudo systemctl status nftables
+
+sudo named-checkconf
+
+sudo named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+sudo journalctl -xe
+
+sudo nft list ruleset
+
+ip address
+
+ip route
+
+ss -lntup

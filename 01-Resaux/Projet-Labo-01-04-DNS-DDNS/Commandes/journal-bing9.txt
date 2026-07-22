@@ -1,0 +1,185 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Consultation des journaux Bind9
+###############################################################################
+
+
+###############################################################################
+# 1. ÉTAT DU SERVICE
+###############################################################################
+
+sudo systemctl status bind9
+
+
+###############################################################################
+# 2. DERNIERS ÉVÉNEMENTS
+###############################################################################
+
+sudo journalctl -u bind9 -n 50 --no-pager
+
+
+###############################################################################
+# 3. SUIVI EN TEMPS RÉEL
+###############################################################################
+
+sudo journalctl -u bind9 -f
+
+
+###############################################################################
+# 4. JOURNAL COMPLET DEPUIS LE DÉMARRAGE
+###############################################################################
+
+sudo journalctl -u bind9
+
+
+###############################################################################
+# 5. RECHERCHE DES ERREURS
+###############################################################################
+
+sudo journalctl -u bind9 --no-pager | grep -i error
+
+sudo journalctl -u bind9 --no-pager | grep -i failed
+
+sudo journalctl -u bind9 --no-pager | grep -i denied
+
+sudo journalctl -u bind9 --no-pager | grep -i warning
+
+
+###############################################################################
+# 6. TRANSFERTS DE ZONES
+###############################################################################
+
+sudo journalctl -u bind9 --no-pager | grep -Ei \
+"transfer|transferred|notify|refresh|serial|zone"
+
+
+###############################################################################
+# 7. MISES À JOUR DDNS
+###############################################################################
+
+sudo journalctl -u bind9 --no-pager | grep -Ei \
+"update|allow-update|TSIG|key|dynamic"
+
+
+###############################################################################
+# 8. CHARGEMENT DES ZONES
+###############################################################################
+
+sudo journalctl -u bind9 --no-pager | grep -Ei \
+"loaded|loading|zone"
+
+
+###############################################################################
+# 9. REDÉMARRAGE DU SERVICE
+###############################################################################
+
+sudo systemctl restart bind9
+
+sudo journalctl -u bind9 -n 30 --no-pager
+
+
+###############################################################################
+# 10. RECHARGEMENT DE LA CONFIGURATION
+###############################################################################
+
+sudo rndc reconfig
+
+sudo rndc reload
+
+sudo journalctl -u bind9 -n 20 --no-pager
+
+
+###############################################################################
+# 11. CONSULTATION DU SYSLOG
+###############################################################################
+
+# Certaines versions de Debian utilisent toujours syslog.
+
+sudo tail -f /var/log/syslog
+
+# Afficher uniquement les messages Bind9 :
+
+sudo tail -f /var/log/syslog | grep named
+
+# ou
+
+sudo grep named /var/log/syslog
+
+
+###############################################################################
+# 12. VÉRIFICATION DE LA CONFIGURATION
+###############################################################################
+
+sudo named-checkconf
+
+sudo named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+sudo named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 13. ÉTAT DE BIND9
+###############################################################################
+
+sudo rndc status
+
+
+###############################################################################
+# 14. RECHARGEMENT DES ZONES
+###############################################################################
+
+sudo rndc reload
+
+sudo rndc retransfer tarantino.family
+
+sudo rndc retransfer 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 15. VÉRIFICATION DES PORTS
+###############################################################################
+
+sudo ss -lntup | grep :53
+
+
+###############################################################################
+# 16. OBSERVATION DU TRAFIC DNS
+###############################################################################
+
+sudo tcpdump -ni any port 53
+
+# Observer uniquement les transferts AXFR (TCP)
+
+sudo tcpdump -ni any tcp port 53
+
+
+###############################################################################
+# 17. VÉRIFICATION DES FICHIERS DE ZONES
+###############################################################################
+
+ls -lah /var/cache/bind/
+
+cat /var/cache/bind/tarantino.family.dns
+
+cat /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 18. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+sudo systemctl restart bind9
+
+sudo systemctl status bind9
+
+sudo journalctl -xe
+
+sudo journalctl -u bind9 -xe
+
+sudo named-checkconf
+
+sudo rndc status
+
+sudo nft list ruleset

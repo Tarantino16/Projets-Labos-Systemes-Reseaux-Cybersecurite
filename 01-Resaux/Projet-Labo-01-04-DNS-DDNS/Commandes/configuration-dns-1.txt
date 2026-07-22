@@ -1,0 +1,344 @@
+###############################################################################
+# Projet-Labo-01-4-DNS-DDNS
+# Configuration du serveur DNS primaire DNS-1
+#
+# Adresse IP : 192.168.11.250/24
+# Passerelle : 192.168.11.254
+# Domaine     : tarantino.family
+###############################################################################
+
+
+###############################################################################
+# 1. CONFIGURATION RÉSEAU
+###############################################################################
+
+sudo nano /etc/network/interfaces
+
+# Copier la configuration présente dans :
+# configurations/dns-1/interfaces
+
+sudo systemctl restart networking
+
+# Vérification des interfaces réseau
+
+ip address
+ip route
+
+# Vérification de la communication avec le routeur
+
+ping -c 4 192.168.11.254
+
+
+###############################################################################
+# 2. CONFIGURATION DE LA RÉSOLUTION LOCALE
+###############################################################################
+
+sudo nano /etc/resolv.conf
+
+# Copier la configuration présente dans :
+# configurations/dns-1/resolv.conf
+
+# Vérification
+
+cat /etc/resolv.conf
+
+
+###############################################################################
+# 3. INSTALLATION DE BIND9
+###############################################################################
+
+sudo apt update
+sudo apt install bind9 bind9-utils dnsutils -y
+
+# Vérification de l'installation
+
+named -v
+systemctl status bind9
+
+
+###############################################################################
+# 4. CONFIGURATION DU DÉMARRAGE DE BIND9
+###############################################################################
+
+sudo nano /etc/default/named
+
+# Copier la configuration présente dans :
+# configurations/dns-1/named
+
+# Contenu attendu :
+#
+# OPTIONS="-u bind -4"
+
+
+###############################################################################
+# 5. CONFIGURATION GÉNÉRALE DE BIND9
+###############################################################################
+
+sudo nano /etc/bind/named.conf
+
+# Copier la configuration présente dans :
+# configurations/dns-1/named.conf
+
+sudo nano /etc/bind/named.conf.options
+
+# Copier la configuration présente dans :
+# configurations/dns-1/named.conf.options
+
+
+###############################################################################
+# 6. CRÉATION DE LA CLÉ TSIG POUR LE DDNS
+###############################################################################
+
+sudo tsig-keygen -a hmac-sha256 cle_dhcp
+
+# Copier le résultat complet dans le fichier :
+
+sudo nano /etc/bind/cle.txt
+
+# Le fichier doit respecter la structure suivante :
+#
+# key "cle_dhcp" {
+#     algorithm hmac-sha256;
+#     secret "VOTRE_CLE_TSIG_GENEREE";
+# };
+
+# Sécurisation de la clé TSIG
+
+sudo chown root:bind /etc/bind/cle.txt
+sudo chmod 640 /etc/bind/cle.txt
+
+# La même clé devra également être renseignée dans :
+# /etc/dhcp/dhcpd.conf
+
+
+###############################################################################
+# 7. CRÉATION DES FICHIERS DE ZONES
+###############################################################################
+
+# Création de la zone directe
+
+sudo nano /var/cache/bind/tarantino.family.dns
+
+# Copier la configuration présente dans :
+# configurations/dns-1/tarantino.family.dns
+
+
+# Création de la zone inversée
+
+sudo nano /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+# Copier la configuration présente dans :
+# configurations/dns-1/11.168.192.in-addr.arpa.dns
+
+
+# Attribution des droits à Bind9
+
+sudo chown bind:bind /var/cache/bind/tarantino.family.dns
+sudo chown bind:bind /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+sudo chmod 664 /var/cache/bind/tarantino.family.dns
+sudo chmod 664 /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 8. DÉCLARATION DES ZONES DNS
+###############################################################################
+
+sudo nano /etc/bind/named.conf.local
+
+# Copier la configuration présente dans :
+# configurations/dns-1/named.conf.local
+
+# La configuration déclare :
+#
+# - la zone directe tarantino.family ;
+# - la zone inversée 11.168.192.in-addr.arpa ;
+# - le serveur DNS-2 autorisé à recevoir les transferts de zones ;
+# - la clé TSIG utilisée pour les mises à jour DDNS.
+
+
+###############################################################################
+# 9. VÉRIFICATION DE LA CONFIGURATION BIND9
+###############################################################################
+
+# Vérification générale de la syntaxe
+
+sudo named-checkconf
+
+# Vérification de la zone directe
+
+sudo named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+# Vérification de la zone inversée
+
+sudo named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 10. REDÉMARRAGE DE BIND9
+###############################################################################
+
+sudo systemctl restart bind9
+sudo systemctl enable bind9
+
+# Vérification de l'état du service
+
+sudo systemctl status bind9
+
+# Vérification de l'écoute sur le port DNS 53
+
+sudo ss -lntup | grep :53
+
+
+###############################################################################
+# 11. TESTS DE LA ZONE DIRECTE
+###############################################################################
+
+dig @127.0.0.1 tarantino.family SOA
+
+dig @127.0.0.1 tarantino.family NS
+
+dig @127.0.0.1 dns-1.tarantino.family A
+
+dig @127.0.0.1 dns-2.tarantino.family A
+
+dig @127.0.0.1 dhcp.tarantino.family A
+
+dig @127.0.0.1 routeur.tarantino.family A
+
+
+###############################################################################
+# 12. TESTS DE LA ZONE INVERSÉE
+###############################################################################
+
+dig @127.0.0.1 -x 192.168.11.250
+
+dig @127.0.0.1 -x 192.168.11.251
+
+dig @127.0.0.1 -x 192.168.11.254
+
+
+###############################################################################
+# 13. TESTS AVEC HOST ET NSLOOKUP
+###############################################################################
+
+host dns-1.tarantino.family 127.0.0.1
+
+host 192.168.11.250 127.0.0.1
+
+nslookup dns-1.tarantino.family 127.0.0.1
+
+nslookup 192.168.11.250 127.0.0.1
+
+
+###############################################################################
+# 14. TEST DU TRANSFERT DE LA ZONE DIRECTE
+###############################################################################
+
+dig @192.168.11.250 tarantino.family AXFR
+
+# Le transfert doit être autorisé uniquement au serveur DNS secondaire :
+# 192.168.12.250
+#
+# Un test réalisé depuis une autre machine peut être refusé selon la
+# configuration de la directive allow-transfer.
+
+
+###############################################################################
+# 15. ACTIVATION DES MISES À JOUR DDNS
+###############################################################################
+
+sudo nano /etc/bind/named.conf.local
+
+# Décommenter les directives allow-update des deux zones :
+#
+# allow-update {
+#     192.168.11.251;
+#     key cle_dhcp;
+# };
+
+# Après modification, vérifier la configuration :
+
+sudo named-checkconf
+
+# Redémarrer Bind9 :
+
+sudo systemctl restart bind9
+
+
+###############################################################################
+# 16. VÉRIFICATION DES MISES À JOUR DYNAMIQUES
+###############################################################################
+
+# Depuis un client DHCP, renouveler le bail :
+
+sudo dhclient -r
+sudo dhclient
+
+# Depuis DNS-1, vérifier l'apparition du client dans la zone directe :
+
+dig @127.0.0.1 megatech-1.tarantino.family A
+
+# Vérifier l'enregistrement inversé :
+
+dig @127.0.0.1 -x 192.168.11.6
+
+# Examiner le contenu de la zone :
+
+sudo cat /var/cache/bind/tarantino.family.dns
+
+sudo cat /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 17. CONSULTATION DES JOURNAUX
+###############################################################################
+
+sudo journalctl -u bind9
+
+sudo journalctl -u bind9 -f
+
+# Sur certaines versions de Debian :
+
+sudo tail -f /var/log/syslog | grep named
+
+
+###############################################################################
+# 18. COMMANDES DE DÉPANNAGE
+###############################################################################
+
+# Vérifier de nouveau toute la configuration
+
+sudo named-checkconf
+
+sudo named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+sudo named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+# Afficher les dernières erreurs Bind9
+
+sudo journalctl -u bind9 -n 50 --no-pager
+
+# Recharger la configuration sans redémarrer complètement le service
+
+sudo rndc reconfig
+
+# Recharger les zones
+
+sudo rndc reload
+
+# Afficher l'état de Bind9
+
+sudo rndc status
+
+# Vérifier les fichiers créés dans le cache Bind9
+
+sudo ls -la /var/cache/bind/
+
+# Vérifier les droits de la clé TSIG
+
+sudo ls -l /etc/bind/cle.txt
