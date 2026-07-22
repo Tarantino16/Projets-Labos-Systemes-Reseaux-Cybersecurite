@@ -1,0 +1,44 @@
+===========================================================
+Projet-Labo 03 - Serveur DHCP Linux
+Fichier : verification.txt
+
+Description :
+Commandes utilisées pour vérifier le bon
+fonctionnement du serveur DHCP.
+===========================================================
+
+
+===========================================================
+1. Vérification du service DHCP
+===========================================================
+
+systemctl status isc-dhcp-server
+
+
+===========================================================
+2. Vérification de la configuration IP du client
+===========================================================
+
+ipconfig /all
+
+
+===========================================================
+Résultat attendu
+===========================================================
+
+Le client doit recevoir automatiquement :
+
+- Une adresse IP comprise entre 192.168.12.12
+  et 192.168.12.62
+
+- Le masque réseau :
+  255.255.255.0
+
+- La passerelle par défaut :
+  192.168.12.254
+
+- Le serveur DNS :
+  192.168.11.250
+
+- Le nom de domaine :
+  tarantino.family

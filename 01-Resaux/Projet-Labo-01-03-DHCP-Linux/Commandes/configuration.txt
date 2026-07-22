@@ -1,0 +1,42 @@
+===========================================================
+Projet-Labo 03 - Serveur DHCP Linux
+Fichier : configuration.txt
+
+Description :
+Commandes utilisées pour configurer le serveur DHCP
+sous Debian.
+===========================================================
+
+
+===========================================================
+1. Configuration de l'adresse IP du serveur
+===========================================================
+
+nano /etc/network/interfaces
+
+systemctl restart networking
+
+
+===========================================================
+2. Configuration de l'interface utilisée par le serveur DHCP
+===========================================================
+
+nano /etc/default/isc-dhcp-server
+
+systemctl restart isc-dhcp-server
+
+
+===========================================================
+3. Configuration du serveur DHCP
+===========================================================
+
+nano /etc/dhcp/dhcpd.conf
+
+systemctl restart isc-dhcp-server
+
+
+===========================================================
+4. Vérification de l'état du service
+===========================================================
+
+systemctl status isc-dhcp-server

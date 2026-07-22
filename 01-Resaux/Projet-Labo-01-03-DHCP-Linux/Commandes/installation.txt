@@ -1,0 +1,22 @@
+===========================================================
+Projet-Labo 03 - Serveur DHCP Linux
+Fichier : installation.txt
+
+Description :
+Commandes utilisées pour installer le rôle DHCP
+sur un serveur Debian.
+===========================================================
+
+
+===========================================================
+1. Installation du serveur DHCP
+===========================================================
+
+apt update && apt install isc-dhcp-server
+
+
+===========================================================
+2. Vérification de l'installation
+===========================================================
+
+systemctl status isc-dhcp-server
