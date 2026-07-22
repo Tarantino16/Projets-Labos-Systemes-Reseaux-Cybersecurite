@@ -124,19 +124,19 @@ Projet-Labo-01-4-DNS-DDNS/
 │
 ├── README.md
 │
-├── documentation/
+├── Documentation/
 │   └── Projet-Labo-01-4-DNS-DDNS.pdf
 │
-├── machines-virtuelles/
+├── Machines-Virtuelles/
 │   └── README.md
 │
-├── configurations/
-│   ├── routeur-debian/
+├── Configurations/
+│   ├── Routeur-Debian/
 │   │   ├── interfaces
 │   │   ├── nftables.conf
 │   │   └── sysctl.conf
 │   │
-│   ├── dns-1/
+│   ├── DNS-1/
 │   │   ├── interfaces
 │   │   ├── resolv.conf
 │   │   ├── named.conf
@@ -147,18 +147,18 @@ Projet-Labo-01-4-DNS-DDNS/
 │   │   ├── 11.168.192.in-addr.arpa.dns
 │   │   └── cle.txt
 │   │
-│   ├── dns-2/
+│   ├── DNS-2/
 │   │   ├── interfaces
 │   │   ├── resolv.conf
 │   │   ├── named.conf.options
 │   │   └── named.conf.local
 │   │
-│   └── dhcp/
+│   └── DHCP/
 │       ├── interfaces
 │       ├── isc-dhcp-server
 │       └── dhcpd.conf
 │
-├── commandes/
+├── Commandes/
 │   ├── installation.txt
 │   ├── configuration-routeur.txt
 │   ├── configuration-dns-1.txt
@@ -167,7 +167,7 @@ Projet-Labo-01-4-DNS-DDNS/
 │   ├── verification.txt
 │   └── journal-bind9.txt
 │
-└── schemas/
+└── Schemas/
     └── schemas.png
 ```
 
