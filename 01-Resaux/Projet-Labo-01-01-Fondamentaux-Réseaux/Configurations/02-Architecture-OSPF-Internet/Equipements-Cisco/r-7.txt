@@ -1,0 +1,48 @@
+enable
+configure terminal
+
+hostname R-7
+
+interface GigabitEthernet0/0
+ ip address 80.0.2.7 255.255.255.0
+ bandwidth 10000
+ no shutdown
+exit
+
+interface GigabitEthernet0/1
+ ip address 80.0.3.7 255.255.255.0
+ bandwidth 10000
+ no shutdown
+exit
+
+interface GigabitEthernet0/2
+ ip address 100.0.17.254 255.255.255.0
+ no shutdown
+exit
+
+interface GigabitEthernet0/0/0
+ ip address 80.0.10.7 255.255.255.0
+ bandwidth 10000
+ no shutdown
+exit
+
+interface GigabitEthernet0/1/0
+ ip address 80.0.13.7 255.255.255.0
+ bandwidth 10000
+ no shutdown
+exit
+
+interface GigabitEthernet0/2/0
+ ip address 80.0.15.7 255.255.255.0
+ bandwidth 10000
+ no shutdown
+exit
+
+router ospf 1
+ network 80.0.0.0 0.255.255.255 area 1
+ network 100.0.0.0 0.255.255.255 area 1
+ auto-cost reference-bandwidth 10000
+exit
+
+end
+write memory
