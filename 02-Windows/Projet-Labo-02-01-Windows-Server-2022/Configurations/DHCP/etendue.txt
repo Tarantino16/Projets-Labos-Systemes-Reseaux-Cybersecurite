@@ -1,0 +1,411 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration de l'étendue DHCP
+#
+# Service :
+# - DHCP Server
+#
+# Serveur DHCP :
+# - 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Nom de l'étendue :
+# - Etendue
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# L'étendue DHCP définit le pool d'adresses IPv4
+# pouvant être attribuées automatiquement aux clients.
+#
+# Dans ce laboratoire, une étendue est créée
+# pour le réseau :
+#
+# 192.168.11.0/24
+
+
+###############################################################################
+# 2. INFORMATIONS DE L'ÉTENDUE
+###############################################################################
+
+Nom de l'étendue :
+
+Etendue
+
+Réseau :
+
+192.168.11.0
+
+Préfixe :
+
+/24
+
+Masque :
+
+255.255.255.0
+
+
+###############################################################################
+# 3. PLAGE D'ADRESSES
+###############################################################################
+
+# Exemple de plage utilisée pour l'étendue :
+
+Adresse de début :
+
+192.168.11.1
+
+Adresse de fin :
+
+192.168.11.100
+
+# Les adresses fixes utilisées par les serveurs
+# et équipements réseau ne doivent pas être
+# attribuées dynamiquement aux clients.
+
+
+###############################################################################
+# 4. ADRESSES FIXES DU LABORATOIRE
+###############################################################################
+
+# Serveur Windows Server 2022 :
+
+192.168.11.250
+
+# Passerelle / Routeur :
+
+192.168.11.254
+
+# Ces adresses sont configurées statiquement
+# et ne doivent pas être distribuées par DHCP.
+
+
+###############################################################################
+# 5. CRÉATION DE L'ÉTENDUE AVEC POWERSHELL
+###############################################################################
+
+Add-DhcpServerv4Scope `
+    -Name "Etendue" `
+    -StartRange 192.168.11.1 `
+    -EndRange 192.168.11.100 `
+    -SubnetMask 255.255.255.0
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# Vérifier :
+#
+# - le nom ;
+# - le ScopeId ;
+# - la plage ;
+# - le masque ;
+# - l'état.
+
+
+###############################################################################
+# 7. IDENTIFIANT DE L'ÉTENDUE
+###############################################################################
+
+ScopeId :
+
+192.168.11.0
+
+
+###############################################################################
+# 8. ACTIVATION DE L'ÉTENDUE
+###############################################################################
+
+Set-DhcpServerv4Scope `
+    -ScopeId 192.168.11.0 `
+    -State Active
+
+
+###############################################################################
+# 9. VÉRIFICATION DE L'ÉTAT
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# Résultat attendu :
+
+State : Active
+
+
+###############################################################################
+# 10. CONFIGURATION DE LA PASSERELLE
+###############################################################################
+
+# Option DHCP 003 :
+
+192.168.11.254
+
+# Commande :
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 3 `
+    -Value 192.168.11.254 `
+    -Force
+
+
+###############################################################################
+# 11. CONFIGURATION DU SERVEUR DNS
+###############################################################################
+
+# Option DHCP 006 :
+
+192.168.11.250
+
+# Commande :
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 6 `
+    -Value 192.168.11.250 `
+    -Force
+
+
+###############################################################################
+# 12. CONFIGURATION DU SUFFIXE DNS
+###############################################################################
+
+# Option DHCP 015 :
+
+Tarantino.Mega
+
+# Commande :
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 15 `
+    -Value "Tarantino.Mega" `
+    -Force
+
+
+###############################################################################
+# 13. VÉRIFICATION DES OPTIONS DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+
+###############################################################################
+# 14. CONFIGURATION RÉSEAU ATTENDUE SUR UN CLIENT
+###############################################################################
+
+# Lorsqu'un client obtient un bail DHCP,
+# il doit recevoir notamment :
+#
+# Adresse IPv4 :
+# Une adresse comprise dans la plage DHCP.
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# Serveur DNS :
+# 192.168.11.250
+#
+# Suffixe DNS :
+# Tarantino.Mega
+
+
+###############################################################################
+# 15. RENOUVELLEMENT DU BAIL CÔTÉ CLIENT
+###############################################################################
+
+# Depuis un poste Windows :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 16. VÉRIFICATION CÔTÉ CLIENT
+###############################################################################
+
+ipconfig /all
+
+# Vérifier :
+#
+# - DHCP activé ;
+# - adresse IPv4 reçue ;
+# - masque correct ;
+# - passerelle correcte ;
+# - serveur DHCP correct ;
+# - serveur DNS correct ;
+# - suffixe DNS correct.
+
+
+###############################################################################
+# 17. CONSULTATION DES BAUX
+###############################################################################
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Cette commande permet de consulter
+# les clients disposant d'un bail DHCP.
+
+
+###############################################################################
+# 18. STATISTIQUES DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4ScopeStatistics `
+    -ScopeId 192.168.11.0
+
+# Cette commande permet notamment de vérifier :
+#
+# - les adresses utilisées ;
+# - les adresses disponibles ;
+# - le taux d'utilisation de l'étendue.
+
+
+###############################################################################
+# 19. STRATÉGIES DHCP
+###############################################################################
+
+# L'étendue est également utilisée pour appliquer
+# des stratégies basées sur les classes utilisateurs :
+#
+# salle-1
+# salle-2
+#
+# La configuration détaillée est disponible dans :
+#
+# configurations/dhcp/strategies-dhcp.txt
+#
+# et :
+#
+# configurations/dhcp/classes-utilisateurs.txt
+
+
+###############################################################################
+# 20. INTÉGRATION AVEC DNS
+###############################################################################
+
+# Le serveur DHCP et le serveur DNS sont hébergés
+# sur le même serveur dans ce laboratoire :
+#
+# 192.168.11.250
+#
+# Les mises à jour DNS dynamiques permettent
+# d'enregistrer automatiquement les postes clients
+# dans la zone DNS Tarantino.Mega.
+
+
+###############################################################################
+# 21. AUTORISATION DANS ACTIVE DIRECTORY
+###############################################################################
+
+# Après la mise en place d'AD DS, le serveur DHCP
+# doit être autorisé dans le domaine :
+
+Add-DhcpServerInDC `
+    -DnsName "Tarantino.Mega" `
+    -IPAddress 192.168.11.250
+
+
+###############################################################################
+# 22. VÉRIFICATION DU SERVEUR AUTORISÉ
+###############################################################################
+
+Get-DhcpServerInDC
+
+
+###############################################################################
+# 23. DÉPANNAGE
+###############################################################################
+
+# Afficher l'étendue :
+
+Get-DhcpServerv4Scope
+
+
+# Afficher les options :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+
+# Afficher les baux :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+
+# Afficher les statistiques :
+
+Get-DhcpServerv4ScopeStatistics `
+    -ScopeId 192.168.11.0
+
+
+# Vérifier le service DHCP :
+
+Get-Service DHCPServer
+
+
+###############################################################################
+# 24. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Options DHCP :
+
+configurations/dhcp/options-dhcp.txt
+
+# Classes utilisateurs :
+
+configurations/dhcp/classes-utilisateurs.txt
+
+# Stratégies DHCP :
+
+configurations/dhcp/strategies-dhcp.txt
+
+# Procédure complète :
+
+commandes/configuration-dhcp.txt
+
+
+###############################################################################
+# 25. VALIDATION
+###############################################################################
+
+# L'étendue DHCP est correctement configurée si :
+#
+# [ ] L'étendue "Etendue" existe.
+#
+# [ ] Le ScopeId est 192.168.11.0.
+#
+# [ ] Le masque est 255.255.255.0.
+#
+# [ ] L'étendue est active.
+#
+# [ ] Les clients reçoivent une adresse IPv4.
+#
+# [ ] La passerelle distribuée est 192.168.11.254.
+#
+# [ ] Le serveur DNS distribué est 192.168.11.250.
+#
+# [ ] Le suffixe DNS distribué est Tarantino.Mega.
+#
+# [ ] Les baux DHCP sont visibles sur le serveur.
+#
+# [ ] Les clients peuvent renouveler leur bail.
+#
+# [ ] L'étendue fonctionne avec les stratégies
+#     et classes utilisateurs du laboratoire.
+###############################################################################

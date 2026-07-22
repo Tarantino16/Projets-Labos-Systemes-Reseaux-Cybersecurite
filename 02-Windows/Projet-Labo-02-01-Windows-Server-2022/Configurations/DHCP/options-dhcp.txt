@@ -1,0 +1,555 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des options DHCP
+#
+# Service :
+# - DHCP Server
+#
+# Serveur DHCP :
+# - 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Domaine :
+# - Tarantino.Mega
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les options DHCP permettent de transmettre automatiquement
+# aux postes clients les paramètres nécessaires
+# à leur configuration réseau.
+#
+# Dans ce laboratoire, le serveur DHCP distribue notamment :
+#
+# - la passerelle par défaut ;
+# - le serveur DNS ;
+# - le nom de domaine DNS.
+#
+# Ces paramètres sont transmis aux clients
+# lors de l'attribution ou du renouvellement d'un bail DHCP.
+
+
+###############################################################################
+# 2. INFORMATIONS GÉNÉRALES
+###############################################################################
+
+Réseau :
+
+192.168.11.0/24
+
+Serveur DHCP :
+
+192.168.11.250
+
+Passerelle :
+
+192.168.11.254
+
+Serveur DNS :
+
+192.168.11.250
+
+Domaine DNS :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 3. OPTION 003 - ROUTEUR
+###############################################################################
+
+# L'option DHCP 003 définit la passerelle par défaut
+# transmise aux postes clients.
+
+Option :
+
+003 - Routeur
+
+Valeur :
+
+192.168.11.254
+
+
+###############################################################################
+# 4. CONFIGURATION DE L'OPTION 003
+###############################################################################
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 3 `
+    -Value 192.168.11.254 `
+    -Force
+
+
+###############################################################################
+# 5. VÉRIFICATION DE L'OPTION 003
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 3
+
+# Résultat attendu :
+
+192.168.11.254
+
+
+###############################################################################
+# 6. OPTION 006 - SERVEURS DNS
+###############################################################################
+
+# L'option DHCP 006 définit le serveur DNS
+# utilisé par les postes clients.
+
+Option :
+
+006 - Serveurs DNS
+
+Valeur :
+
+192.168.11.250
+
+# Dans ce laboratoire, le serveur Windows Server 2022
+# héberge également le rôle DNS.
+
+
+###############################################################################
+# 7. CONFIGURATION DE L'OPTION 006
+###############################################################################
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 6 `
+    -Value 192.168.11.250 `
+    -Force
+
+
+###############################################################################
+# 8. VÉRIFICATION DE L'OPTION 006
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 6
+
+# Résultat attendu :
+
+192.168.11.250
+
+
+###############################################################################
+# 9. OPTION 015 - NOM DE DOMAINE DNS
+###############################################################################
+
+# L'option DHCP 015 permet de transmettre
+# le suffixe DNS aux postes clients.
+
+Option :
+
+015 - Nom de domaine DNS
+
+Valeur :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 10. CONFIGURATION DE L'OPTION 015
+###############################################################################
+
+Set-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 15 `
+    -Value "Tarantino.Mega" `
+    -Force
+
+
+###############################################################################
+# 11. VÉRIFICATION DE L'OPTION 015
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 15
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 12. VÉRIFICATION DE TOUTES LES OPTIONS DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+# Vérifier notamment :
+#
+# Option 003 :
+# 192.168.11.254
+#
+# Option 006 :
+# 192.168.11.250
+#
+# Option 015 :
+# Tarantino.Mega
+
+
+###############################################################################
+# 13. CONFIGURATION DEPUIS LA CONSOLE DHCP
+###############################################################################
+
+# Depuis un poste Windows équipé de RSAT :
+
+dhcpmgmt.msc
+
+# Puis accéder à :
+#
+# DHCP
+#     |
+#     └── Serveur DHCP
+#         |
+#         └── IPv4
+#             |
+#             └── Étendue
+#                 |
+#                 └── Options d'étendue
+#
+# Sélectionner :
+#
+# 003 Routeur
+# 006 Serveurs DNS
+# 015 Nom de domaine DNS
+
+
+###############################################################################
+# 14. CONFIGURATION ATTENDUE SUR LES CLIENTS
+###############################################################################
+
+# Lorsqu'un poste client obtient une configuration
+# auprès du serveur DHCP, il doit recevoir :
+#
+# Adresse IPv4 :
+# Adresse attribuée depuis l'étendue DHCP
+#
+# Masque :
+# 255.255.255.0
+#
+# Passerelle :
+# 192.168.11.254
+#
+# Serveur DHCP :
+# 192.168.11.250
+#
+# Serveur DNS :
+# 192.168.11.250
+#
+# Suffixe DNS :
+# Tarantino.Mega
+
+
+###############################################################################
+# 15. RENOUVELLEMENT DE LA CONFIGURATION DHCP
+###############################################################################
+
+# Depuis un poste client Windows :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 16. VÉRIFICATION DE LA CONFIGURATION CLIENT
+###############################################################################
+
+ipconfig /all
+
+# Vérifier notamment :
+#
+# DHCP activé :
+# Oui
+#
+# Passerelle par défaut :
+# 192.168.11.254
+#
+# Serveur DHCP :
+# 192.168.11.250
+#
+# Serveur DNS :
+# 192.168.11.250
+#
+# Suffixe DNS :
+# Tarantino.Mega
+
+
+###############################################################################
+# 17. TEST DE LA PASSERELLE
+###############################################################################
+
+# Depuis le poste client :
+
+ping 192.168.11.254
+
+# La passerelle doit répondre.
+
+
+###############################################################################
+# 18. TEST DU SERVEUR DNS
+###############################################################################
+
+ping 192.168.11.250
+
+# Puis tester la résolution DNS :
+
+nslookup Tarantino.Mega
+
+# ou :
+
+nslookup SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 19. TEST AVEC POWERSHELL
+###############################################################################
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# Résultat attendu :
+
+192.168.11.250
+
+
+###############################################################################
+# 20. RELATION ENTRE DHCP ET DNS
+###############################################################################
+
+# Architecture :
+#
+# +----------------------------+
+# | Poste client Windows       |
+# |                            |
+# | Configuration automatique |
+# +-------------+--------------+
+#               |
+#               | DHCP
+#               v
+# +-------------+--------------+
+# | Windows Server 2022        |
+# | 192.168.11.250             |
+# |                            |
+# | DHCP                       |
+# |   |                        |
+# |   +--> IP                  |
+# |   +--> Masque              |
+# |   +--> Passerelle          |
+# |   +--> DNS                 |
+# |   +--> Domaine DNS         |
+# |                            |
+# | DNS                        |
+# |   |                        |
+# |   +--> Tarantino.Mega      |
+# +----------------------------+
+
+
+###############################################################################
+# 21. MISES À JOUR DNS DYNAMIQUES
+###############################################################################
+
+# Le serveur DHCP peut être configuré pour participer
+# aux mises à jour dynamiques DNS.
+#
+# Lorsqu'un poste obtient un bail DHCP :
+#
+# Client
+#    |
+#    v
+# DHCP
+#    |
+#    v
+# Attribution d'une adresse IPv4
+#    |
+#    v
+# Mise à jour DNS
+#    |
+#    +--> Enregistrement A
+#    |
+#    └--> Enregistrement PTR
+#
+# Cette configuration facilite la résolution
+# des noms des postes clients dans le domaine.
+
+
+###############################################################################
+# 22. VÉRIFICATION DES PARAMÈTRES DNS DU SERVEUR DHCP
+###############################################################################
+
+Get-DhcpServerv4DnsSetting
+
+# Cette commande permet de consulter les paramètres
+# relatifs aux mises à jour DNS dynamiques.
+
+
+###############################################################################
+# 23. INTÉGRATION AVEC ACTIVE DIRECTORY
+###############################################################################
+
+# Après la mise en place du domaine Active Directory,
+# le serveur DHCP doit être autorisé.
+#
+# Vérification :
+
+Get-DhcpServerInDC
+
+# Le serveur DHCP autorisé doit apparaître
+# dans le résultat.
+
+
+###############################################################################
+# 24. CLASSES UTILISATEURS
+###############################################################################
+
+# Le laboratoire utilise également deux classes DHCP :
+#
+# salle-1
+# salle-2
+#
+# Elles permettent d'identifier certains clients
+# afin d'appliquer des stratégies DHCP spécifiques.
+#
+# Voir :
+
+configurations/dhcp/classes-utilisateurs.txt
+
+
+###############################################################################
+# 25. STRATÉGIES DHCP
+###############################################################################
+
+# Les stratégies DHCP peuvent appliquer des paramètres
+# spécifiques en fonction de la classe utilisateur.
+#
+# Exemple :
+#
+# Client salle-1
+#      |
+#      v
+# Classe DHCP salle-1
+#      |
+#      v
+# Stratégie DHCP salle-1
+#      |
+#      v
+# Options correspondantes
+#
+# Voir :
+
+configurations/dhcp/strategies-dhcp.txt
+
+
+###############################################################################
+# 26. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+# Afficher toutes les options :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+
+# Afficher la passerelle :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 3
+
+
+# Afficher le serveur DNS :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 6
+
+
+# Afficher le domaine DNS :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -OptionId 15
+
+
+# Vérifier l'étendue :
+
+Get-DhcpServerv4Scope
+
+
+# Vérifier les baux :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+
+# Vérifier le service DHCP :
+
+Get-Service DHCPServer
+
+
+###############################################################################
+# 27. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Configuration de l'étendue :
+
+configurations/dhcp/etendue.txt
+
+# Classes utilisateurs :
+
+configurations/dhcp/classes-utilisateurs.txt
+
+# Stratégies DHCP :
+
+configurations/dhcp/strategies-dhcp.txt
+
+# Configuration DNS :
+
+commandes/configuration-dns.txt
+
+# Configuration DHCP complète :
+
+commandes/configuration-dhcp.txt
+
+
+###############################################################################
+# 28. VALIDATION
+###############################################################################
+
+# Les options DHCP sont correctement configurées si :
+#
+# [ ] L'option 003 distribue 192.168.11.254.
+#
+# [ ] L'option 006 distribue 192.168.11.250.
+#
+# [ ] L'option 015 distribue Tarantino.Mega.
+#
+# [ ] Les clients obtiennent automatiquement
+#     les paramètres réseau.
+#
+# [ ] La passerelle est accessible depuis les clients.
+#
+# [ ] Le serveur DNS est accessible.
+#
+# [ ] La résolution DNS interne fonctionne.
+#
+# [ ] Les clients utilisent le domaine Tarantino.Mega.
+#
+# [ ] Les paramètres sont visibles avec ipconfig /all.
+#
+# [ ] Les options fonctionnent avec les classes
+#     et stratégies DHCP du laboratoire.
+###############################################################################

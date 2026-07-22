@@ -1,0 +1,601 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des stratégies DHCP
+#
+# Service :
+# - DHCP Server
+#
+# Serveur DHCP :
+# - 192.168.11.250
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Classes utilisateurs :
+# - salle-1
+# - salle-2
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les stratégies DHCP permettent d'appliquer des paramètres
+# spécifiques à certains clients en fonction de critères définis.
+#
+# Dans ce laboratoire, les stratégies DHCP sont basées
+# sur des classes utilisateurs.
+#
+# Deux classes sont utilisées :
+#
+# - salle-1
+# - salle-2
+#
+# Le serveur DHCP peut ainsi identifier la classe déclarée
+# par un poste client et appliquer la stratégie correspondante.
+
+
+###############################################################################
+# 2. PRINCIPE DE FONCTIONNEMENT
+###############################################################################
+
+# Fonctionnement général :
+#
+# Poste client
+#      |
+#      | Classe utilisateur
+#      v
+# Serveur DHCP
+#      |
+#      +--> salle-1
+#      |       |
+#      |       v
+#      |   Stratégie salle-1
+#      |
+#      └--> salle-2
+#              |
+#              v
+#          Stratégie salle-2
+#
+# Les options définies par la stratégie correspondante
+# sont ensuite transmises au client.
+
+
+###############################################################################
+# 3. ÉTENDUE DHCP CONCERNÉE
+###############################################################################
+
+ScopeId :
+
+192.168.11.0
+
+Réseau :
+
+192.168.11.0/24
+
+Serveur DHCP :
+
+192.168.11.250
+
+
+###############################################################################
+# 4. CLASSES UTILISATEURS
+###############################################################################
+
+# Les stratégies reposent sur les classes :
+
+salle-1
+
+salle-2
+
+# La création des classes est documentée dans :
+
+configurations/dhcp/classes-utilisateurs.txt
+
+
+###############################################################################
+# 5. CRÉATION DEPUIS LA CONSOLE DHCP
+###############################################################################
+
+# Depuis un poste Windows équipé de RSAT, ouvrir :
+
+dhcpmgmt.msc
+
+# Puis accéder à :
+#
+# DHCP
+#     |
+#     └── Serveur DHCP
+#         |
+#         └── IPv4
+#             |
+#             └── Étendue
+#                 |
+#                 └── Stratégies
+
+
+###############################################################################
+# 6. CRÉATION DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Effectuer un clic droit sur :
+
+Stratégies
+
+# Puis sélectionner :
+
+Nouvelle stratégie
+
+
+# Nom de la stratégie :
+
+salle-1
+
+
+###############################################################################
+# 7. CONDITION DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Ajouter une condition basée sur :
+
+Classe d'utilisateur
+
+# Opérateur :
+
+Est égal à
+
+# Valeur :
+
+salle-1
+
+
+###############################################################################
+# 8. LOGIQUE DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Condition :
+
+Classe d'utilisateur = salle-1
+
+# Fonctionnement :
+#
+# Client
+#     |
+#     | User Class = salle-1
+#     v
+# Serveur DHCP
+#     |
+#     v
+# Stratégie salle-1
+#     |
+#     v
+# Application des paramètres DHCP associés
+
+
+###############################################################################
+# 9. OPTIONS DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Les options réseau peuvent être configurées
+# directement au niveau de la stratégie.
+#
+# Paramètres du laboratoire :
+
+Option 003 - Routeur :
+
+192.168.11.254
+
+
+Option 006 - Serveurs DNS :
+
+192.168.11.250
+
+
+Option 015 - Nom de domaine DNS :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 10. CRÉATION DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Depuis :
+
+DHCP
+    |
+    └── IPv4
+        |
+        └── Étendue
+            |
+            └── Stratégies
+
+# Créer une nouvelle stratégie.
+
+# Nom :
+
+salle-2
+
+
+###############################################################################
+# 11. CONDITION DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Ajouter une condition basée sur :
+
+Classe d'utilisateur
+
+# Opérateur :
+
+Est égal à
+
+# Valeur :
+
+salle-2
+
+
+###############################################################################
+# 12. LOGIQUE DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Condition :
+
+Classe d'utilisateur = salle-2
+
+# Fonctionnement :
+#
+# Client
+#     |
+#     | User Class = salle-2
+#     v
+# Serveur DHCP
+#     |
+#     v
+# Stratégie salle-2
+#     |
+#     v
+# Application des paramètres DHCP associés
+
+
+###############################################################################
+# 13. OPTIONS DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Configurer les options prévues pour la classe salle-2.
+#
+# Les valeurs exactes doivent correspondre
+# à la configuration définie dans le laboratoire.
+#
+# Si les options sont communes à l'ensemble de l'étendue,
+# elles peuvent être héritées des options d'étendue.
+
+
+###############################################################################
+# 14. VÉRIFICATION DES STRATÉGIES AVEC POWERSHELL
+###############################################################################
+
+Get-DhcpServerv4Policy `
+    -ScopeId 192.168.11.0
+
+# Vérifier la présence des stratégies :
+
+salle-1
+
+salle-2
+
+
+###############################################################################
+# 15. AFFICHAGE D'UNE STRATÉGIE
+###############################################################################
+
+Get-DhcpServerv4Policy `
+    -ScopeId 192.168.11.0 `
+    -Name "salle-1"
+
+
+###############################################################################
+# 16. AFFICHAGE DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+Get-DhcpServerv4Policy `
+    -ScopeId 192.168.11.0 `
+    -Name "salle-2"
+
+
+###############################################################################
+# 17. VÉRIFICATION DES OPTIONS DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -PolicyName "salle-1"
+
+
+###############################################################################
+# 18. VÉRIFICATION DES OPTIONS DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -PolicyName "salle-2"
+
+
+###############################################################################
+# 19. CONFIGURATION DU CLIENT POUR SALLE-1
+###############################################################################
+
+# Depuis un poste client Windows :
+
+ipconfig /setclassid Ethernet salle-1
+
+# Vérifier la classe :
+
+ipconfig /showclassid Ethernet
+
+
+###############################################################################
+# 20. RENOUVELLEMENT DU BAIL POUR SALLE-1
+###############################################################################
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier la configuration reçue :
+
+ipconfig /all
+
+
+###############################################################################
+# 21. TEST DE LA STRATÉGIE SALLE-1
+###############################################################################
+
+# Vérifier que :
+#
+# [ ] Le client utilise la classe salle-1.
+#
+# [ ] Une adresse IPv4 est attribuée par le serveur DHCP.
+#
+# [ ] La stratégie salle-1 est appliquée.
+#
+# [ ] Les options DHCP attendues sont reçues.
+
+
+###############################################################################
+# 22. CONFIGURATION DU CLIENT POUR SALLE-2
+###############################################################################
+
+ipconfig /setclassid Ethernet salle-2
+
+# Vérifier :
+
+ipconfig /showclassid Ethernet
+
+
+###############################################################################
+# 23. RENOUVELLEMENT DU BAIL POUR SALLE-2
+###############################################################################
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier :
+
+ipconfig /all
+
+
+###############################################################################
+# 24. TEST DE LA STRATÉGIE SALLE-2
+###############################################################################
+
+# Vérifier que :
+#
+# [ ] Le client utilise la classe salle-2.
+#
+# [ ] Une adresse IPv4 est attribuée par le serveur DHCP.
+#
+# [ ] La stratégie salle-2 est appliquée.
+#
+# [ ] Les options DHCP attendues sont reçues.
+
+
+###############################################################################
+# 25. SUPPRESSION DE LA CLASSE UTILISATEUR DU CLIENT
+###############################################################################
+
+# Pour revenir à la configuration DHCP standard :
+
+ipconfig /setclassid Ethernet
+
+# Puis renouveler le bail :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 26. VÉRIFICATION DES BAUX DHCP
+###############################################################################
+
+# Depuis le serveur :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Vérifier que les clients apparaissent
+# dans la liste des baux.
+
+
+###############################################################################
+# 27. VÉRIFICATION DE L'ÉTENDUE
+###############################################################################
+
+Get-DhcpServerv4Scope
+
+# Vérifier que l'étendue est active.
+
+
+###############################################################################
+# 28. VÉRIFICATION DES OPTIONS GÉNÉRALES
+###############################################################################
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0
+
+# Vérifier notamment :
+#
+# Passerelle :
+# 192.168.11.254
+#
+# DNS :
+# 192.168.11.250
+#
+# Domaine :
+# Tarantino.Mega
+
+
+###############################################################################
+# 29. SCHÉMA DE FONCTIONNEMENT
+###############################################################################
+
+#                 +----------------------+
+#                 |     Serveur DHCP     |
+#                 |    192.168.11.250    |
+#                 +----------+-----------+
+#                            |
+#             +--------------+--------------+
+#             |                             |
+#             v                             v
+#     +---------------+             +---------------+
+#     |   Stratégie   |             |   Stratégie   |
+#     |    salle-1    |             |    salle-2    |
+#     +-------+-------+             +-------+-------+
+#             |                             |
+#             v                             v
+#     Classe utilisateur            Classe utilisateur
+#          salle-1                       salle-2
+#             |                             |
+#             v                             v
+#       Client salle-1               Client salle-2
+
+
+###############################################################################
+# 30. PRIORITÉ DES OPTIONS DHCP
+###############################################################################
+
+# Les options DHCP peuvent être configurées
+# à différents niveaux.
+#
+# Exemple :
+#
+# Options serveur
+#       |
+#       v
+# Options d'étendue
+#       |
+#       v
+# Options de stratégie
+#
+# Une stratégie peut donc fournir des paramètres
+# spécifiques aux clients qui correspondent
+# à ses conditions.
+
+
+###############################################################################
+# 31. DÉPANNAGE
+###############################################################################
+
+# Si une stratégie ne semble pas fonctionner :
+#
+# 1. Vérifier la classe du client :
+
+ipconfig /showclassid Ethernet
+
+
+# 2. Vérifier les stratégies du serveur :
+
+Get-DhcpServerv4Policy `
+    -ScopeId 192.168.11.0
+
+
+# 3. Vérifier les options de la stratégie :
+
+Get-DhcpServerv4OptionValue `
+    -ScopeId 192.168.11.0 `
+    -PolicyName "salle-1"
+
+
+# 4. Renouveler le bail :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+# 5. Vérifier la configuration :
+
+ipconfig /all
+
+
+###############################################################################
+# 32. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Configuration de l'étendue :
+
+configurations/dhcp/etendue.txt
+
+# Configuration des options DHCP :
+
+configurations/dhcp/options-dhcp.txt
+
+# Configuration des classes utilisateurs :
+
+configurations/dhcp/classes-utilisateurs.txt
+
+# Procédure générale :
+
+commandes/configuration-dhcp.txt
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 33. VALIDATION
+###############################################################################
+
+# La configuration des stratégies DHCP est correcte si :
+#
+# [ ] La stratégie salle-1 existe.
+#
+# [ ] La stratégie salle-2 existe.
+#
+# [ ] salle-1 utilise la classe utilisateur salle-1.
+#
+# [ ] salle-2 utilise la classe utilisateur salle-2.
+#
+# [ ] Les stratégies sont associées à l'étendue
+#     192.168.11.0/24.
+#
+# [ ] Les clients peuvent définir leur classe
+#     avec ipconfig /setclassid.
+#
+# [ ] Le renouvellement du bail fonctionne.
+#
+# [ ] Les clients reçoivent les paramètres DHCP
+#     correspondant à leur stratégie.
+#
+# [ ] Les stratégies sont visibles avec
+#     Get-DhcpServerv4Policy.
+#
+# [ ] Les options de stratégie sont visibles avec
+#     Get-DhcpServerv4OptionValue.
+#
+# [ ] Le fonctionnement des classes salle-1
+#     et salle-2 est validé.
+###############################################################################

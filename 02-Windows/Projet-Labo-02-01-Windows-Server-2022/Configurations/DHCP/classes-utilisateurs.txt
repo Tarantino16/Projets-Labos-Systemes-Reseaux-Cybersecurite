@@ -1,0 +1,413 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des classes utilisateurs DHCP
+#
+# Service :
+# - DHCP Server
+#
+# Serveur :
+# - Windows Server 2022 Core
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Classes utilisées :
+# - salle-1
+# - salle-2
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les classes utilisateurs DHCP permettent d'identifier
+# certains postes clients afin de leur appliquer
+# des paramètres réseau spécifiques.
+#
+# Dans ce laboratoire, deux classes utilisateurs sont créées :
+#
+# - salle-1
+# - salle-2
+#
+# Ces classes sont ensuite utilisées dans des stratégies DHCP.
+
+
+###############################################################################
+# 2. OBJECTIF
+###############################################################################
+
+# L'objectif est de permettre au serveur DHCP
+# d'appliquer une configuration différente selon
+# la classe utilisateur déclarée sur le poste client.
+#
+# Exemple :
+#
+# Client Windows
+#      |
+#      | Classe utilisateur : salle-1
+#      v
+# Serveur DHCP
+#      |
+#      v
+# Stratégie DHCP salle-1
+#      |
+#      v
+# Paramètres réseau correspondants
+
+
+###############################################################################
+# 3. CLASSE UTILISATEUR SALLE-1
+###############################################################################
+
+Nom complet :
+
+salle-1
+
+Valeur ASCII :
+
+salle-1
+
+Type :
+
+Classe utilisateur DHCP
+
+
+###############################################################################
+# 4. CLASSE UTILISATEUR SALLE-2
+###############################################################################
+
+Nom complet :
+
+salle-2
+
+Valeur ASCII :
+
+salle-2
+
+Type :
+
+Classe utilisateur DHCP
+
+
+###############################################################################
+# 5. CRÉATION DEPUIS LA CONSOLE DHCP
+###############################################################################
+
+# Depuis le poste d'administration équipé de RSAT :
+#
+# Ouvrir :
+
+dhcpmgmt.msc
+
+# Puis :
+#
+# Serveur DHCP
+#     └── IPv4
+#         └── Clic droit
+#             └── Définir les classes des utilisateurs
+
+
+###############################################################################
+# 6. AJOUT DE LA CLASSE SALLE-1
+###############################################################################
+
+# Cliquer sur :
+
+Ajouter
+
+# Renseigner :
+#
+# Nom complet :
+# salle-1
+#
+# Valeur ASCII :
+# salle-1
+#
+# La valeur est automatiquement représentée
+# sous forme hexadécimale par la console DHCP.
+
+
+###############################################################################
+# 7. AJOUT DE LA CLASSE SALLE-2
+###############################################################################
+
+# Reproduire la même procédure :
+#
+# Nom complet :
+# salle-2
+#
+# Valeur ASCII :
+# salle-2
+
+
+###############################################################################
+# 8. VÉRIFICATION DES CLASSES
+###############################################################################
+
+# Depuis :
+#
+# DHCP
+#     └── IPv4
+#         └── Définir les classes des utilisateurs
+#
+# Vérifier la présence de :
+#
+# salle-1
+# salle-2
+
+
+###############################################################################
+# 9. ASSOCIATION AVEC LES STRATÉGIES DHCP
+###############################################################################
+
+# Les classes sont utilisées comme critères
+# dans les stratégies DHCP.
+#
+# Exemple pour salle-1 :
+#
+# Critère :
+# Classe d'utilisateur
+#
+# Opérateur :
+# Est égal à
+#
+# Valeur :
+# salle-1
+
+
+###############################################################################
+# 10. STRATÉGIE SALLE-1
+###############################################################################
+
+Classe utilisateur :
+
+salle-1
+
+Condition :
+
+Classe d'utilisateur = salle-1
+
+Options associées :
+
+Routeur :
+192.168.11.254
+
+Serveur DNS :
+192.168.11.250
+
+Nom de domaine DNS :
+Tarantino.Mega
+
+
+###############################################################################
+# 11. STRATÉGIE SALLE-2
+###############################################################################
+
+Classe utilisateur :
+
+salle-2
+
+Condition :
+
+Classe d'utilisateur = salle-2
+
+# Les paramètres spécifiques de la stratégie
+# doivent correspondre à la configuration
+# définie dans le laboratoire.
+
+
+###############################################################################
+# 12. ATTRIBUTION DE LA CLASSE SALLE-1 À UN CLIENT
+###############################################################################
+
+# Depuis le poste client Windows :
+
+ipconfig /setclassid Ethernet salle-1
+
+# Vérifier la classe configurée :
+
+ipconfig /showclassid Ethernet
+
+
+###############################################################################
+# 13. RENOUVELLEMENT DU BAIL DHCP
+###############################################################################
+
+ipconfig /release
+
+ipconfig /renew
+
+# Vérifier la nouvelle configuration :
+
+ipconfig /all
+
+
+###############################################################################
+# 14. ATTRIBUTION DE LA CLASSE SALLE-2 À UN CLIENT
+###############################################################################
+
+ipconfig /setclassid Ethernet salle-2
+
+# Vérifier :
+
+ipconfig /showclassid Ethernet
+
+# Renouveler ensuite le bail :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 15. SUPPRESSION DE LA CLASSE DU CLIENT
+###############################################################################
+
+# Pour supprimer la classe utilisateur
+# configurée sur l'interface Ethernet :
+
+ipconfig /setclassid Ethernet
+
+# Renouveler ensuite la configuration :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 16. VÉRIFICATION DEPUIS LE CLIENT
+###############################################################################
+
+ipconfig /all
+
+# Vérifier notamment :
+#
+# - l'adresse IPv4 attribuée ;
+# - la passerelle ;
+# - le serveur DHCP ;
+# - le serveur DNS ;
+# - le suffixe DNS.
+
+
+###############################################################################
+# 17. VÉRIFICATION DEPUIS LE SERVEUR DHCP
+###############################################################################
+
+# Afficher les baux de l'étendue :
+
+Get-DhcpServerv4Lease `
+    -ScopeId 192.168.11.0
+
+# Vérifier que le client apparaît bien
+# dans la liste des baux DHCP.
+
+
+###############################################################################
+# 18. FONCTIONNEMENT GÉNÉRAL
+###############################################################################
+
+# Exemple :
+#
+# Poste client
+#     |
+#     | ipconfig /setclassid Ethernet salle-1
+#     v
+# Classe utilisateur salle-1
+#     |
+#     v
+# Serveur DHCP
+#     |
+#     v
+# Stratégie salle-1
+#     |
+#     +--> Passerelle : 192.168.11.254
+#     |
+#     +--> DNS : 192.168.11.250
+#     |
+#     +--> Domaine : Tarantino.Mega
+
+
+###############################################################################
+# 19. COMMANDES UTILES SUR LE CLIENT
+###############################################################################
+
+# Afficher les classes disponibles :
+
+ipconfig /showclassid Ethernet
+
+
+# Définir salle-1 :
+
+ipconfig /setclassid Ethernet salle-1
+
+
+# Définir salle-2 :
+
+ipconfig /setclassid Ethernet salle-2
+
+
+# Supprimer la classe :
+
+ipconfig /setclassid Ethernet
+
+
+# Renouveler le bail :
+
+ipconfig /release
+
+ipconfig /renew
+
+
+###############################################################################
+# 20. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Configuration de l'étendue :
+
+configurations/dhcp/etendue.txt
+
+# Options DHCP :
+
+configurations/dhcp/options-dhcp.txt
+
+# Stratégies DHCP :
+
+configurations/dhcp/strategies-dhcp.txt
+
+# Procédure complète :
+
+commandes/configuration-dhcp.txt
+
+
+###############################################################################
+# 21. VALIDATION
+###############################################################################
+
+# La configuration des classes utilisateurs est correcte si :
+#
+# [ ] La classe salle-1 existe.
+#
+# [ ] La classe salle-2 existe.
+#
+# [ ] La valeur ASCII salle-1 est correctement configurée.
+#
+# [ ] La valeur ASCII salle-2 est correctement configurée.
+#
+# [ ] Les stratégies DHCP utilisent les classes
+#     comme critères.
+#
+# [ ] Le client peut utiliser :
+#
+#     ipconfig /setclassid Ethernet salle-1
+#
+# [ ] Le client peut utiliser :
+#
+#     ipconfig /setclassid Ethernet salle-2
+#
+# [ ] Après renouvellement du bail, le client reçoit
+#     les paramètres correspondant à sa stratégie.
+#
+# [ ] Les classes utilisateurs DHCP fonctionnent correctement.
+###############################################################################
