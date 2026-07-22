@@ -1,0 +1,315 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration du domaine Active Directory
+#
+# Service :
+# - Active Directory Domain Services (AD DS)
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Nom NetBIOS :
+# - TARANTINO
+#
+# Contrôleur de domaine :
+# - SRV-1
+#
+# Adresse IPv4 :
+# - 192.168.11.250
+###############################################################################
+
+
+###############################################################################
+# 1. INFORMATIONS DU DOMAINE
+###############################################################################
+
+Nom du domaine DNS :
+Tarantino.Mega
+
+Nom NetBIOS :
+TARANTINO
+
+Nom du contrôleur de domaine :
+SRV-1
+
+Nom complet du contrôleur de domaine :
+SRV-1.Tarantino.Mega
+
+Adresse IPv4 du contrôleur de domaine :
+192.168.11.250
+
+
+###############################################################################
+# 2. TYPE D'INFRASTRUCTURE ACTIVE DIRECTORY
+###############################################################################
+
+Type :
+Nouvelle forêt Active Directory
+
+Domaine racine :
+Tarantino.Mega
+
+Contrôleur de domaine principal :
+SRV-1
+
+
+###############################################################################
+# 3. CONFIGURATION DNS DU DOMAINE
+###############################################################################
+
+Zone DNS principale :
+Tarantino.Mega
+
+Zone de recherche inversée :
+11.168.192.in-addr.arpa
+
+Réseau associé :
+192.168.11.0/24
+
+Serveur DNS :
+192.168.11.250
+
+
+###############################################################################
+# 4. SERVICES HÉBERGÉS PAR LE CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+Le serveur SRV-1 héberge les rôles suivants :
+
+- Active Directory Domain Services (AD DS)
+- DNS Server
+- DHCP Server
+
+
+###############################################################################
+# 5. AUTHENTIFICATION DU DOMAINE
+###############################################################################
+
+Le domaine Active Directory utilise les services suivants :
+
+- Kerberos pour l'authentification ;
+- LDAP pour l'accès à l'annuaire ;
+- DNS pour la localisation des services du domaine ;
+- Netlogon pour l'authentification des ordinateurs et utilisateurs.
+
+
+###############################################################################
+# 6. STRUCTURE GÉNÉRALE
+###############################################################################
+
+Forêt :
+Tarantino.Mega
+    |
+    └── Domaine :
+        Tarantino.Mega
+            |
+            └── Contrôleur de domaine :
+                SRV-1.Tarantino.Mega
+                    |
+                    ├── Active Directory Domain Services
+                    ├── DNS
+                    └── DHCP
+
+
+###############################################################################
+# 7. COMMANDES DE VÉRIFICATION DU DOMAINE
+###############################################################################
+
+# Afficher les informations du domaine :
+
+Get-ADDomain
+
+
+# Afficher les informations de la forêt :
+
+Get-ADForest
+
+
+# Afficher les contrôleurs de domaine :
+
+Get-ADDomainController -Filter *
+
+
+###############################################################################
+# 8. VÉRIFICATION DU NOM DNS DU DOMAINE
+###############################################################################
+
+(Get-ADDomain).DNSRoot
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 9. VÉRIFICATION DU NOM NETBIOS
+###############################################################################
+
+(Get-ADDomain).NetBIOSName
+
+# Résultat attendu :
+
+TARANTINO
+
+
+###############################################################################
+# 10. VÉRIFICATION DE LA FORÊT
+###############################################################################
+
+(Get-ADForest).RootDomain
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 11. VÉRIFICATION DU CONTRÔLEUR DE DOMAINE
+###############################################################################
+
+Get-ADDomainController
+
+# Le serveur attendu est :
+
+SRV-1
+
+
+###############################################################################
+# 12. VÉRIFICATION DES SERVICES ACTIVE DIRECTORY
+###############################################################################
+
+Get-Service NTDS
+
+Get-Service Netlogon
+
+Get-Service KDC
+
+Get-Service DNS
+
+
+###############################################################################
+# 13. VÉRIFICATION DNS DU DOMAINE
+###############################################################################
+
+Resolve-DnsName Tarantino.Mega
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 14. VÉRIFICATION DES ENREGISTREMENTS SRV
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 15. DIAGNOSTIC DU DOMAINE
+###############################################################################
+
+dcdiag
+
+# Diagnostic spécifique au DNS :
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 16. ADMINISTRATION DU DOMAINE
+###############################################################################
+
+# Le domaine peut être administré à distance depuis
+# un poste Windows équipé des outils RSAT.
+
+# Utilisateurs et ordinateurs Active Directory :
+
+dsa.msc
+
+# Gestionnaire DNS :
+
+dnsmgmt.msc
+
+# Gestionnaire DHCP :
+
+dhcpmgmt.msc
+
+
+###############################################################################
+# 17. SÉCURITÉ
+###############################################################################
+
+# Ne jamais stocker dans ce fichier :
+#
+# - le mot de passe Administrateur du domaine ;
+# - le mot de passe DSRM ;
+# - les mots de passe des utilisateurs ;
+# - des identifiants ou secrets d'administration.
+#
+# Ce fichier peut être publié sur GitHub à condition
+# que l'environnement présenté soit un environnement
+# de laboratoire et qu'aucun secret réel ne soit inclus.
+
+
+###############################################################################
+# 18. RÉSUMÉ DE LA CONFIGURATION
+###############################################################################
+
+Domaine DNS :
+Tarantino.Mega
+
+Nom NetBIOS :
+TARANTINO
+
+Forêt :
+Tarantino.Mega
+
+Contrôleur de domaine :
+SRV-1
+
+FQDN du contrôleur de domaine :
+SRV-1.Tarantino.Mega
+
+Adresse IPv4 :
+192.168.11.250
+
+Réseau :
+192.168.11.0/24
+
+Rôles :
+AD DS
+DNS
+DHCP
+
+
+###############################################################################
+# 19. VALIDATION
+###############################################################################
+
+# La configuration du domaine est correcte si :
+#
+# [ ] Le domaine Tarantino.Mega est accessible.
+#
+# [ ] La forêt Tarantino.Mega existe.
+#
+# [ ] Le nom NetBIOS est TARANTINO.
+#
+# [ ] SRV-1 est reconnu comme contrôleur de domaine.
+#
+# [ ] SRV-1.Tarantino.Mega est résolu par le DNS.
+#
+# [ ] Les enregistrements SRV LDAP sont présents.
+#
+# [ ] Les enregistrements SRV Kerberos sont présents.
+#
+# [ ] Les services NTDS, Netlogon, KDC et DNS fonctionnent.
+#
+# [ ] Le diagnostic dcdiag ne retourne pas d'erreur critique.
+#
+# [ ] Le domaine peut être administré depuis les outils RSAT.
+###############################################################################

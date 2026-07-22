@@ -1,0 +1,518 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des unités d'organisation Active Directory
+#
+# Service :
+# - Active Directory Domain Services (AD DS)
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Objet :
+# - Organisation hiérarchique de l'annuaire Active Directory
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les unités d'organisation (OU) permettent d'organiser
+# les objets présents dans Active Directory.
+#
+# Elles peuvent notamment contenir :
+#
+# - des utilisateurs ;
+# - des groupes ;
+# - des ordinateurs ;
+# - des sous-unités d'organisation.
+#
+# Dans ce laboratoire, la structure des OU est automatisée
+# à partir d'un fichier CSV.
+
+
+###############################################################################
+# 2. DOMAINE ACTIVE DIRECTORY
+###############################################################################
+
+Domaine :
+Tarantino.Mega
+
+Distinguished Name du domaine :
+
+DC=Tarantino,DC=Mega
+
+
+###############################################################################
+# 3. FICHIER SOURCE DES UNITÉS D'ORGANISATION
+###############################################################################
+
+# La structure des unités d'organisation est définie
+# dans le fichier :
+
+scripts/csv/OU.csv
+
+# Ce fichier permet de décrire la hiérarchie
+# des différentes unités d'organisation.
+
+
+###############################################################################
+# 4. STRUCTURE DU FICHIER OU.CSV
+###############################################################################
+
+# Le fichier CSV utilise notamment les colonnes :
+
+parent
+enfant
+
+# Le séparateur utilisé lors de l'importation est :
+
+;
+
+# Exemple de structure générique :
+
+parent;enfant
+;Entreprise
+Entreprise;Direction
+Entreprise;Informatique
+Entreprise;Comptabilite
+
+
+###############################################################################
+# 5. IMPORTATION DU FICHIER CSV
+###############################################################################
+
+# Importer le fichier contenant la structure des OU :
+
+$unite = Import-Csv `
+    -Delimiter ";" `
+    -Path "C:\Users\Administrateur\Desktop\OU.csv"
+
+
+###############################################################################
+# 6. VÉRIFICATION DES DONNÉES IMPORTÉES
+###############################################################################
+
+$unite
+
+# Cette commande permet de vérifier les valeurs
+# des colonnes parent et enfant avant de lancer
+# la création des objets Active Directory.
+
+
+###############################################################################
+# 7. CRÉATION MANUELLE D'UNE OU
+###############################################################################
+
+# Depuis :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# Sélectionner le domaine :
+
+Tarantino.Mega
+
+# Puis :
+#
+# Clic droit
+#     └── Nouveau
+#         └── Unité d'organisation
+#
+# Saisir ensuite le nom de l'OU.
+
+
+###############################################################################
+# 8. CRÉATION D'UNE OU AVEC POWERSHELL
+###############################################################################
+
+# Exemple de création d'une OU à la racine du domaine :
+
+New-ADOrganizationalUnit `
+    -Name "Nom-OU" `
+    -Path "DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 9. CRÉATION D'UNE SOUS-OU
+###############################################################################
+
+# Exemple :
+
+New-ADOrganizationalUnit `
+    -Name "Sous-OU" `
+    -Path "OU=Nom-OU,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 10. CRÉATION AUTOMATIQUE DES OU RACINES
+###############################################################################
+
+# Exemple de logique utilisée pour identifier
+# les éléments sans parent :
+
+foreach ($element in $unite) {
+
+    if ($element.parent -eq "") {
+
+        New-ADOrganizationalUnit `
+            -Name $element.enfant `
+            -Path "DC=Tarantino,DC=Mega"
+
+    }
+
+}
+
+# Les éléments ne possédant pas de parent
+# sont ainsi créés directement à la racine du domaine.
+
+
+###############################################################################
+# 11. RECHERCHE D'UNE OU PARENTE
+###############################################################################
+
+# Pour créer une OU enfant, il est nécessaire
+# de récupérer le DistinguishedName de son parent.
+
+$OUParent = Get-ADOrganizationalUnit `
+    -Filter "Name -eq '$($element.parent)'"
+
+
+###############################################################################
+# 12. CRÉATION D'UNE OU ENFANT
+###############################################################################
+
+# Exemple :
+
+New-ADOrganizationalUnit `
+    -Name $element.enfant `
+    -Path $OUParent.DistinguishedName
+
+# L'OU enfant est ainsi créée directement
+# dans son OU parente.
+
+
+###############################################################################
+# 13. VÉRIFICATION DES UNITÉS D'ORGANISATION
+###############################################################################
+
+Get-ADOrganizationalUnit -Filter *
+
+# Affichage simplifié :
+
+Get-ADOrganizationalUnit -Filter * |
+Select-Object Name, DistinguishedName
+
+
+###############################################################################
+# 14. RECHERCHE D'UNE OU PAR SON NOM
+###############################################################################
+
+# Exemple :
+
+Get-ADOrganizationalUnit `
+    -Filter "Name -like 'Nom-OU'"
+
+# Cette commande permet notamment de récupérer
+# le DistinguishedName nécessaire pour créer
+# des objets dans cette OU.
+
+
+###############################################################################
+# 15. ORGANISATION DES UTILISATEURS
+###############################################################################
+
+# Dans le laboratoire, les utilisateurs sont placés
+# dans les unités d'organisation correspondant
+# à leur service.
+#
+# Une sous-OU dédiée peut être utilisée :
+
+utilisateurs
+
+# Exemple de chemin :
+
+OU=utilisateurs,OU=NomDuService,DC=Tarantino,DC=Mega
+
+
+###############################################################################
+# 16. ORGANISATION DES ORDINATEURS
+###############################################################################
+
+# Une sous-OU peut également être utilisée
+# pour organiser les postes informatiques :
+
+ordinateurs
+
+# Exemple de chemin :
+
+OU=ordinateurs,OU=NomDuService,DC=Tarantino,DC=Mega
+
+
+###############################################################################
+# 17. EXEMPLE DE STRUCTURE LOGIQUE
+###############################################################################
+
+# Exemple générique :
+#
+# Tarantino.Mega
+# │
+# └── Entreprise
+#     │
+#     ├── Direction
+#     │   ├── utilisateurs
+#     │   └── ordinateurs
+#     │
+#     ├── Comptabilite
+#     │   ├── utilisateurs
+#     │   └── ordinateurs
+#     │
+#     └── Informatique
+#         ├── utilisateurs
+#         └── ordinateurs
+#
+# La structure exacte dépend du contenu
+# du fichier OU.csv.
+
+
+###############################################################################
+# 18. CRÉATION DES GROUPES ASSOCIÉS
+###############################################################################
+
+# Le script du laboratoire permet également
+# de créer des groupes globaux associés aux OU.
+#
+# Convention utilisée :
+
+gg_<NomDuService>
+
+# Exemple :
+
+gg_Direction
+
+gg_Comptabilite
+
+gg_Informatique
+
+# La configuration détaillée des groupes est disponible dans :
+
+configurations/active-directory/groupes-securite.txt
+
+
+###############################################################################
+# 19. SCRIPT D'AUTOMATISATION
+###############################################################################
+
+# Le script PowerShell associé est :
+
+scripts/powershell/creation-ou-groupes.ps1
+
+# Ce script permet notamment :
+#
+# - d'importer OU.csv ;
+# - de parcourir la structure parent/enfant ;
+# - de créer les OU ;
+# - de créer les sous-OU ;
+# - de créer les groupes globaux associés ;
+# - d'organiser les groupes selon la hiérarchie définie.
+
+
+###############################################################################
+# 20. PROTECTION CONTRE LA SUPPRESSION ACCIDENTELLE
+###############################################################################
+
+# Lors de la création d'une OU avec PowerShell,
+# la protection contre la suppression accidentelle
+# peut être activée :
+
+New-ADOrganizationalUnit `
+    -Name "Nom-OU" `
+    -Path "DC=Tarantino,DC=Mega" `
+    -ProtectedFromAccidentalDeletion $true
+
+
+###############################################################################
+# 21. VÉRIFICATION DE LA PROTECTION DES OU
+###############################################################################
+
+Get-ADOrganizationalUnit `
+    -Filter * `
+    -Properties ProtectedFromAccidentalDeletion |
+Select-Object Name, ProtectedFromAccidentalDeletion
+
+
+###############################################################################
+# 22. DÉPLACEMENT D'UN UTILISATEUR DANS UNE OU
+###############################################################################
+
+# Récupérer l'utilisateur :
+
+$Utilisateur = Get-ADUser `
+    -Identity "b.dylan"
+
+# Déplacer l'utilisateur :
+
+Move-ADObject `
+    -Identity $Utilisateur.DistinguishedName `
+    -TargetPath "OU=utilisateurs,OU=NomDuService,DC=Tarantino,DC=Mega"
+
+# Adapter le nom du service à la structure réelle.
+
+
+###############################################################################
+# 23. DÉPLACEMENT D'UN ORDINATEUR DANS UNE OU
+###############################################################################
+
+# Récupérer l'ordinateur :
+
+$Ordinateur = Get-ADComputer `
+    -Identity "NOM-ORDINATEUR"
+
+# Déplacer l'ordinateur :
+
+Move-ADObject `
+    -Identity $Ordinateur.DistinguishedName `
+    -TargetPath "OU=ordinateurs,OU=NomDuService,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 24. AFFICHAGE DU CONTENU D'UNE OU
+###############################################################################
+
+# Exemple pour afficher les utilisateurs d'une OU :
+
+Get-ADUser `
+    -Filter * `
+    -SearchBase "OU=utilisateurs,OU=NomDuService,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 25. AFFICHAGE DES GROUPES D'UNE OU
+###############################################################################
+
+Get-ADGroup `
+    -Filter * `
+    -SearchBase "OU=NomDuService,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 26. AFFICHAGE DES ORDINATEURS D'UNE OU
+###############################################################################
+
+Get-ADComputer `
+    -Filter * `
+    -SearchBase "OU=ordinateurs,OU=NomDuService,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 27. SUPPRESSION D'UNE OU
+###############################################################################
+
+# ATTENTION :
+#
+# Cette commande supprime une unité d'organisation.
+# Vérifier son contenu avant toute suppression.
+
+Remove-ADOrganizationalUnit `
+    -Identity "OU=Nom-OU,DC=Tarantino,DC=Mega"
+
+# Si l'OU est protégée contre la suppression accidentelle,
+# désactiver d'abord cette protection uniquement
+# si la suppression est réellement nécessaire.
+
+
+###############################################################################
+# 28. COMMANDES DE VÉRIFICATION
+###############################################################################
+
+# Afficher toutes les OU :
+
+Get-ADOrganizationalUnit -Filter *
+
+
+# Afficher les noms et DistinguishedName :
+
+Get-ADOrganizationalUnit -Filter * |
+Select-Object Name, DistinguishedName
+
+
+# Rechercher une OU spécifique :
+
+Get-ADOrganizationalUnit `
+    -Filter "Name -eq 'Nom-OU'"
+
+
+# Afficher la protection contre la suppression :
+
+Get-ADOrganizationalUnit `
+    -Filter * `
+    -Properties ProtectedFromAccidentalDeletion |
+Select-Object Name, ProtectedFromAccidentalDeletion
+
+
+###############################################################################
+# 29. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Données utilisées pour créer les OU :
+
+scripts/csv/OU.csv
+
+# Script d'automatisation :
+
+scripts/powershell/creation-ou-groupes.ps1
+
+# Configuration des groupes :
+
+configurations/active-directory/groupes-securite.txt
+
+# Configuration des utilisateurs :
+
+configurations/active-directory/utilisateurs.txt
+
+# Configuration du domaine :
+
+configurations/active-directory/domaine.txt
+
+
+###############################################################################
+# 30. BONNES PRATIQUES
+###############################################################################
+
+# L'utilisation des OU permet :
+#
+# - d'organiser logiquement les objets Active Directory ;
+# - de séparer les utilisateurs par service ;
+# - de séparer les ordinateurs ;
+# - de simplifier l'administration ;
+# - de préparer l'application de stratégies de groupe (GPO) ;
+# - de faciliter l'automatisation avec PowerShell.
+#
+# Les OU doivent représenter une organisation logique
+# adaptée aux besoins de l'infrastructure.
+
+
+###############################################################################
+# 31. VALIDATION
+###############################################################################
+
+# La configuration des unités d'organisation est correcte si :
+#
+# [ ] Les OU définies dans OU.csv sont créées.
+#
+# [ ] La hiérarchie parent/enfant est respectée.
+#
+# [ ] Les sous-OU sont placées dans les bons conteneurs.
+#
+# [ ] Les OU utilisateurs sont présentes lorsque prévues.
+#
+# [ ] Les OU ordinateurs sont présentes lorsque prévues.
+#
+# [ ] Les utilisateurs sont placés dans les OU correspondantes.
+#
+# [ ] Les groupes sont associés aux bonnes OU.
+#
+# [ ] Get-ADOrganizationalUnit affiche la structure attendue.
+#
+# [ ] Le script creation-ou-groupes.ps1 permet de reproduire
+#     automatiquement la structure Active Directory.
+###############################################################################

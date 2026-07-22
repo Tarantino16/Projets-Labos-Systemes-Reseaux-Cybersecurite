@@ -1,0 +1,443 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des groupes de sécurité Active Directory
+#
+# Service :
+# - Active Directory Domain Services (AD DS)
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Convention de nommage :
+# - gg_<nom-du-service>
+#
+# Type :
+# - Groupes globaux de sécurité
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les groupes de sécurité Active Directory permettent
+# de regrouper les utilisateurs afin de faciliter
+# la gestion des accès et des autorisations.
+#
+# Dans ce laboratoire, des groupes globaux sont créés
+# en fonction de la structure des unités d'organisation.
+#
+# Convention utilisée :
+#
+# gg_<nom>
+#
+# Exemple :
+#
+# gg_direction
+# gg_comptabilite
+# gg_informatique
+
+
+###############################################################################
+# 2. TYPE DE GROUPE UTILISÉ
+###############################################################################
+
+Portée du groupe :
+Global
+
+Type du groupe :
+Security
+
+# Les groupes globaux peuvent contenir principalement
+# des utilisateurs et groupes provenant du même domaine.
+
+
+###############################################################################
+# 3. CONVENTION DE NOMMAGE
+###############################################################################
+
+Préfixe utilisé :
+
+gg_
+
+# Exemple :
+#
+# Un service nommé :
+#
+# Direction
+#
+# donne le groupe :
+#
+# gg_Direction
+
+
+###############################################################################
+# 4. CRÉATION MANUELLE D'UN GROUPE
+###############################################################################
+
+# Depuis :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# Sélectionner l'OU concernée.
+#
+# Puis :
+#
+# Clic droit
+#     └── Nouveau
+#         └── Groupe
+#
+# Renseigner :
+#
+# Nom du groupe :
+# gg_NomDuService
+#
+# Étendue du groupe :
+# Global
+#
+# Type du groupe :
+# Sécurité
+
+
+###############################################################################
+# 5. CRÉATION D'UN GROUPE AVEC POWERSHELL
+###############################################################################
+
+# Exemple :
+
+New-ADGroup `
+    -Name "gg_NomDuService" `
+    -Path "OU=NomDuService,DC=Tarantino,DC=Mega" `
+    -GroupScope Global `
+    -GroupCategory Security
+
+
+###############################################################################
+# 6. VÉRIFICATION DU GROUPE
+###############################################################################
+
+Get-ADGroup `
+    -Identity "gg_NomDuService"
+
+# Affichage détaillé :
+
+Get-ADGroup `
+    -Identity "gg_NomDuService" `
+    -Properties *
+
+
+###############################################################################
+# 7. AFFICHAGE DE TOUS LES GROUPES
+###############################################################################
+
+Get-ADGroup -Filter *
+
+# Affichage simplifié :
+
+Get-ADGroup -Filter * |
+Select-Object Name, GroupScope, GroupCategory
+
+
+###############################################################################
+# 8. CRÉATION AUTOMATISÉE DES GROUPES
+###############################################################################
+
+# Dans le laboratoire, la création des groupes est automatisée
+# à partir du fichier :
+#
+# scripts/csv/OU.csv
+#
+# Le script utilisé est :
+#
+# scripts/powershell/creation-ou-groupes.ps1
+#
+# Le script crée :
+#
+# - les unités d'organisation ;
+# - les groupes globaux associés ;
+# - les relations entre groupes parents et enfants.
+
+
+###############################################################################
+# 9. LOGIQUE DE CRÉATION AUTOMATIQUE
+###############################################################################
+
+# Exemple de logique utilisée dans le script :
+
+New-ADGroup `
+    -Name "gg_$($element.enfant)" `
+    -Path $chemin `
+    -GroupScope Global
+
+# Cette commande crée automatiquement un groupe global
+# portant le même nom que l'élément défini dans OU.csv.
+
+
+###############################################################################
+# 10. CRÉATION D'UN GROUPE DANS UNE OU ENFANT
+###############################################################################
+
+# Exemple :
+
+New-ADGroup `
+    -Name "gg_$($element.enfant)" `
+    -Path "OU=$($element.enfant),$chemin" `
+    -GroupScope Global
+
+# Le groupe est créé directement dans l'OU
+# correspondant à son nom.
+
+
+###############################################################################
+# 11. EXCLUSION DE CERTAINS GROUPES
+###############################################################################
+
+# Dans le script, certaines OU peuvent être exclues
+# de la création automatique de groupes.
+#
+# Exemple :
+#
+# ordinateurs
+# utilisateurs
+#
+# Ces OU servent principalement à organiser les objets
+# et n'ont pas nécessairement besoin d'un groupe global
+# portant le même nom.
+
+
+###############################################################################
+# 12. IMBRICATION DES GROUPES
+###############################################################################
+
+# Les groupes enfants peuvent être ajoutés
+# dans leurs groupes parents.
+
+# Exemple :
+
+Add-ADGroupMember `
+    -Identity "gg_GroupeParent" `
+    -Members "gg_GroupeEnfant"
+
+
+###############################################################################
+# 13. LOGIQUE D'ORGANISATION
+###############################################################################
+
+# Exemple :
+#
+# gg_Entreprise
+#     |
+#     +-- gg_Direction
+#     |
+#     +-- gg_Comptabilite
+#     |
+#     +-- gg_Informatique
+#
+# Cette structure facilite la gestion des permissions
+# et permet de regrouper plusieurs groupes métiers.
+
+
+###############################################################################
+# 14. PRINCIPE AGDLP
+###############################################################################
+
+# Le laboratoire aborde le principe AGDLP :
+#
+# A = Accounts
+# G = Global Groups
+# DL = Domain Local Groups
+# P = Permissions
+#
+# Principe :
+#
+# Comptes utilisateurs
+#         |
+#         v
+# Groupes globaux
+#         |
+#         v
+# Groupes locaux de domaine
+#         |
+#         v
+# Permissions
+#
+# Dans ce projet, la création des groupes globaux
+# constitue une étape importante de cette organisation.
+
+
+###############################################################################
+# 15. AJOUT D'UN UTILISATEUR DANS UN GROUPE
+###############################################################################
+
+# Exemple :
+
+Add-ADGroupMember `
+    -Identity "gg_NomDuService" `
+    -Members "b.dylan"
+
+# L'utilisateur est ajouté au groupe correspondant
+# à son service.
+
+
+###############################################################################
+# 16. VÉRIFICATION DES MEMBRES D'UN GROUPE
+###############################################################################
+
+Get-ADGroupMember `
+    -Identity "gg_NomDuService"
+
+
+###############################################################################
+# 17. VÉRIFICATION DES GROUPES D'UN UTILISATEUR
+###############################################################################
+
+Get-ADPrincipalGroupMembership `
+    -Identity "b.dylan"
+
+# Adapter l'identifiant à l'utilisateur
+# présent dans l'environnement.
+
+
+###############################################################################
+# 18. SUPPRESSION D'UN MEMBRE D'UN GROUPE
+###############################################################################
+
+Remove-ADGroupMember `
+    -Identity "gg_NomDuService" `
+    -Members "b.dylan"
+
+# Confirmer l'opération si demandé.
+
+
+###############################################################################
+# 19. SUPPRESSION D'UN GROUPE
+###############################################################################
+
+# À utiliser uniquement si nécessaire :
+
+Remove-ADGroup `
+    -Identity "gg_NomDuService"
+
+# Attention :
+#
+# Cette commande supprime le groupe Active Directory.
+
+
+###############################################################################
+# 20. EXEMPLE DE STRUCTURE
+###############################################################################
+
+# Exemple générique :
+#
+# Tarantino.Mega
+# │
+# ├── Direction
+# │   └── gg_Direction
+# │
+# ├── Comptabilite
+# │   └── gg_Comptabilite
+# │
+# ├── Informatique
+# │   └── gg_Informatique
+# │
+# └── Ressources-Humaines
+#     └── gg_Ressources-Humaines
+#
+# La structure exacte dépend du contenu du fichier OU.csv.
+
+
+###############################################################################
+# 21. FICHIER SOURCE
+###############################################################################
+
+# Les groupes sont créés à partir des informations présentes dans :
+#
+# scripts/csv/OU.csv
+
+
+###############################################################################
+# 22. SCRIPT ASSOCIÉ
+###############################################################################
+
+# Script PowerShell :
+
+scripts/powershell/creation-ou-groupes.ps1
+
+# Ce script permet notamment :
+#
+# - d'importer OU.csv ;
+# - de créer les OU ;
+# - de créer les groupes globaux ;
+# - d'imbriquer les groupes enfants dans les groupes parents.
+
+
+###############################################################################
+# 23. COMMANDES DE VÉRIFICATION
+###############################################################################
+
+# Afficher tous les groupes :
+
+Get-ADGroup -Filter *
+
+
+# Afficher les groupes globaux :
+
+Get-ADGroup `
+    -Filter "GroupScope -eq 'Global'"
+
+
+# Afficher un groupe spécifique :
+
+Get-ADGroup `
+    -Identity "gg_NomDuService"
+
+
+# Afficher ses membres :
+
+Get-ADGroupMember `
+    -Identity "gg_NomDuService"
+
+
+###############################################################################
+# 24. SÉCURITÉ
+###############################################################################
+
+# Les groupes de sécurité doivent être utilisés
+# pour simplifier l'attribution des droits.
+#
+# Il est préférable d'attribuer des permissions à des groupes
+# plutôt que directement à des comptes utilisateurs.
+#
+# Cela permet :
+#
+# - une gestion plus simple ;
+# - une meilleure traçabilité ;
+# - une administration plus cohérente ;
+# - une meilleure évolutivité de l'infrastructure.
+
+
+###############################################################################
+# 25. VALIDATION
+###############################################################################
+
+# La configuration des groupes est correcte si :
+#
+# [ ] Les groupes globaux sont créés.
+#
+# [ ] La convention gg_<nom> est respectée.
+#
+# [ ] Les groupes sont placés dans les bonnes OU.
+#
+# [ ] Les groupes enfants sont intégrés aux groupes parents
+#     lorsque cela est prévu.
+#
+# [ ] Les utilisateurs appartiennent aux groupes
+#     correspondant à leur service.
+#
+# [ ] Get-ADGroup affiche les groupes attendus.
+#
+# [ ] Get-ADGroupMember affiche les membres attendus.
+#
+# [ ] Le script PowerShell permet de reproduire
+#     automatiquement la structure des groupes.
+###############################################################################

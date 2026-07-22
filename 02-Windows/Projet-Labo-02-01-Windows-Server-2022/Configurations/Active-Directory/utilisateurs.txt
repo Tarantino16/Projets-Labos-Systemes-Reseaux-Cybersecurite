@@ -1,0 +1,724 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des utilisateurs Active Directory
+#
+# Service :
+# - Active Directory Domain Services (AD DS)
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Objectif :
+# - Création et organisation des comptes utilisateurs
+# - Importation automatisée depuis un fichier CSV
+# - Affectation des utilisateurs aux groupes de sécurité
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les comptes utilisateurs Active Directory permettent
+# aux utilisateurs de s'authentifier sur le domaine
+# et d'accéder aux ressources qui leur sont autorisées.
+#
+# Dans ce laboratoire, les comptes utilisateurs sont
+# créés automatiquement à partir d'un fichier CSV.
+#
+# Chaque utilisateur est ensuite :
+#
+# - créé dans l'OU correspondant à son service ;
+# - activé automatiquement ;
+# - associé à un identifiant de connexion ;
+# - associé à un mot de passe initial ;
+# - ajouté au groupe global correspondant à son service.
+
+
+###############################################################################
+# 2. DOMAINE ACTIVE DIRECTORY
+###############################################################################
+
+Domaine :
+Tarantino.Mega
+
+Distinguished Name :
+
+DC=Tarantino,DC=Mega
+
+
+###############################################################################
+# 3. FICHIER SOURCE DES UTILISATEURS
+###############################################################################
+
+# Les informations des utilisateurs sont stockées dans :
+
+scripts/csv/users.csv
+
+# Le fichier est ensuite importé par le script :
+
+scripts/powershell/creation-utilisateurs.ps1
+
+
+###############################################################################
+# 4. IMPORTATION DU FICHIER CSV
+###############################################################################
+
+# Exemple d'importation :
+
+$fichier = Import-Csv `
+    -Delimiter ";" `
+    -Path "C:\Users\Administrateur\Desktop\users.csv"
+
+
+###############################################################################
+# 5. VÉRIFICATION DES DONNÉES IMPORTÉES
+###############################################################################
+
+$fichier
+
+# Vérifier les informations avant de lancer
+# la création automatique des comptes.
+
+
+###############################################################################
+# 6. INFORMATIONS UTILISÉES POUR CHAQUE UTILISATEUR
+###############################################################################
+
+# Le script utilise notamment les informations suivantes :
+#
+# - prénom ;
+# - nom ;
+# - service ;
+# - mot de passe initial.
+#
+# Ces informations permettent de générer automatiquement :
+#
+# - le nom complet ;
+# - le SamAccountName ;
+# - le UserPrincipalName (UPN) ;
+# - l'OU de destination ;
+# - le groupe de sécurité.
+
+
+###############################################################################
+# 7. RÉCUPÉRATION DU NOM DE DOMAINE
+###############################################################################
+
+$domain = (Get-ADDomain).DNSRoot
+
+# Résultat attendu :
+
+Tarantino.Mega
+
+
+###############################################################################
+# 8. CRÉATION DU NOM COMPLET
+###############################################################################
+
+# Le nom complet est construit à partir
+# du prénom et du nom.
+
+$nom_complet = $element.prenom + " " + $element.nom
+
+# Exemple :
+#
+# Prénom :
+# Bob
+#
+# Nom :
+# Dylan
+#
+# Nom complet :
+# Bob Dylan
+
+
+###############################################################################
+# 9. CRÉATION DE L'IDENTIFIANT DE CONNEXION
+###############################################################################
+
+# L'identifiant est généré avec :
+#
+# première lettre du prénom
+# +
+# "."
+# +
+# nom
+
+$login = $element.prenom.Substring(0,1) + "." + $element.nom
+
+# Exemple :
+#
+# Bob Dylan
+#
+# devient :
+#
+# b.dylan
+
+
+###############################################################################
+# 10. USER PRINCIPAL NAME
+###############################################################################
+
+# Le UserPrincipalName est construit avec :
+
+$login + "@" + $domain
+
+# Exemple :
+
+b.dylan@Tarantino.Mega
+
+
+###############################################################################
+# 11. SAMACCOUNTNAME
+###############################################################################
+
+# Le SamAccountName utilisé correspond au login :
+
+b.dylan
+
+# Il permet notamment l'identification du compte
+# dans Active Directory.
+
+
+###############################################################################
+# 12. RECHERCHE DE L'OU DU SERVICE
+###############################################################################
+
+# Le script recherche automatiquement l'OU
+# correspondant au service de l'utilisateur.
+
+$OU = Get-ADOrganizationalUnit `
+    -Filter "Name -like '$($element.service)'"
+
+# Cette commande permet de récupérer
+# le DistinguishedName de l'OU.
+
+
+###############################################################################
+# 13. OU DE DESTINATION DE L'UTILISATEUR
+###############################################################################
+
+# Les utilisateurs sont placés dans une sous-OU :
+
+utilisateurs
+
+# Exemple :
+
+OU=utilisateurs,OU=NomDuService,DC=Tarantino,DC=Mega
+
+
+###############################################################################
+# 14. CONVERSION DU MOT DE PASSE
+###############################################################################
+
+# Le mot de passe présent dans le fichier CSV
+# doit être converti en SecureString.
+
+$pass = ConvertTo-SecureString `
+    -AsPlainText $element.pass `
+    -Force
+
+# IMPORTANT :
+#
+# Cette méthode est utilisée dans le cadre du laboratoire.
+#
+# Ne jamais publier de véritables mots de passe
+# dans un dépôt GitHub public.
+
+
+###############################################################################
+# 15. CRÉATION D'UN UTILISATEUR AVEC POWERSHELL
+###############################################################################
+
+New-ADUser `
+    -Name $nom_complet `
+    -DisplayName $nom_complet `
+    -Surname $element.nom `
+    -GivenName $element.prenom `
+    -AccountPassword $pass `
+    -Path "OU=utilisateurs,$($OU.DistinguishedName)" `
+    -UserPrincipalName ($login + "@" + $domain) `
+    -SamAccountName $login `
+    -Enabled $true `
+    -ChangePasswordAtLogon $true
+
+
+###############################################################################
+# 16. PARAMÈTRES DU COMPTE
+###############################################################################
+
+# Chaque compte créé possède les paramètres suivants :
+#
+# Name :
+# Prénom + Nom
+#
+# DisplayName :
+# Prénom + Nom
+#
+# GivenName :
+# Prénom
+#
+# Surname :
+# Nom
+#
+# SamAccountName :
+# première lettre du prénom + "." + nom
+#
+# UserPrincipalName :
+# login@Tarantino.Mega
+#
+# Enabled :
+# True
+#
+# ChangePasswordAtLogon :
+# True
+
+
+###############################################################################
+# 17. CHANGEMENT DU MOT DE PASSE À LA PREMIÈRE CONNEXION
+###############################################################################
+
+# L'option suivante est activée :
+
+-ChangePasswordAtLogon $true
+
+# L'utilisateur doit donc modifier son mot de passe
+# lors de sa première connexion au domaine.
+
+
+###############################################################################
+# 18. ACTIVATION DU COMPTE
+###############################################################################
+
+# Le compte est directement activé lors de sa création :
+
+-Enabled $true
+
+
+###############################################################################
+# 19. AJOUT AU GROUPE DU SERVICE
+###############################################################################
+
+# Après la création du compte, l'utilisateur
+# est ajouté au groupe global correspondant
+# à son service.
+
+Add-ADGroupMember `
+    -Identity "gg_$($element.service)" `
+    -Members $login
+
+
+###############################################################################
+# 20. EXEMPLE D'AFFECTATION
+###############################################################################
+
+# Exemple :
+#
+# Utilisateur :
+# Bob Dylan
+#
+# Service :
+# Informatique
+#
+# Login :
+# b.dylan
+#
+# UPN :
+# b.dylan@Tarantino.Mega
+#
+# OU :
+# Informatique
+#     └── utilisateurs
+#
+# Groupe :
+# gg_Informatique
+
+
+###############################################################################
+# 21. STRUCTURE LOGIQUE
+###############################################################################
+
+# Exemple générique :
+#
+# Tarantino.Mega
+# │
+# └── Entreprise
+#     │
+#     ├── Direction
+#     │   ├── utilisateurs
+#     │   │   ├── Utilisateur-1
+#     │   │   └── Utilisateur-2
+#     │   │
+#     │   └── gg_Direction
+#     │
+#     ├── Comptabilite
+#     │   ├── utilisateurs
+#     │   │   ├── Utilisateur-3
+#     │   │   └── Utilisateur-4
+#     │   │
+#     │   └── gg_Comptabilite
+#     │
+#     └── Informatique
+#         ├── utilisateurs
+#         │   ├── Utilisateur-5
+#         │   └── Utilisateur-6
+#         │
+#         └── gg_Informatique
+#
+# La structure exacte dépend des fichiers :
+#
+# OU.csv
+# users.csv
+
+
+###############################################################################
+# 22. CRÉATION MANUELLE D'UN UTILISATEUR
+###############################################################################
+
+# Depuis :
+#
+# Utilisateurs et ordinateurs Active Directory
+#
+# Ouvrir l'OU concernée.
+#
+# Puis :
+#
+# Clic droit
+#     └── Nouveau
+#         └── Utilisateur
+#
+# Renseigner :
+#
+# - prénom ;
+# - nom ;
+# - identifiant de connexion ;
+# - mot de passe.
+#
+# Configurer ensuite les options du compte.
+
+
+###############################################################################
+# 23. CRÉATION MANUELLE AVEC POWERSHELL
+###############################################################################
+
+# Exemple :
+
+$password = ConvertTo-SecureString `
+    "MotDePasseTemporaire" `
+    -AsPlainText `
+    -Force
+
+New-ADUser `
+    -Name "Bob Dylan" `
+    -GivenName "Bob" `
+    -Surname "Dylan" `
+    -DisplayName "Bob Dylan" `
+    -SamAccountName "b.dylan" `
+    -UserPrincipalName "b.dylan@Tarantino.Mega" `
+    -Path "OU=utilisateurs,OU=Informatique,DC=Tarantino,DC=Mega" `
+    -AccountPassword $password `
+    -Enabled $true `
+    -ChangePasswordAtLogon $true
+
+# Utiliser uniquement un mot de passe fictif
+# dans une documentation publique.
+
+
+###############################################################################
+# 24. VÉRIFICATION DE TOUS LES UTILISATEURS
+###############################################################################
+
+Get-ADUser -Filter *
+
+
+###############################################################################
+# 25. AFFICHAGE DÉTAILLÉ DES UTILISATEURS
+###############################################################################
+
+Get-ADUser `
+    -Filter * `
+    -Properties *
+
+
+###############################################################################
+# 26. RECHERCHE D'UN UTILISATEUR
+###############################################################################
+
+# Exemple :
+
+Get-ADUser `
+    -Identity "b.dylan"
+
+# Affichage détaillé :
+
+Get-ADUser `
+    -Identity "b.dylan" `
+    -Properties *
+
+
+###############################################################################
+# 27. VÉRIFICATION DU USER PRINCIPAL NAME
+###############################################################################
+
+Get-ADUser `
+    -Identity "b.dylan" `
+    -Properties UserPrincipalName |
+Select-Object Name, UserPrincipalName
+
+
+###############################################################################
+# 28. VÉRIFICATION DE L'OU D'UN UTILISATEUR
+###############################################################################
+
+Get-ADUser `
+    -Identity "b.dylan" |
+Select-Object Name, DistinguishedName
+
+# Le DistinguishedName permet de vérifier
+# l'emplacement du compte dans Active Directory.
+
+
+###############################################################################
+# 29. VÉRIFICATION DES GROUPES D'UN UTILISATEUR
+###############################################################################
+
+Get-ADPrincipalGroupMembership `
+    -Identity "b.dylan"
+
+# Vérifier que l'utilisateur appartient au groupe
+# correspondant à son service.
+
+
+###############################################################################
+# 30. VÉRIFICATION DES MEMBRES D'UN GROUPE
+###############################################################################
+
+Get-ADGroupMember `
+    -Identity "gg_NomDuService"
+
+
+###############################################################################
+# 31. ACTIVATION D'UN COMPTE
+###############################################################################
+
+Enable-ADAccount `
+    -Identity "b.dylan"
+
+
+###############################################################################
+# 32. DÉSACTIVATION D'UN COMPTE
+###############################################################################
+
+Disable-ADAccount `
+    -Identity "b.dylan"
+
+# Il est généralement préférable de désactiver
+# un compte avant d'envisager sa suppression.
+
+
+###############################################################################
+# 33. RÉINITIALISATION DU MOT DE PASSE
+###############################################################################
+
+$NouveauMotDePasse = ConvertTo-SecureString `
+    "MotDePasseTemporaire" `
+    -AsPlainText `
+    -Force
+
+Set-ADAccountPassword `
+    -Identity "b.dylan" `
+    -Reset `
+    -NewPassword $NouveauMotDePasse
+
+
+###############################################################################
+# 34. FORCER LE CHANGEMENT DU MOT DE PASSE
+###############################################################################
+
+Set-ADUser `
+    -Identity "b.dylan" `
+    -ChangePasswordAtLogon $true
+
+
+###############################################################################
+# 35. DÉPLACEMENT D'UN UTILISATEUR
+###############################################################################
+
+$Utilisateur = Get-ADUser `
+    -Identity "b.dylan"
+
+Move-ADObject `
+    -Identity $Utilisateur.DistinguishedName `
+    -TargetPath "OU=utilisateurs,OU=NomDuService,DC=Tarantino,DC=Mega"
+
+
+###############################################################################
+# 36. SUPPRESSION D'UN UTILISATEUR
+###############################################################################
+
+# ATTENTION :
+#
+# Cette commande supprime le compte Active Directory.
+
+Remove-ADUser `
+    -Identity "b.dylan"
+
+# À utiliser uniquement lorsque la suppression
+# du compte est réellement nécessaire.
+
+
+###############################################################################
+# 37. SCRIPT D'AUTOMATISATION
+###############################################################################
+
+# Script utilisé :
+
+scripts/powershell/creation-utilisateurs.ps1
+
+# Fonctionnement :
+#
+# 1. Importation de users.csv.
+#
+# 2. Récupération du domaine Active Directory.
+#
+# 3. Lecture de chaque utilisateur.
+#
+# 4. Génération du nom complet.
+#
+# 5. Génération du login.
+#
+# 6. Recherche de l'OU correspondant au service.
+#
+# 7. Conversion du mot de passe.
+#
+# 8. Création du compte utilisateur.
+#
+# 9. Activation du compte.
+#
+# 10. Ajout au groupe global correspondant.
+
+
+###############################################################################
+# 38. EXEMPLE DE LOGIQUE D'AUTOMATISATION
+###############################################################################
+
+foreach ($element in $fichier) {
+
+    $nom_complet = $element.prenom + " " + $element.nom
+
+    $login = `
+        $element.prenom.Substring(0,1) `
+        + "." `
+        + $element.nom
+
+    $OU = Get-ADOrganizationalUnit `
+        -Filter "Name -like '$($element.service)'"
+
+    $pass = ConvertTo-SecureString `
+        -AsPlainText $element.pass `
+        -Force
+
+    New-ADUser `
+        -Name $nom_complet `
+        -DisplayName $nom_complet `
+        -Surname $element.nom `
+        -GivenName $element.prenom `
+        -AccountPassword $pass `
+        -Path "OU=utilisateurs,$($OU.DistinguishedName)" `
+        -UserPrincipalName ($login + "@" + $domain) `
+        -SamAccountName $login `
+        -Enabled $true `
+        -ChangePasswordAtLogon $true
+
+    Add-ADGroupMember `
+        -Identity "gg_$($element.service)" `
+        -Members $login
+
+}
+
+
+###############################################################################
+# 39. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Données utilisateurs :
+
+scripts/csv/users.csv
+
+# Script de création :
+
+scripts/powershell/creation-utilisateurs.ps1
+
+# Structure des OU :
+
+configurations/active-directory/unites-organisation.txt
+
+# Groupes de sécurité :
+
+configurations/active-directory/groupes-securite.txt
+
+# Domaine :
+
+configurations/active-directory/domaine.txt
+
+
+###############################################################################
+# 40. SÉCURITÉ
+###############################################################################
+
+# IMPORTANT :
+#
+# Ne jamais publier dans un dépôt GitHub public :
+#
+# - les véritables mots de passe utilisateurs ;
+# - les mots de passe administrateurs ;
+# - les mots de passe DSRM ;
+# - des données personnelles réelles ;
+# - des identifiants sensibles.
+#
+# Pour un projet de démonstration, utiliser uniquement :
+#
+# - des utilisateurs fictifs ;
+# - des mots de passe fictifs ;
+# - des données anonymisées.
+#
+# Si users.csv contient des mots de passe,
+# utiliser uniquement des valeurs de démonstration.
+
+
+###############################################################################
+# 41. VALIDATION
+###############################################################################
+
+# La configuration des utilisateurs est correcte si :
+#
+# [ ] Le fichier users.csv est correctement importé.
+#
+# [ ] Chaque utilisateur possède un nom complet.
+#
+# [ ] Chaque utilisateur possède un SamAccountName.
+#
+# [ ] Chaque utilisateur possède un UserPrincipalName.
+#
+# [ ] Le domaine utilisé est Tarantino.Mega.
+#
+# [ ] Les utilisateurs sont créés dans les bonnes OU.
+#
+# [ ] Les comptes sont activés.
+#
+# [ ] Le changement du mot de passe est demandé
+#     à la première connexion.
+#
+# [ ] Les utilisateurs appartiennent aux groupes
+#     correspondant à leur service.
+#
+# [ ] Get-ADUser affiche les comptes attendus.
+#
+# [ ] Get-ADPrincipalGroupMembership affiche
+#     les groupes attendus.
+#
+# [ ] Le script creation-utilisateurs.ps1 permet
+#     de reproduire automatiquement la création
+#     des comptes Active Directory.
+###############################################################################
