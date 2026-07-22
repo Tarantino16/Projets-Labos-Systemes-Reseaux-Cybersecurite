@@ -1,0 +1,41 @@
+// =========================================================
+// Projet-Labo-01-4-DNS-DDNS
+// Serveur DNS secondaire
+// Fichier : /etc/bind/named.conf.local
+//
+// Description :
+// Déclaration des zones DNS récupérées automatiquement
+// depuis le serveur DNS primaire (192.168.11.250).
+// =========================================================
+
+
+// =========================================================
+// Zone directe
+// =========================================================
+
+zone "tarantino.family" {
+
+    type secondary;
+
+    file "/var/cache/bind/tarantino.family.dns";
+
+    masters {
+        192.168.11.250;
+    };
+};
+
+
+// =========================================================
+// Zone inversée
+// =========================================================
+
+zone "11.168.192.in-addr.arpa" {
+
+    type secondary;
+
+    file "/var/cache/bind/11.168.192.in-addr.arpa.dns";
+
+    masters {
+        192.168.11.250;
+    };
+};

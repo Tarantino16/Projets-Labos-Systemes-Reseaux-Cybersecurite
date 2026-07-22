@@ -1,0 +1,26 @@
+// =========================================================
+// Projet-Labo-01-4-DNS-DDNS
+// Serveur DNS secondaire
+// Fichier : /etc/bind/named.conf.options
+//
+// Description :
+// Configuration générale de Bind9.
+// =========================================================
+
+options {
+
+    directory "/var/cache/bind";
+
+    // Forwarders DNS (non utilisés dans ce laboratoire)
+    //forwarders {
+    //    0.0.0.0;
+    //};
+
+    dnssec-validation auto;
+
+    // Écoute sur l'adresse du serveur DNS secondaire
+    listen-on { 192.168.12.250; };
+
+    // Désactive IPv6 (le laboratoire est entièrement en IPv4)
+    listen-on-v6 { none; };
+};
