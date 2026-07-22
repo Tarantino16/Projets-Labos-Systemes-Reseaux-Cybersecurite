@@ -1,0 +1,136 @@
+enable
+configure terminal
+
+hostname SW-7
+
+!
+! VLAN
+!
+vlan 10
+ name red
+exit
+
+vlan 20
+ name orange
+exit
+
+vlan 30
+ name grey
+exit
+
+vlan 40
+ name brown
+exit
+
+vlan 50
+ name black
+exit
+
+vlan 60
+ name yellow
+exit
+
+vlan 70
+ name gold
+exit
+
+vlan 80
+ name green
+exit
+
+vlan 90
+ name cyan
+exit
+
+vlan 100
+ name copper
+exit
+
+vlan 110
+ name silver
+exit
+
+vlan 120
+ name salmon
+exit
+
+vlan 150
+ name purple
+exit
+
+!
+! Interfaces FastEthernet
+!
+interface range FastEthernet0/1-6
+ switchport mode access
+exit
+
+interface FastEthernet0/7
+ switchport mode access
+ switchport access vlan 70
+exit
+
+interface FastEthernet0/8
+ switchport mode access
+ switchport access vlan 80
+exit
+
+interface FastEthernet0/9
+ switchport mode access
+ switchport access vlan 90
+exit
+
+interface FastEthernet0/10
+ switchport mode access
+ switchport access vlan 100
+exit
+
+interface FastEthernet0/11
+ switchport mode access
+ switchport access vlan 110
+exit
+
+interface FastEthernet0/12
+ switchport mode access
+ switchport access vlan 120
+exit
+
+interface range FastEthernet0/13-24
+ switchport mode access
+exit
+
+!
+! Interfaces Trunk
+!
+interface range GigabitEthernet0/1-2
+ switchport mode trunk
+exit
+
+!
+! Interface de management
+!
+interface Vlan150
+ ip address 192.168.15.7 255.255.255.0
+ no shutdown
+exit
+
+ip default-gateway 192.168.15.254
+
+!
+! SSH
+!
+ip domain-name maison.org
+
+username giosue secret poseidon
+
+crypto key generate rsa general-keys modulus 4096
+
+line vty 0 4
+ login local
+ transport input ssh
+exit
+
+enable secret poseidon
+
+end
+write memory
