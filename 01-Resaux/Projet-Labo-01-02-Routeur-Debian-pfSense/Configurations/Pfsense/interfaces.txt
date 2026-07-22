@@ -1,0 +1,21 @@
+# Configuration des interfaces pfSense
+
+## WAN
+
+- Interface : WAN
+- Configuration IPv4 : DHCP
+
+## LAN
+
+- Interface : LAN
+- Adresse IPv4 : 192.168.11.254
+- Masque : /24
+
+## DHCP
+
+- Activé sur l'interface LAN
+
+## Administration
+
+- Accès à l'interface Web via HTTPS
+- Configuration réalisée depuis le WebConfigurator

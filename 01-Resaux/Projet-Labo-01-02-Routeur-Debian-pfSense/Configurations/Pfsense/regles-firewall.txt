@@ -1,0 +1,51 @@
+===========================================================
+Projet-Labo 02 - Routeur Debian & pfSense
+Configuration des règles de pare-feu pfSense
+===========================================================
+
+Interface : WAN
+
+Règle PAT
+
+Action :
+    Pass
+
+Interface :
+    WAN
+
+Protocol :
+    TCP
+
+Destination :
+    WAN Address
+
+Destination Port :
+    HTTP (80)
+
+Redirect target IP :
+    192.168.12.250
+
+Redirect target Port :
+    HTTP (80)
+
+Description :
+    Redirection des requêtes HTTP provenant du réseau WAN
+    vers le serveur Apache situé sur le LAN.
+
+===========================================================
+
+Emplacement de la règle :
+
+Firewall
+    └── NAT
+          └── Port Forward
+
+===========================================================
+
+Objectif :
+
+Permettre à un utilisateur situé sur le réseau WAN
+d'accéder au serveur Web Apache (192.168.12.250)
+au travers de l'adresse IP WAN du routeur.
+
+===========================================================

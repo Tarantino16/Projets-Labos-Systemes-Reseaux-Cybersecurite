@@ -1,0 +1,178 @@
+===========================================================
+Projet-Labo 02 — Routeur Debian & pfSense
+Configuration du routage, du NAT et du PAT sous pfSense
+===========================================================
+
+
+1. ROUTAGE
+===========================================================
+
+pfSense assure le routage entre les différentes interfaces
+réseau configurées dans le laboratoire :
+
+- WAN
+- LAN 1 : 192.168.11.0/24
+- LAN 2 : 192.168.12.0/24
+
+Les équipements des réseaux internes utilisent l’adresse IP
+de l’interface pfSense correspondant à leur réseau comme
+passerelle par défaut.
+
+LAN 1 :
+    Réseau : 192.168.11.0/24
+    Passerelle : 192.168.11.254
+
+LAN 2 :
+    Réseau : 192.168.12.0/24
+    Passerelle : 192.168.12.254
+
+Le routage entre les interfaces est réalisé par pfSense.
+Les communications restent soumises aux règles définies
+dans le pare-feu.
+
+
+2. NAT SORTANT
+===========================================================
+
+Emplacement dans l’interface Web :
+
+Firewall
+    └── NAT
+        └── Outbound
+
+Mode sélectionné :
+
+Automatic Outbound NAT Rule Generation
+(IPsec Passthrough included)
+
+Fonction :
+
+Le NAT sortant permet aux machines des réseaux privés
+LAN 1 et LAN 2 d’accéder au réseau WAN en utilisant
+l’adresse IPv4 de l’interface WAN de pfSense.
+
+Réseaux internes concernés :
+
+- 192.168.11.0/24
+- 192.168.12.0/24
+
+Interface de sortie :
+
+- WAN
+
+Mode de traduction :
+
+- Traduction automatique vers l’adresse de l’interface WAN
+
+
+3. PAT — REDIRECTION DE PORT
+===========================================================
+
+Emplacement dans l’interface Web :
+
+Firewall
+    └── NAT
+        └── Port Forward
+
+Paramètres de la règle :
+
+Interface :
+    WAN
+
+Famille d’adresses :
+    IPv4
+
+Protocole :
+    TCP
+
+Source :
+    Any
+
+Destination :
+    WAN Address
+
+Port de destination :
+    HTTP — Port 80
+
+Redirect Target IP :
+    Single Host
+
+Adresse du serveur de destination :
+    192.168.12.250
+
+Redirect Target Port :
+    HTTP — Port 80
+
+Description :
+    Redirection HTTP vers le serveur Apache du LAN 2
+
+
+4. FONCTIONNEMENT DE LA RÈGLE PAT
+===========================================================
+
+Lorsqu’un poste situé sur le réseau WAN contacte l’adresse
+WAN de pfSense sur le port TCP 80, pfSense redirige la
+connexion vers le serveur Web Apache :
+
+Adresse interne :
+    192.168.12.250
+
+Port interne :
+    TCP 80
+
+Flux :
+
+Client WAN
+    ↓
+Adresse WAN pfSense : port 80
+    ↓
+Règle de redirection PAT
+    ↓
+Serveur Apache : 192.168.12.250:80
+
+
+5. OBJECTIFS
+===========================================================
+
+Le NAT sortant permet :
+
+- l’accès des réseaux privés au WAN ;
+- le masquage des adresses IPv4 privées ;
+- l’utilisation de l’adresse WAN de pfSense pour les
+  communications sortantes.
+
+Le PAT permet :
+
+- de rendre le serveur Web accessible depuis le WAN ;
+- de rediriger le port TCP 80 de l’adresse WAN vers le
+  serveur Apache du LAN 2 ;
+- de publier un service interne sans exposer directement
+  son adresse privée.
+
+
+6. VÉRIFICATIONS
+===========================================================
+
+Vérification du NAT sortant :
+
+- Depuis un poste du LAN, tester la connectivité vers le WAN.
+- Vérifier que la passerelle du poste correspond à
+  l’interface LAN de pfSense.
+
+Vérification du PAT :
+
+- Depuis un poste situé sur le WAN, ouvrir un navigateur.
+- Entrer l’adresse IPv4 WAN de pfSense.
+- Vérifier que la page du serveur Apache
+  192.168.12.250 s’affiche.
+
+Vérification dans pfSense :
+
+Firewall
+    └── NAT
+        ├── Outbound
+        └── Port Forward
+
+===========================================================
+Fin de la configuration
+===========================================================
