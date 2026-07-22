@@ -1,0 +1,562 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Configuration des groupes Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectif :
+# - Documenter les groupes créés pendant le laboratoire
+# - Vérifier leur présence dans le système
+# - Documenter l'appartenance des utilisateurs
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les groupes Linux permettent de regrouper plusieurs utilisateurs.
+#
+# Ils facilitent notamment :
+#
+# - l'administration des permissions ;
+# - le partage de fichiers ;
+# - l'accès à certaines ressources ;
+# - l'organisation des utilisateurs.
+
+
+###############################################################################
+# 2. GROUPES DU LABORATOIRE
+###############################################################################
+
+travail
+
+direction
+
+compta
+
+rh
+
+marketing
+
+manutentionnaires
+
+
+###############################################################################
+# 3. CRÉATION DES GROUPES
+###############################################################################
+
+# Groupe travail :
+
+addgroup travail
+
+
+# Groupe direction :
+
+addgroup direction
+
+
+# Groupe compta :
+
+addgroup compta
+
+
+# Groupe rh :
+
+addgroup rh
+
+
+# Groupe marketing :
+
+addgroup marketing
+
+
+# Groupe manutentionnaires :
+
+addgroup manutentionnaires
+
+
+###############################################################################
+# 4. VÉRIFICATION DES GROUPES
+###############################################################################
+
+# Afficher tous les groupes locaux :
+
+cat /etc/group
+
+
+# Vérifier individuellement les groupes :
+
+getent group travail
+
+getent group direction
+
+getent group compta
+
+getent group rh
+
+getent group marketing
+
+getent group manutentionnaires
+
+
+###############################################################################
+# 5. GROUPE DIRECTION
+###############################################################################
+
+Nom :
+
+direction
+
+Type :
+
+Groupe local Linux
+
+Utilisation :
+
+Groupe utilisé pour regrouper les utilisateurs
+appartenant au service ou rôle de direction.
+
+
+###############################################################################
+# 6. UTILISATEUR GIOSUE
+###############################################################################
+
+# Dans le laboratoire, l'utilisateur :
+
+giosue
+
+# est ajouté au groupe :
+
+direction
+
+
+# Commande :
+
+adduser giosue direction
+
+
+###############################################################################
+# 7. VÉRIFICATION DE L'APPARTENANCE
+###############################################################################
+
+groups giosue
+
+
+# ou :
+
+id giosue
+
+
+# ou :
+
+getent group direction
+
+
+###############################################################################
+# 8. GROUPE TRAVAIL
+###############################################################################
+
+Nom :
+
+travail
+
+Type :
+
+Groupe local Linux
+
+# Ce groupe fait partie des groupes créés
+# pendant les exercices du laboratoire.
+
+
+###############################################################################
+# 9. GROUPE COMPTA
+###############################################################################
+
+Nom :
+
+compta
+
+Type :
+
+Groupe local Linux
+
+
+###############################################################################
+# 10. GROUPE RH
+###############################################################################
+
+Nom :
+
+rh
+
+Type :
+
+Groupe local Linux
+
+
+###############################################################################
+# 11. GROUPE MARKETING
+###############################################################################
+
+Nom :
+
+marketing
+
+Type :
+
+Groupe local Linux
+
+
+###############################################################################
+# 12. GROUPE MANUTENTIONNAIRES
+###############################################################################
+
+Nom :
+
+manutentionnaires
+
+Type :
+
+Groupe local Linux
+
+
+###############################################################################
+# 13. STRUCTURE DU FICHIER /etc/group
+###############################################################################
+
+# Les informations relatives aux groupes locaux
+# sont stockées notamment dans :
+
+/etc/group
+
+
+# Une entrée possède généralement la structure :
+
+nom_groupe:x:GID:membres
+
+
+# Exemple générique :
+
+direction:x:1002:giosue
+
+
+###############################################################################
+# 14. SIGNIFICATION DES CHAMPS
+###############################################################################
+
+nom_groupe
+
+# Nom du groupe.
+
+
+x
+
+# Indique que les informations sensibles éventuelles
+# sont gérées séparément.
+
+
+GID
+
+# Group Identifier.
+#
+# Identifiant numérique du groupe.
+
+
+membres
+
+# Liste des utilisateurs appartenant au groupe
+# en tant que membres supplémentaires.
+
+
+###############################################################################
+# 15. GID
+###############################################################################
+
+# Chaque groupe possède un identifiant numérique appelé :
+
+GID
+
+
+# Pour afficher le GID d'un groupe :
+
+getent group direction
+
+
+# Les valeurs numériques peuvent varier
+# selon l'ordre de création des groupes.
+
+
+###############################################################################
+# 16. GROUPES D'UN UTILISATEUR
+###############################################################################
+
+# Afficher les groupes d'un utilisateur :
+
+groups giosue
+
+
+# Affichage détaillé :
+
+id giosue
+
+
+###############################################################################
+# 17. GROUPE PRINCIPAL ET GROUPES SECONDAIRES
+###############################################################################
+
+# Un utilisateur possède :
+#
+# - un groupe principal ;
+# - éventuellement plusieurs groupes secondaires.
+#
+# L'ajout réalisé avec :
+
+adduser giosue direction
+
+# ajoute généralement direction
+# comme groupe secondaire de giosue.
+
+
+###############################################################################
+# 18. RELATION AVEC LES PERMISSIONS
+###############################################################################
+
+# Dans les permissions Linux classiques :
+
+U = User
+G = Group
+O = Other
+
+
+# Le groupe propriétaire d'un fichier
+# utilise les permissions définies dans :
+
+G
+
+
+###############################################################################
+# 19. EXEMPLE AVEC GIOSUE.TXT
+###############################################################################
+
+# Dans le laboratoire, le fichier :
+
+giosue.txt
+
+# peut avoir comme propriétaire :
+
+giosue
+
+# et comme groupe propriétaire :
+
+direction
+
+
+# Commande :
+
+chgrp direction giosue.txt
+
+
+###############################################################################
+# 20. VÉRIFICATION DU GROUPE PROPRIÉTAIRE
+###############################################################################
+
+ls -l giosue.txt
+
+
+# Exemple de principe :
+
+-rwxrwxr-x 1 giosue direction ... giosue.txt
+
+
+###############################################################################
+# 21. PERMISSIONS DU GROUPE
+###############################################################################
+
+# Avec :
+
+chmod 775 giosue.txt
+
+
+# les permissions sont :
+
+User  = rwx
+
+Group = rwx
+
+Other = r-x
+
+
+# Les utilisateurs appartenant au groupe direction
+# peuvent donc bénéficier des permissions Group
+# lorsqu'elles s'appliquent.
+
+
+###############################################################################
+# 22. AJOUTER UN AUTRE UTILISATEUR À UN GROUPE
+###############################################################################
+
+# Exemple :
+
+adduser bob direction
+
+
+# Vérification :
+
+groups bob
+
+
+###############################################################################
+# 23. RETIRER UN UTILISATEUR D'UN GROUPE
+###############################################################################
+
+deluser bob direction
+
+
+###############################################################################
+# 24. SUPPRIMER UN GROUPE
+###############################################################################
+
+# Exemple :
+
+delgroup travail
+
+
+# ATTENTION :
+#
+# Vérifier auparavant qu'aucune ressource
+# ou utilisateur ne dépend du groupe.
+
+
+###############################################################################
+# 25. COMMANDES PRINCIPALES
+###############################################################################
+
+# Créer un groupe :
+
+addgroup groupe
+
+
+# Consulter les groupes :
+
+cat /etc/group
+
+
+# Rechercher un groupe :
+
+getent group groupe
+
+
+# Ajouter un utilisateur :
+
+adduser utilisateur groupe
+
+
+# Afficher les groupes d'un utilisateur :
+
+groups utilisateur
+
+
+# Affichage détaillé :
+
+id utilisateur
+
+
+# Retirer un utilisateur :
+
+deluser utilisateur groupe
+
+
+# Supprimer un groupe :
+
+delgroup groupe
+
+
+# Modifier le groupe propriétaire d'un fichier :
+
+chgrp groupe fichier
+
+
+###############################################################################
+# 26. RÉCAPITULATIF
+###############################################################################
+
+Groupes créés :
+
+travail
+direction
+compta
+rh
+marketing
+manutentionnaires
+
+
+Utilisateur ajouté au groupe direction :
+
+giosue
+
+
+Commande utilisée :
+
+adduser giosue direction
+
+
+###############################################################################
+# 27. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Configuration des utilisateurs :
+
+configurations/utilisateurs.txt
+
+
+# Permissions UGO :
+
+configurations/permissions/permissions-ugo.txt
+
+
+# Vérifications :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 28. VALIDATION
+###############################################################################
+
+# La configuration des groupes est correcte si :
+#
+# [ ] Le groupe travail existe.
+#
+# [ ] Le groupe direction existe.
+#
+# [ ] Le groupe compta existe.
+#
+# [ ] Le groupe rh existe.
+#
+# [ ] Le groupe marketing existe.
+#
+# [ ] Le groupe manutentionnaires existe.
+#
+# [ ] Les groupes apparaissent dans /etc/group.
+#
+# [ ] getent group permet de retrouver chaque groupe.
+#
+# [ ] giosue appartient au groupe direction.
+#
+# [ ] groups giosue affiche le groupe direction.
+#
+# [ ] La relation entre groupe propriétaire
+#     et permissions UGO est comprise.
+###############################################################################

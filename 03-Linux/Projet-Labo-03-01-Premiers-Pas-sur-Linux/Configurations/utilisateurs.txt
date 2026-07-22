@@ -1,0 +1,1095 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Configuration des utilisateurs Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Documenter les utilisateurs utilisés pendant le laboratoire
+# - Identifier leurs comptes Linux
+# - Vérifier leur présence dans le système
+# - Vérifier leurs UID et GID
+# - Vérifier leurs groupes
+# - Vérifier leurs répertoires personnels
+# - Comprendre la relation entre utilisateurs, groupes et permissions
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Linux est un système multi-utilisateur.
+#
+# Chaque utilisateur possède notamment :
+#
+# - un nom de compte ;
+# - un UID ;
+# - un groupe principal ;
+# - un GID ;
+# - éventuellement plusieurs groupes secondaires ;
+# - un répertoire personnel ;
+# - un shell de connexion.
+
+
+###############################################################################
+# 2. UTILISATEURS DU LABORATOIRE
+###############################################################################
+
+giosue
+
+bob
+
+alice
+
+marc
+
+jenny
+
+
+###############################################################################
+# 3. CRÉATION DES UTILISATEURS
+###############################################################################
+
+# Création de l'utilisateur giosue :
+
+adduser giosue
+
+
+# Création de l'utilisateur bob :
+
+adduser bob
+
+
+# Création de l'utilisateur alice :
+
+adduser alice
+
+
+# Création de l'utilisateur marc :
+
+adduser marc
+
+
+# Création de l'utilisateur jenny :
+
+adduser jenny
+
+
+###############################################################################
+# 4. VÉRIFICATION DES UTILISATEURS
+###############################################################################
+
+# Vérifier individuellement les comptes :
+
+getent passwd giosue
+
+getent passwd bob
+
+getent passwd alice
+
+getent passwd marc
+
+getent passwd jenny
+
+
+###############################################################################
+# 5. VÉRIFICATION AVEC /etc/passwd
+###############################################################################
+
+# Les comptes locaux peuvent notamment être consultés dans :
+
+/etc/passwd
+
+
+# Afficher le fichier :
+
+cat /etc/passwd
+
+
+# Rechercher un utilisateur précis :
+
+grep giosue /etc/passwd
+
+grep bob /etc/passwd
+
+grep alice /etc/passwd
+
+grep marc /etc/passwd
+
+grep jenny /etc/passwd
+
+
+###############################################################################
+# 6. STRUCTURE D'UNE ENTRÉE UTILISATEUR
+###############################################################################
+
+# Une entrée dans /etc/passwd possède généralement
+# la structure suivante :
+
+utilisateur:x:UID:GID:informations:home:shell
+
+
+# Exemple générique :
+
+giosue:x:1001:1001:Giosue:/home/giosue:/bin/bash
+
+
+# ATTENTION :
+#
+# Les UID et GID exacts dépendent de l'ordre
+# dans lequel les utilisateurs et groupes
+# ont été créés sur la machine.
+
+
+###############################################################################
+# 7. SIGNIFICATION DES CHAMPS
+###############################################################################
+
+utilisateur
+
+# Nom du compte Linux.
+
+
+x
+
+# Indique que les informations d'authentification
+# ne sont pas stockées directement en clair
+# dans /etc/passwd.
+
+
+UID
+
+# User Identifier.
+#
+# Identifiant numérique associé à l'utilisateur.
+
+
+GID
+
+# Group Identifier.
+#
+# Identifiant numérique correspondant
+# au groupe principal de l'utilisateur.
+
+
+informations
+
+# Informations descriptives éventuellement
+# associées au compte.
+
+
+home
+
+# Répertoire personnel de l'utilisateur.
+
+
+shell
+
+# Shell utilisé lors de la connexion.
+
+
+###############################################################################
+# 8. UTILISATEUR GIOSUE
+###############################################################################
+
+Nom du compte :
+
+giosue
+
+
+Répertoire personnel :
+
+/home/giosue
+
+
+# Vérification :
+
+getent passwd giosue
+
+
+# Informations détaillées :
+
+id giosue
+
+
+# Groupes :
+
+groups giosue
+
+
+###############################################################################
+# 9. APPARTENANCE DE GIOSUE AU GROUPE DIRECTION
+###############################################################################
+
+# Dans le laboratoire, l'utilisateur :
+
+giosue
+
+# est ajouté au groupe :
+
+direction
+
+
+# Commande :
+
+adduser giosue direction
+
+
+###############################################################################
+# 10. VÉRIFICATION DE GIOSUE
+###############################################################################
+
+groups giosue
+
+
+# Vérification détaillée :
+
+id giosue
+
+
+# Vérification directement depuis le groupe :
+
+getent group direction
+
+
+###############################################################################
+# 11. UTILISATEUR BOB
+###############################################################################
+
+Nom du compte :
+
+bob
+
+
+Répertoire personnel :
+
+/home/bob
+
+
+# Vérification :
+
+getent passwd bob
+
+
+# Informations détaillées :
+
+id bob
+
+
+# Groupes :
+
+groups bob
+
+
+###############################################################################
+# 12. UTILISATEUR ALICE
+###############################################################################
+
+Nom du compte :
+
+alice
+
+
+Répertoire personnel :
+
+/home/alice
+
+
+# Vérification :
+
+getent passwd alice
+
+
+# Informations détaillées :
+
+id alice
+
+
+# Groupes :
+
+groups alice
+
+
+###############################################################################
+# 13. UTILISATEUR MARC
+###############################################################################
+
+Nom du compte :
+
+marc
+
+
+Répertoire personnel :
+
+/home/marc
+
+
+# Vérification :
+
+getent passwd marc
+
+
+# Informations détaillées :
+
+id marc
+
+
+# Groupes :
+
+groups marc
+
+
+###############################################################################
+# 14. UTILISATEUR JENNY
+###############################################################################
+
+Nom du compte :
+
+jenny
+
+
+Répertoire personnel :
+
+/home/jenny
+
+
+# Vérification :
+
+getent passwd jenny
+
+
+# Informations détaillées :
+
+id jenny
+
+
+# Groupes :
+
+groups jenny
+
+
+###############################################################################
+# 15. RÉPERTOIRES PERSONNELS
+###############################################################################
+
+# Les répertoires personnels des utilisateurs
+# se trouvent généralement dans :
+
+/home/
+
+
+# Dans le laboratoire :
+
+/home/giosue
+
+/home/bob
+
+/home/alice
+
+/home/marc
+
+/home/jenny
+
+
+###############################################################################
+# 16. VÉRIFIER LES RÉPERTOIRES PERSONNELS
+###############################################################################
+
+ls -l /home
+
+
+# Vérifications individuelles :
+
+ls -ld /home/giosue
+
+ls -ld /home/bob
+
+ls -ld /home/alice
+
+ls -ld /home/marc
+
+ls -ld /home/jenny
+
+
+###############################################################################
+# 17. UID
+###############################################################################
+
+# UID signifie :
+
+User Identifier
+
+
+# Chaque utilisateur possède un identifiant
+# numérique utilisé par Linux.
+#
+# Pour afficher l'UID de Giosue :
+
+id giosue
+
+
+# Pour afficher uniquement l'UID :
+
+id -u giosue
+
+
+###############################################################################
+# 18. GID PRINCIPAL
+###############################################################################
+
+# Chaque utilisateur possède également
+# un groupe principal.
+#
+# Pour afficher les informations :
+
+id giosue
+
+
+# Pour afficher uniquement le GID principal :
+
+id -g giosue
+
+
+###############################################################################
+# 19. GROUPES D'UN UTILISATEUR
+###############################################################################
+
+# Pour afficher les groupes :
+
+groups giosue
+
+
+# ou :
+
+id giosue
+
+
+###############################################################################
+# 20. GROUPE PRINCIPAL
+###############################################################################
+
+# Lors de la création d'un utilisateur avec adduser,
+# Debian peut créer un groupe principal associé
+# au compte utilisateur.
+#
+# Exemple :
+
+Utilisateur :
+
+bob
+
+
+Groupe principal :
+
+bob
+
+
+# Vérification :
+
+id bob
+
+
+###############################################################################
+# 21. GROUPES SECONDAIRES
+###############################################################################
+
+# Un utilisateur peut appartenir à plusieurs
+# groupes supplémentaires.
+#
+# Exemple du laboratoire :
+
+adduser giosue direction
+
+
+# "direction" devient alors un groupe supplémentaire
+# de l'utilisateur giosue.
+
+
+###############################################################################
+# 22. VÉRIFIER LES GROUPES SECONDAIRES
+###############################################################################
+
+groups giosue
+
+
+# ou :
+
+id giosue
+
+
+###############################################################################
+# 23. RELATION ENTRE UTILISATEURS ET GROUPES
+###############################################################################
+
+# Organisation générale :
+
+Utilisateur
+    │
+    ├── UID
+    │
+    ├── Groupe principal
+    │       └── GID
+    │
+    ├── Groupes secondaires
+    │
+    ├── Répertoire personnel
+    │
+    └── Shell
+
+
+###############################################################################
+# 24. RELATION AVEC LES PERMISSIONS UGO
+###############################################################################
+
+# Les permissions Linux classiques utilisent :
+
+U = User
+G = Group
+O = Other
+
+
+# U :
+#
+# permissions du propriétaire.
+
+
+# G :
+#
+# permissions du groupe propriétaire.
+
+
+# O :
+#
+# permissions des autres utilisateurs.
+
+
+###############################################################################
+# 25. UTILISATEUR PROPRIÉTAIRE D'UN FICHIER
+###############################################################################
+
+# Exemple du laboratoire :
+
+giosue.txt
+
+
+# Le propriétaire peut être défini avec :
+
+chown giosue giosue.txt
+
+
+###############################################################################
+# 26. GROUPE PROPRIÉTAIRE DU FICHIER
+###############################################################################
+
+# Le groupe peut être défini avec :
+
+chgrp direction giosue.txt
+
+
+###############################################################################
+# 27. VÉRIFICATION
+###############################################################################
+
+ls -l giosue.txt
+
+
+# Exemple de principe :
+
+-rwxrwxr-x 1 giosue direction ... giosue.txt
+
+
+# Dans cet exemple :
+#
+# propriétaire :
+
+giosue
+
+
+# groupe propriétaire :
+
+direction
+
+
+###############################################################################
+# 28. CONFIGURATION DES PERMISSIONS
+###############################################################################
+
+# Exemple utilisé dans le laboratoire :
+
+chmod 775 giosue.txt
+
+
+# Décomposition :
+
+User  = rwx
+
+Group = rwx
+
+Other = r-x
+
+
+###############################################################################
+# 29. RELATION ENTRE GIOSUE ET DIRECTION
+###############################################################################
+
+# Configuration :
+
+Utilisateur :
+
+giosue
+
+
+Groupe secondaire :
+
+direction
+
+
+Fichier :
+
+giosue.txt
+
+
+Propriétaire :
+
+giosue
+
+
+Groupe propriétaire :
+
+direction
+
+
+Permissions :
+
+775
+
+
+###############################################################################
+# 30. SCHÉMA DE LA CONFIGURATION
+###############################################################################
+
+#                         giosue
+#                            │
+#                  ┌─────────┴─────────┐
+#                  │                   │
+#                  ▼                   ▼
+#                UID               Groupes
+#                                      │
+#                                      ▼
+#                                  direction
+#                                      │
+#                                      ▼
+#                                 giosue.txt
+#                                      │
+#                      ┌───────────────┼───────────────┐
+#                      │               │               │
+#                      ▼               ▼               ▼
+#                    User            Group           Other
+#                     rwx             rwx              r-x
+#
+#                      7               7                5
+
+
+###############################################################################
+# 31. RELATION AVEC LES ACL
+###############################################################################
+
+# Les ACL permettent d'attribuer une règle
+# spécifique à un utilisateur supplémentaire.
+#
+# Exemple avec Bob :
+
+setfacl -m u:bob:--- giosue.txt
+
+
+# Cette ACL concerne directement :
+
+bob
+
+
+# sans changer le propriétaire :
+
+giosue
+
+
+# ni le groupe propriétaire :
+
+direction
+
+
+###############################################################################
+# 32. VÉRIFIER L'ACL UTILISATEUR
+###############################################################################
+
+getfacl giosue.txt
+
+
+# Vérifier la présence de :
+
+user:bob:---
+
+
+###############################################################################
+# 33. TESTER UN COMPTE UTILISATEUR
+###############################################################################
+
+# Ouvrir une session avec Bob :
+
+su - bob
+
+
+# Vérifier l'utilisateur connecté :
+
+whoami
+
+
+# Résultat attendu :
+
+bob
+
+
+###############################################################################
+# 34. VÉRIFIER LE RÉPERTOIRE PERSONNEL
+###############################################################################
+
+pwd
+
+
+# Pour Bob, le résultat doit normalement
+# correspondre à :
+
+/home/bob
+
+
+###############################################################################
+# 35. QUITTER LA SESSION
+###############################################################################
+
+exit
+
+
+###############################################################################
+# 36. MODIFICATION DU MOT DE PASSE
+###############################################################################
+
+# Pour modifier le mot de passe d'un utilisateur :
+
+passwd utilisateur
+
+
+# Exemple :
+
+passwd bob
+
+
+# Ne jamais enregistrer ou publier les mots
+# de passe réels dans ce fichier ou sur GitHub.
+
+
+###############################################################################
+# 37. SUPPRESSION D'UN UTILISATEUR
+###############################################################################
+
+# Supprimer un compte :
+
+deluser utilisateur
+
+
+# Exemple :
+
+deluser bob
+
+
+###############################################################################
+# 38. SUPPRESSION AVEC LE RÉPERTOIRE PERSONNEL
+###############################################################################
+
+deluser --remove-home utilisateur
+
+
+# Exemple :
+
+deluser --remove-home bob
+
+
+# ATTENTION :
+#
+# Cette opération supprime également
+# le répertoire personnel de l'utilisateur.
+
+
+###############################################################################
+# 39. VÉRIFICATION APRÈS SUPPRESSION
+###############################################################################
+
+getent passwd bob
+
+
+# Si le compte a été supprimé,
+# aucune entrée ne doit être retournée.
+
+
+###############################################################################
+# 40. RÉCAPITULATIF DES UTILISATEURS
+###############################################################################
+
+Utilisateurs :
+
+giosue
+bob
+alice
+marc
+jenny
+
+
+###############################################################################
+# 41. RÉCAPITULATIF DES RÉPERTOIRES PERSONNELS
+###############################################################################
+
+giosue :
+
+/home/giosue
+
+
+bob :
+
+/home/bob
+
+
+alice :
+
+/home/alice
+
+
+marc :
+
+/home/marc
+
+
+jenny :
+
+/home/jenny
+
+
+###############################################################################
+# 42. CONFIGURATION SPÉCIFIQUE DOCUMENTÉE
+###############################################################################
+
+Utilisateur :
+
+giosue
+
+
+Groupe supplémentaire :
+
+direction
+
+
+Commande :
+
+adduser giosue direction
+
+
+Fichier associé :
+
+giosue.txt
+
+
+Propriétaire :
+
+giosue
+
+
+Groupe propriétaire :
+
+direction
+
+
+Permissions :
+
+775
+
+
+###############################################################################
+# 43. COMMANDES DE VÉRIFICATION
+###############################################################################
+
+# Giosue :
+
+getent passwd giosue
+
+id giosue
+
+groups giosue
+
+
+# Bob :
+
+getent passwd bob
+
+id bob
+
+groups bob
+
+
+# Alice :
+
+getent passwd alice
+
+id alice
+
+groups alice
+
+
+# Marc :
+
+getent passwd marc
+
+id marc
+
+groups marc
+
+
+# Jenny :
+
+getent passwd jenny
+
+id jenny
+
+groups jenny
+
+
+###############################################################################
+# 44. COMMANDES PRINCIPALES
+###############################################################################
+
+# Créer un utilisateur :
+
+adduser utilisateur
+
+
+# Vérifier un utilisateur :
+
+getent passwd utilisateur
+
+
+# Afficher son UID/GID :
+
+id utilisateur
+
+
+# Afficher ses groupes :
+
+groups utilisateur
+
+
+# Modifier son mot de passe :
+
+passwd utilisateur
+
+
+# Ajouter à un groupe :
+
+adduser utilisateur groupe
+
+
+# Changer d'utilisateur :
+
+su - utilisateur
+
+
+# Quitter la session :
+
+exit
+
+
+# Modifier le propriétaire d'un fichier :
+
+chown utilisateur fichier
+
+
+# Supprimer un utilisateur :
+
+deluser utilisateur
+
+
+###############################################################################
+# 45. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion détaillée des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion détaillée des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Configuration des groupes :
+
+configurations/groupes.txt
+
+
+# Permissions UGO :
+
+configurations/permissions/permissions-ugo.txt
+
+
+# ACL :
+
+configurations/permissions/acl.txt
+
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 46. VALIDATION
+###############################################################################
+
+# La configuration des utilisateurs est correcte si :
+#
+# [ ] giosue existe.
+#
+# [ ] bob existe.
+#
+# [ ] alice existe.
+#
+# [ ] marc existe.
+#
+# [ ] jenny existe.
+#
+# [ ] Les comptes peuvent être retrouvés
+#     avec getent passwd.
+#
+# [ ] Les utilisateurs possèdent un UID.
+#
+# [ ] Les utilisateurs possèdent un GID principal.
+#
+# [ ] Les répertoires personnels existent.
+#
+# [ ] id permet d'afficher les informations
+#     des utilisateurs.
+#
+# [ ] groups permet d'afficher leurs groupes.
+#
+# [ ] giosue appartient au groupe direction.
+#
+# [ ] Le fichier giosue.txt peut appartenir
+#     à l'utilisateur giosue.
+#
+# [ ] Le groupe propriétaire de giosue.txt
+#     peut être direction.
+#
+# [ ] La relation entre utilisateurs,
+#     groupes et permissions UGO est comprise.
+#
+# [ ] Les ACL peuvent appliquer une règle
+#     supplémentaire à un utilisateur précis.
+###############################################################################
