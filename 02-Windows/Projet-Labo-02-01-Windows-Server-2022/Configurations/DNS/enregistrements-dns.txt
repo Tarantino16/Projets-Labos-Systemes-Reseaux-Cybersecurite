@@ -1,0 +1,655 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration des enregistrements DNS
+#
+# Service :
+# - DNS Server
+#
+# Serveur DNS :
+# - SRV-1
+# - 192.168.11.250
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Zone directe :
+# - Tarantino.Mega
+#
+# Zone inversée :
+# - 11.168.192.in-addr.arpa
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Les enregistrements DNS permettent d'assurer la résolution
+# des noms et des adresses IP dans l'infrastructure.
+#
+# Dans ce laboratoire, le serveur DNS est intégré
+# à l'environnement Windows Server 2022 et Active Directory.
+#
+# Les principaux types d'enregistrements utilisés sont :
+#
+# - A     : nom d'hôte vers adresse IPv4 ;
+# - PTR   : adresse IPv4 vers nom d'hôte ;
+# - CNAME : alias vers un nom canonique ;
+# - MX    : serveur de messagerie ;
+# - SRV   : localisation des services Active Directory.
+
+
+###############################################################################
+# 2. INFORMATIONS DNS
+###############################################################################
+
+Serveur DNS :
+
+SRV-1
+
+Adresse IPv4 :
+
+192.168.11.250
+
+Domaine :
+
+Tarantino.Mega
+
+FQDN du serveur :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 3. ZONE DE RECHERCHE DIRECTE
+###############################################################################
+
+Zone :
+
+Tarantino.Mega
+
+# La zone directe permet la résolution :
+#
+# Nom d'hôte
+#     |
+#     v
+# Adresse IPv4
+#
+# Exemple :
+#
+# SRV-1.Tarantino.Mega
+#     |
+#     v
+# 192.168.11.250
+
+
+###############################################################################
+# 4. ENREGISTREMENT A DU SERVEUR
+###############################################################################
+
+Type :
+
+A
+
+Nom :
+
+SRV-1
+
+FQDN :
+
+SRV-1.Tarantino.Mega
+
+Adresse IPv4 :
+
+192.168.11.250
+
+
+###############################################################################
+# 5. CRÉATION D'UN ENREGISTREMENT A
+###############################################################################
+
+Add-DnsServerResourceRecordA `
+    -Name "SRV-1" `
+    -ZoneName "Tarantino.Mega" `
+    -IPv4Address "192.168.11.250"
+
+
+###############################################################################
+# 6. CRÉATION D'UN ENREGISTREMENT A AVEC PTR
+###############################################################################
+
+# Il est possible de créer simultanément
+# l'enregistrement PTR associé :
+
+Add-DnsServerResourceRecordA `
+    -Name "SRV-1" `
+    -ZoneName "Tarantino.Mega" `
+    -IPv4Address "192.168.11.250" `
+    -CreatePtr
+
+
+###############################################################################
+# 7. VÉRIFICATION DE L'ENREGISTREMENT A
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega" `
+    -Name "SRV-1"
+
+
+###############################################################################
+# 8. TEST DE RÉSOLUTION DIRECTE
+###############################################################################
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+# ou :
+
+nslookup SRV-1.Tarantino.Mega
+
+# Résultat attendu :
+
+192.168.11.250
+
+
+###############################################################################
+# 9. ZONE DE RECHERCHE INVERSÉE
+###############################################################################
+
+Zone :
+
+11.168.192.in-addr.arpa
+
+Réseau :
+
+192.168.11.0/24
+
+# La zone inversée permet la résolution :
+#
+# Adresse IPv4
+#     |
+#     v
+# Nom d'hôte
+
+
+###############################################################################
+# 10. ENREGISTREMENT PTR DU SERVEUR
+###############################################################################
+
+Type :
+
+PTR
+
+Adresse :
+
+192.168.11.250
+
+Nom cible :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 11. CRÉATION MANUELLE D'UN ENREGISTREMENT PTR
+###############################################################################
+
+Add-DnsServerResourceRecordPtr `
+    -Name "250" `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -PtrDomainName "SRV-1.Tarantino.Mega"
+
+
+###############################################################################
+# 12. VÉRIFICATION DE L'ENREGISTREMENT PTR
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 13. TEST DE RÉSOLUTION INVERSÉE
+###############################################################################
+
+Resolve-DnsName 192.168.11.250
+
+# ou :
+
+nslookup 192.168.11.250
+
+# Résultat attendu :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 14. ENREGISTREMENTS CNAME
+###############################################################################
+
+# Un enregistrement CNAME permet de créer
+# un alias pointant vers un nom DNS existant.
+#
+# Exemple générique :
+#
+# Alias :
+# www
+#
+# Cible :
+# SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 15. CRÉATION D'UN CNAME
+###############################################################################
+
+Add-DnsServerResourceRecordCName `
+    -Name "www" `
+    -HostNameAlias "SRV-1.Tarantino.Mega" `
+    -ZoneName "Tarantino.Mega"
+
+# Cette commande est un exemple.
+# Ne créer cet alias que s'il est prévu
+# dans l'architecture du laboratoire.
+
+
+###############################################################################
+# 16. VÉRIFICATION DU CNAME
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega" `
+    -RRType CName
+
+
+###############################################################################
+# 17. TEST DU CNAME
+###############################################################################
+
+Resolve-DnsName www.Tarantino.Mega
+
+# ou :
+
+nslookup www.Tarantino.Mega
+
+
+###############################################################################
+# 18. ENREGISTREMENTS MX
+###############################################################################
+
+# Un enregistrement MX permet d'indiquer
+# le serveur chargé de recevoir les courriers électroniques
+# pour un domaine.
+#
+# Exemple générique :
+#
+# Domaine :
+# Tarantino.Mega
+#
+# Serveur de messagerie :
+# mail.Tarantino.Mega
+#
+# Un enregistrement A correspondant doit exister
+# pour le serveur de messagerie.
+
+
+###############################################################################
+# 19. EXEMPLE DE CRÉATION D'UN ENREGISTREMENT MX
+###############################################################################
+
+Add-DnsServerResourceRecordMX `
+    -Name "." `
+    -ZoneName "Tarantino.Mega" `
+    -MailExchange "mail.Tarantino.Mega" `
+    -Preference 10
+
+# Cette commande est un exemple.
+# Ne l'utiliser que si un serveur de messagerie
+# est effectivement configuré dans le laboratoire.
+
+
+###############################################################################
+# 20. VÉRIFICATION DES ENREGISTREMENTS MX
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega" `
+    -RRType MX
+
+
+###############################################################################
+# 21. ENREGISTREMENTS SRV ACTIVE DIRECTORY
+###############################################################################
+
+# Active Directory utilise automatiquement des
+# enregistrements DNS de type SRV.
+#
+# Ils permettent aux clients de localiser notamment :
+#
+# - les contrôleurs de domaine ;
+# - le service LDAP ;
+# - le service Kerberos ;
+# - le catalogue global.
+#
+# Ces enregistrements sont normalement créés
+# automatiquement lors de la promotion du serveur
+# en contrôleur de domaine.
+
+
+###############################################################################
+# 22. VÉRIFICATION DU SERVICE LDAP
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 23. VÉRIFICATION DU SERVICE KERBEROS
+###############################################################################
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 24. AFFICHAGE DE TOUS LES ENREGISTREMENTS
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+###############################################################################
+# 25. AFFICHAGE DES ENREGISTREMENTS A
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega" `
+    -RRType A
+
+
+###############################################################################
+# 26. AFFICHAGE DES ENREGISTREMENTS PTR
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -RRType PTR
+
+
+###############################################################################
+# 27. MISES À JOUR DNS DYNAMIQUES
+###############################################################################
+
+# Dans un environnement Active Directory,
+# les zones DNS peuvent autoriser les mises à jour dynamiques.
+#
+# Cela permet notamment aux postes clients
+# et au serveur DHCP de mettre à jour automatiquement
+# les enregistrements DNS.
+
+
+###############################################################################
+# 28. INTÉGRATION DHCP / DNS
+###############################################################################
+
+# Fonctionnement :
+#
+# +-----------------------+
+# |     Poste client      |
+# +-----------+-----------+
+#             |
+#             | Demande DHCP
+#             v
+# +-----------+-----------+
+# |     Serveur DHCP      |
+# |    192.168.11.250     |
+# +-----------+-----------+
+#             |
+#             | Mise à jour DNS dynamique
+#             v
+# +-----------+-----------+
+# |      Serveur DNS      |
+# |    192.168.11.250     |
+# |                       |
+# | Enregistrement A      |
+# | Enregistrement PTR    |
+# +-----------------------+
+
+
+###############################################################################
+# 29. VÉRIFICATION DES PARAMÈTRES DNS DU DHCP
+###############################################################################
+
+Get-DhcpServerv4DnsSetting
+
+# Cette commande permet de consulter
+# les paramètres de mise à jour DNS dynamique
+# configurés sur le serveur DHCP.
+
+
+###############################################################################
+# 30. TEST AVEC UN CLIENT DHCP
+###############################################################################
+
+# Depuis le poste client :
+
+ipconfig /release
+
+ipconfig /renew
+
+# Forcer éventuellement l'enregistrement DNS :
+
+ipconfig /registerdns
+
+
+###############################################################################
+# 31. VÉRIFICATION DE L'ENREGISTREMENT DU CLIENT
+###############################################################################
+
+# Depuis le serveur DNS :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+# Vérifier que le poste client apparaît
+# dans la zone DNS.
+
+
+###############################################################################
+# 32. TEST DE RÉSOLUTION DU CLIENT
+###############################################################################
+
+# Adapter NOM-DU-CLIENT au nom réel du poste :
+
+Resolve-DnsName NOM-DU-CLIENT.Tarantino.Mega
+
+# ou :
+
+nslookup NOM-DU-CLIENT.Tarantino.Mega
+
+
+###############################################################################
+# 33. TEST DE RÉSOLUTION INVERSÉE DU CLIENT
+###############################################################################
+
+# Adapter l'adresse à celle reçue par le client :
+
+nslookup 192.168.11.X
+
+# Vérifier que le nom du poste client
+# est correctement retourné.
+
+
+###############################################################################
+# 34. VIDAGE DU CACHE DNS CLIENT
+###############################################################################
+
+ipconfig /flushdns
+
+
+###############################################################################
+# 35. RÉENREGISTREMENT DNS DU CLIENT
+###############################################################################
+
+ipconfig /registerdns
+
+
+###############################################################################
+# 36. VIDAGE DU CACHE DU SERVEUR DNS
+###############################################################################
+
+Clear-DnsServerCache -Force
+
+
+###############################################################################
+# 37. DIAGNOSTIC DNS ACTIVE DIRECTORY
+###############################################################################
+
+dcdiag /test:dns
+
+# Cette commande permet de vérifier
+# le fonctionnement DNS du contrôleur de domaine.
+
+
+###############################################################################
+# 38. SUPPRESSION D'UN ENREGISTREMENT DNS
+###############################################################################
+
+# Exemple de suppression d'un enregistrement A :
+
+Remove-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega" `
+    -RRType "A" `
+    -Name "NOM-HOTE" `
+    -Force
+
+# ATTENTION :
+#
+# Ne supprimer un enregistrement que si celui-ci
+# n'est plus utilisé.
+
+
+###############################################################################
+# 39. ADMINISTRATION AVEC RSAT
+###############################################################################
+
+# Depuis un poste équipé de RSAT :
+
+dnsmgmt.msc
+
+# Puis :
+#
+# Gestionnaire DNS
+#     |
+#     └── SRV-1
+#         |
+#         ├── Zones de recherche directe
+#         |       |
+#         |       └── Tarantino.Mega
+#         |
+#         └── Zones de recherche inversée
+#                 |
+#                 └── 11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 40. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+# Afficher les zones :
+
+Get-DnsServerZone
+
+
+# Afficher les enregistrements de la zone directe :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "Tarantino.Mega"
+
+
+# Afficher les enregistrements de la zone inversée :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+# Tester le serveur :
+
+Resolve-DnsName SRV-1.Tarantino.Mega
+
+
+# Tester l'adresse du serveur :
+
+Resolve-DnsName 192.168.11.250
+
+
+# Tester LDAP :
+
+Resolve-DnsName `
+    -Name "_ldap._tcp.dc._msdcs.Tarantino.Mega" `
+    -Type SRV
+
+
+# Tester Kerberos :
+
+Resolve-DnsName `
+    -Name "_kerberos._tcp.Tarantino.Mega" `
+    -Type SRV
+
+
+###############################################################################
+# 41. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Configuration des zones DNS :
+
+configurations/dns/zones-dns.txt
+
+# Configuration des redirecteurs :
+
+configurations/dns/redirecteurs.txt
+
+# Configuration DNS générale :
+
+commandes/configuration-dns.txt
+
+# Configuration DHCP :
+
+commandes/configuration-dhcp.txt
+
+# Vérification globale :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 42. VALIDATION
+###############################################################################
+
+# La configuration des enregistrements DNS est correcte si :
+#
+# [ ] L'enregistrement A de SRV-1 existe.
+#
+# [ ] SRV-1.Tarantino.Mega retourne 192.168.11.250.
+#
+# [ ] L'enregistrement PTR de SRV-1 existe.
+#
+# [ ] 192.168.11.250 retourne SRV-1.Tarantino.Mega.
+#
+# [ ] Les enregistrements SRV Active Directory sont présents.
+#
+# [ ] Le service LDAP est localisable via DNS.
+#
+# [ ] Le service Kerberos est localisable via DNS.
+#
+# [ ] Les clients DHCP peuvent être enregistrés dans DNS.
+#
+# [ ] La résolution directe fonctionne.
+#
+# [ ] La résolution inversée fonctionne.
+#
+# [ ] dcdiag /test:dns ne retourne pas d'erreur critique.
+###############################################################################

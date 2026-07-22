@@ -1,0 +1,565 @@
+###############################################################################
+# Projet-Labo-02-1-Windows-Server-2022
+# Configuration de la zone DNS de recherche inversée
+#
+# Service :
+# - DNS Server
+#
+# Serveur DNS :
+# - SRV-1
+# - 192.168.11.250
+#
+# Domaine :
+# - Tarantino.Mega
+#
+# Réseau :
+# - 192.168.11.0/24
+#
+# Zone inversée :
+# - 11.168.192.in-addr.arpa
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Une zone de recherche inversée DNS permet de retrouver
+# le nom d'un hôte à partir de son adresse IPv4.
+#
+# Elle fonctionne dans le sens inverse
+# d'une zone de recherche directe.
+#
+# Principe :
+#
+# Adresse IPv4
+#     |
+#     v
+# Serveur DNS
+#     |
+#     v
+# Enregistrement PTR
+#     |
+#     v
+# Nom DNS
+#
+# Exemple :
+#
+# 192.168.11.250
+#     |
+#     v
+# SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 2. INFORMATIONS DE LA ZONE
+###############################################################################
+
+Type :
+
+Zone de recherche inversée IPv4
+
+Réseau :
+
+192.168.11.0/24
+
+ID réseau :
+
+192.168.11
+
+Nom de la zone :
+
+11.168.192.in-addr.arpa
+
+Serveur DNS :
+
+SRV-1
+
+Adresse du serveur DNS :
+
+192.168.11.250
+
+
+###############################################################################
+# 3. FONCTIONNEMENT DE LA RÉSOLUTION INVERSÉE
+###############################################################################
+
+# Pour le réseau :
+#
+# 192.168.11.0/24
+#
+# la zone inversée est :
+#
+# 11.168.192.in-addr.arpa
+#
+# Exemple :
+#
+# Adresse :
+# 192.168.11.250
+#
+# Enregistrement PTR :
+# 250
+#
+# Nom associé :
+# SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 4. CRÉATION DE LA ZONE INVERSÉE
+###############################################################################
+
+Add-DnsServerPrimaryZone `
+    -NetworkId "192.168.11.0/24" `
+    -ReplicationScope "Domain"
+
+
+###############################################################################
+# 5. VÉRIFICATION DE LA ZONE
+###############################################################################
+
+Get-DnsServerZone
+
+# Vérifier la présence de :
+
+11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 6. AFFICHAGE DE LA ZONE INVERSÉE
+###############################################################################
+
+Get-DnsServerZone `
+    -Name "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 7. VÉRIFICATION DE L'INTÉGRATION ACTIVE DIRECTORY
+###############################################################################
+
+Get-DnsServerZone `
+    -Name "11.168.192.in-addr.arpa" |
+Select-Object ZoneName, ZoneType, IsDsIntegrated, DynamicUpdate
+
+
+###############################################################################
+# 8. MISES À JOUR DYNAMIQUES
+###############################################################################
+
+# Dans un environnement Active Directory,
+# la zone inversée peut utiliser les mises à jour
+# dynamiques sécurisées.
+
+Set-DnsServerPrimaryZone `
+    -Name "11.168.192.in-addr.arpa" `
+    -DynamicUpdate Secure
+
+
+###############################################################################
+# 9. VÉRIFICATION DES MISES À JOUR DYNAMIQUES
+###############################################################################
+
+Get-DnsServerZone `
+    -Name "11.168.192.in-addr.arpa" |
+Select-Object ZoneName, DynamicUpdate
+
+
+###############################################################################
+# 10. ENREGISTREMENT PTR
+###############################################################################
+
+# Un enregistrement PTR permet d'associer
+# une adresse IPv4 à un nom DNS.
+#
+# Exemple :
+
+Adresse IPv4 :
+
+192.168.11.250
+
+Identifiant PTR :
+
+250
+
+Nom DNS :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 11. CRÉATION DE L'ENREGISTREMENT PTR
+###############################################################################
+
+Add-DnsServerResourceRecordPtr `
+    -Name "250" `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -PtrDomainName "SRV-1.Tarantino.Mega"
+
+
+###############################################################################
+# 12. CRÉATION AUTOMATIQUE DU PTR
+###############################################################################
+
+# Lors de la création d'un enregistrement A,
+# l'option -CreatePtr permet de créer automatiquement
+# l'enregistrement PTR correspondant.
+
+Add-DnsServerResourceRecordA `
+    -Name "SRV-1" `
+    -ZoneName "Tarantino.Mega" `
+    -IPv4Address "192.168.11.250" `
+    -CreatePtr
+
+# Cette commande nécessite que la zone
+# de recherche inversée existe déjà.
+
+
+###############################################################################
+# 13. VÉRIFICATION DES ENREGISTREMENTS PTR
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+
+###############################################################################
+# 14. AFFICHAGE UNIQUEMENT DES PTR
+###############################################################################
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -RRType PTR
+
+
+###############################################################################
+# 15. TEST DE RÉSOLUTION INVERSÉE
+###############################################################################
+
+Resolve-DnsName 192.168.11.250
+
+# ou :
+
+nslookup 192.168.11.250
+
+# Résultat attendu :
+
+SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 16. TEST AVEC LE SERVEUR DNS SPÉCIFIQUE
+###############################################################################
+
+nslookup 192.168.11.250 192.168.11.250
+
+# Cette commande interroge directement
+# le serveur DNS SRV-1.
+
+
+###############################################################################
+# 17. RELATION ENTRE ZONE DIRECTE ET ZONE INVERSÉE
+###############################################################################
+
+# Zone directe :
+#
+# Tarantino.Mega
+#
+# SRV-1.Tarantino.Mega
+#         |
+#         | Enregistrement A
+#         v
+# 192.168.11.250
+#
+#
+# Zone inversée :
+#
+# 11.168.192.in-addr.arpa
+#
+# 192.168.11.250
+#         |
+#         | Enregistrement PTR
+#         v
+# SRV-1.Tarantino.Mega
+
+
+###############################################################################
+# 18. SCHÉMA DE FONCTIONNEMENT
+###############################################################################
+
+# Résolution directe :
+#
+# +-------------------------+
+# | SRV-1.Tarantino.Mega    |
+# +------------+------------+
+#              |
+#              | Enregistrement A
+#              v
+# +-------------------------+
+# | 192.168.11.250          |
+# +-------------------------+
+#
+#
+# Résolution inversée :
+#
+# +-------------------------+
+# | 192.168.11.250          |
+# +------------+------------+
+#              |
+#              | Enregistrement PTR
+#              v
+# +-------------------------+
+# | SRV-1.Tarantino.Mega    |
+# +-------------------------+
+
+
+###############################################################################
+# 19. INTÉGRATION AVEC DHCP
+###############################################################################
+
+# Le serveur DHCP peut participer à la mise à jour
+# des enregistrements DNS des clients.
+#
+# Lorsqu'un client reçoit une adresse :
+#
+# Client
+#     |
+#     v
+# Serveur DHCP
+#     |
+#     +----------------------+
+#     |                      |
+#     v                      v
+# Enregistrement A      Enregistrement PTR
+#     |                      |
+#     v                      v
+# Zone directe          Zone inversée
+# Tarantino.Mega        11.168.192.in-addr.arpa
+
+
+###############################################################################
+# 20. VÉRIFICATION DES PARAMÈTRES DNS DU DHCP
+###############################################################################
+
+Get-DhcpServerv4DnsSetting
+
+# Cette commande permet de vérifier
+# la configuration des mises à jour DNS
+# dynamiques effectuées par le serveur DHCP.
+
+
+###############################################################################
+# 21. TEST AVEC UN CLIENT DHCP
+###############################################################################
+
+# Depuis un poste client Windows :
+
+ipconfig /release
+
+ipconfig /renew
+
+ipconfig /registerdns
+
+
+###############################################################################
+# 22. VÉRIFICATION DE L'ENREGISTREMENT PTR DU CLIENT
+###############################################################################
+
+# Depuis le serveur DNS :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa"
+
+# Vérifier que l'adresse du poste client
+# possède un enregistrement PTR.
+
+
+###############################################################################
+# 23. TEST DE RÉSOLUTION INVERSÉE D'UN CLIENT
+###############################################################################
+
+# Adapter l'adresse IPv4 à celle du poste :
+
+nslookup 192.168.11.X
+
+# ou :
+
+Resolve-DnsName 192.168.11.X
+
+# Le nom DNS correspondant au poste
+# doit être retourné.
+
+
+###############################################################################
+# 24. CRÉATION MANUELLE DEPUIS LA CONSOLE DNS
+###############################################################################
+
+# Depuis un poste équipé de RSAT :
+
+dnsmgmt.msc
+
+# Puis :
+#
+# Gestionnaire DNS
+#     |
+#     └── SRV-1
+#         |
+#         └── Zones de recherche inversée
+#             |
+#             └── 11.168.192.in-addr.arpa
+#
+# Effectuer un clic droit puis créer
+# un nouvel enregistrement PTR.
+
+
+###############################################################################
+# 25. SUPPRESSION D'UN ENREGISTREMENT PTR
+###############################################################################
+
+# Exemple :
+
+Remove-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -RRType "PTR" `
+    -Name "250" `
+    -Force
+
+# ATTENTION :
+#
+# Ne supprimer l'enregistrement que s'il
+# n'est plus nécessaire.
+
+
+###############################################################################
+# 26. VIDAGE DU CACHE DNS CLIENT
+###############################################################################
+
+ipconfig /flushdns
+
+
+###############################################################################
+# 27. VIDAGE DU CACHE DNS SERVEUR
+###############################################################################
+
+Clear-DnsServerCache -Force
+
+
+###############################################################################
+# 28. NOUVEAU TEST DE RÉSOLUTION
+###############################################################################
+
+Resolve-DnsName 192.168.11.250
+
+
+###############################################################################
+# 29. DIAGNOSTIC DNS ACTIVE DIRECTORY
+###############################################################################
+
+dcdiag /test:dns
+
+# Vérifier qu'aucune erreur critique
+# concernant DNS n'est retournée.
+
+
+###############################################################################
+# 30. VÉRIFICATION DU SERVICE DNS
+###############################################################################
+
+Get-Service DNS
+
+# Résultat attendu :
+
+Running
+
+
+###############################################################################
+# 31. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+# Afficher toutes les zones :
+
+Get-DnsServerZone
+
+
+# Afficher la zone inversée :
+
+Get-DnsServerZone `
+    -Name "11.168.192.in-addr.arpa"
+
+
+# Afficher tous les enregistrements PTR :
+
+Get-DnsServerResourceRecord `
+    -ZoneName "11.168.192.in-addr.arpa" `
+    -RRType PTR
+
+
+# Tester la résolution inversée du serveur :
+
+Resolve-DnsName 192.168.11.250
+
+
+# Test avec nslookup :
+
+nslookup 192.168.11.250
+
+
+# Diagnostic DNS :
+
+dcdiag /test:dns
+
+
+###############################################################################
+# 32. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Zone de recherche directe :
+
+configurations/dns/zone-directe.txt
+
+# Enregistrements DNS :
+
+configurations/dns/enregistrements-dns.txt
+
+# Redirecteurs DNS :
+
+configurations/dns/redirecteurs.txt
+
+# Configuration DNS générale :
+
+commandes/configuration-dns.txt
+
+# Configuration DHCP :
+
+commandes/configuration-dhcp.txt
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 33. VALIDATION
+###############################################################################
+
+# La zone de recherche inversée est opérationnelle si :
+#
+# [ ] La zone 11.168.192.in-addr.arpa existe.
+#
+# [ ] La zone correspond au réseau 192.168.11.0/24.
+#
+# [ ] L'enregistrement PTR de SRV-1 existe.
+#
+# [ ] 192.168.11.250 retourne SRV-1.Tarantino.Mega.
+#
+# [ ] La résolution inversée fonctionne avec Resolve-DnsName.
+#
+# [ ] La résolution inversée fonctionne avec nslookup.
+#
+# [ ] Les clients DHCP peuvent disposer d'enregistrements PTR
+#     si les mises à jour DNS dynamiques sont configurées.
+#
+# [ ] Les zones directe et inversée sont cohérentes.
+#
+# [ ] Le service DNS fonctionne.
+#
+# [ ] dcdiag /test:dns ne retourne pas d'erreur critique.
+###############################################################################
