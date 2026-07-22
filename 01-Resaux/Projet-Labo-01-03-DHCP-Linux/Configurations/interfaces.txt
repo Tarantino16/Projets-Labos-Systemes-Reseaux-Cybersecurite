@@ -1,0 +1,18 @@
+# =========================================================
+# Projet-Labo 03 - Serveur DHCP Linux
+# Fichier : /etc/network/interfaces
+#
+# Description :
+# Configuration réseau du serveur Debian hébergeant
+# le service DHCP.
+# =========================================================
+
+# Interface loopback
+auto lo
+iface lo inet loopback
+
+# Interface réseau principale
+allow-hotplug enp0s3
+iface enp0s3 inet static
+    address 192.168.12.250/24
+    gateway 192.168.12.254

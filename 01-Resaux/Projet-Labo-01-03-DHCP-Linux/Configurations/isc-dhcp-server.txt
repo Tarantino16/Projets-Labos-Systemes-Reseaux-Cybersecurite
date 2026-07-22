@@ -1,0 +1,14 @@
+# =========================================================
+# Projet-Labo 03 - Serveur DHCP Linux
+# Fichier : /etc/default/isc-dhcp-server
+#
+# Description :
+# Configuration de l'interface réseau utilisée
+# par le serveur DHCP.
+# =========================================================
+
+# Interface IPv4 utilisée par le serveur DHCP
+INTERFACESv4="enp0s3"
+
+# Interface IPv6 (non utilisée)
+INTERFACESv6=""
