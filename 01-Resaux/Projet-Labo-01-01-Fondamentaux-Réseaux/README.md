@@ -257,8 +257,11 @@ Projet-Labo-01-01-Fondamentaux-Réseaux/
 │       │
 │       └── README.md
 │
-├── Laboratoires-Packet-Tracer/
+├── Laboratoire-Packet-Tracer/
 │   └── projet de conception d'architecture réseau.pkt
+│
+├── Documentation/
+│   └── Projet-Labo-01-01-Fondamentaux-Réseaux.pdf
 │
 └── Schemas/
     ├── architecture-1.png
