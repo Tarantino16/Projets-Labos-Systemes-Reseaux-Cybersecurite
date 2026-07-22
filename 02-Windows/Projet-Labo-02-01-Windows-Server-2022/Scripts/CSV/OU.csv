@@ -1,0 +1,14 @@
+parent;enfant
+;Entreprise
+Entreprise;Direction
+Entreprise;Comptabilite
+Entreprise;Informatique
+Entreprise;Ressources-Humaines
+Direction;utilisateurs
+Direction;ordinateurs
+Comptabilite;utilisateurs
+Comptabilite;ordinateurs
+Informatique;utilisateurs
+Informatique;ordinateurs
+Ressources-Humaines;utilisateurs
+Ressources-Humaines;ordinateurs
