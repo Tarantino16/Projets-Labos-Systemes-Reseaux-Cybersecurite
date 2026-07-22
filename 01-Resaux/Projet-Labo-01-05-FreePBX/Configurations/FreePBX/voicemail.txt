@@ -1,0 +1,331 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration de la messagerie vocale (Voicemail)
+#
+# Serveur :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Extensions :
+# - 100 : Standard
+# - 101 : Bob
+# - 102 : Alice
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# La messagerie vocale permet aux utilisateurs de recevoir
+# et de consulter des messages lorsqu'ils ne répondent pas
+# à un appel.
+#
+# Dans FreePBX, la messagerie vocale est configurée
+# directement depuis les paramètres de chaque extension.
+
+
+###############################################################################
+# 2. ACCÈS À LA CONFIGURATION
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Extensions
+#
+# Sélectionner l'extension à configurer.
+#
+# Accéder ensuite aux paramètres :
+#
+# Voicemail
+
+
+###############################################################################
+# 3. EXTENSION 100 - STANDARD
+###############################################################################
+
+Extension          : 100
+Nom                : Standard
+
+Voicemail          : Activée
+Voicemail Password : MOT-DE-PASSE-VOICEMAIL-100
+
+Accès messagerie   : *97
+
+
+###############################################################################
+# 4. EXTENSION 101 - BOB
+###############################################################################
+
+Extension          : 101
+Nom                : Bob
+
+Voicemail          : Activée
+Voicemail Password : MOT-DE-PASSE-VOICEMAIL-101
+
+Accès messagerie   : *97
+
+
+###############################################################################
+# 5. EXTENSION 102 - ALICE
+###############################################################################
+
+Extension          : 102
+Nom                : Alice
+
+Voicemail          : Activée
+Voicemail Password : MOT-DE-PASSE-VOICEMAIL-102
+
+Accès messagerie   : *97
+
+
+###############################################################################
+# 6. CONFIGURATION DANS FREEPBX
+###############################################################################
+
+# Pour chaque extension :
+#
+# Applications
+#     └── Extensions
+#         └── Sélectionner l'extension
+#
+# Dans les paramètres de messagerie vocale :
+#
+# Voicemail :
+# Yes
+#
+# Voicemail Password :
+# Définir le mot de passe de la boîte vocale.
+#
+# Enregistrer ensuite avec :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+
+
+###############################################################################
+# 7. ACCÈS À LA MESSAGERIE VOCALE
+###############################################################################
+
+# Depuis le softphone associé à l'extension :
+#
+# Composer :
+#
+# *97
+#
+# Le système donne accès à la boîte vocale
+# de l'extension depuis laquelle l'utilisateur appelle.
+#
+# Suivre ensuite les instructions vocales.
+
+
+###############################################################################
+# 8. TEST DE LA MESSAGERIE DE BOB
+###############################################################################
+
+# Depuis une autre extension :
+#
+# Appeler :
+#
+# 101
+#
+# Ne pas répondre depuis le softphone de Bob.
+#
+# Si la destination de non-réponse est configurée
+# vers la messagerie vocale, attendre le déclenchement
+# de la boîte vocale.
+#
+# Laisser un message.
+#
+# Depuis le softphone de Bob :
+#
+# Composer :
+#
+# *97
+#
+# Vérifier que le message peut être consulté.
+
+
+###############################################################################
+# 9. TEST DE LA MESSAGERIE D'ALICE
+###############################################################################
+
+# Depuis une autre extension :
+#
+# Appeler :
+#
+# 102
+#
+# Ne pas répondre depuis le softphone d'Alice.
+#
+# Attendre le déclenchement de la messagerie vocale
+# si celle-ci est configurée comme destination
+# en cas de non-réponse.
+#
+# Laisser un message.
+#
+# Depuis le softphone d'Alice :
+#
+# Composer :
+#
+# *97
+#
+# Vérifier que le message peut être consulté.
+
+
+###############################################################################
+# 10. TEST DE LA MESSAGERIE DU STANDARD
+###############################################################################
+
+# Depuis une autre extension :
+#
+# Appeler :
+#
+# 100
+#
+# Ne pas répondre depuis le Standard.
+#
+# Attendre le déclenchement de la messagerie vocale
+# si celle-ci est configurée comme destination
+# en cas de non-réponse.
+#
+# Laisser un message.
+#
+# Depuis le Standard :
+#
+# Composer :
+#
+# *97
+#
+# Vérifier que le message peut être consulté.
+
+
+###############################################################################
+# 11. FONCTIONNEMENT ATTENDU
+###############################################################################
+
+# Exemple :
+#
+# Bob (101)
+#     |
+#     | Appel vers Alice
+#     v
+# Alice (102)
+#     |
+#     | Aucune réponse
+#     v
+# Messagerie vocale Alice
+#     |
+#     | Dépôt d'un message
+#     v
+# Message enregistré
+#     |
+#     | Alice compose *97
+#     v
+# Consultation du message
+
+
+###############################################################################
+# 12. VÉRIFICATION DEPUIS ASTERISK
+###############################################################################
+
+# Vérifier les utilisateurs de messagerie vocale :
+
+asterisk -rx "voicemail show users"
+
+# Vérifier les utilisateurs du contexte par défaut si nécessaire :
+
+asterisk -rx "voicemail show users for default"
+
+# Vérifier l'état général d'Asterisk :
+
+asterisk -rx "core show uptime"
+
+
+###############################################################################
+# 13. VÉRIFICATION EN TEMPS RÉEL
+###############################################################################
+
+# Ouvrir la console Asterisk :
+
+asterisk -rvvv
+
+# Effectuer ensuite un appel vers une extension
+# disposant d'une messagerie vocale.
+#
+# Ne pas répondre.
+#
+# Observer le traitement de l'appel jusqu'au
+# déclenchement de la messagerie vocale.
+
+
+###############################################################################
+# 14. DÉPANNAGE
+###############################################################################
+
+# Si la messagerie vocale ne fonctionne pas :
+#
+# - vérifier qu'elle est activée sur l'extension ;
+# - vérifier le mot de passe de la boîte vocale ;
+# - vérifier la destination configurée en cas de non-réponse ;
+# - appliquer les modifications avec "Apply Config" ;
+# - vérifier le fonctionnement d'Asterisk.
+
+
+# Vérifier FreePBX :
+
+fwconsole status
+
+
+# Vérifier les utilisateurs de messagerie :
+
+asterisk -rx "voicemail show users"
+
+
+# Redémarrer FreePBX/Asterisk si nécessaire :
+
+fwconsole restart
+
+
+###############################################################################
+# 15. SÉCURITÉ
+###############################################################################
+
+# Ne jamais publier les véritables mots de passe
+# des boîtes vocales dans un dépôt GitHub public.
+#
+# Conserver uniquement des valeurs génériques telles que :
+#
+# MOT-DE-PASSE-VOICEMAIL-100
+# MOT-DE-PASSE-VOICEMAIL-101
+# MOT-DE-PASSE-VOICEMAIL-102
+
+
+###############################################################################
+# 16. VALIDATION FINALE
+###############################################################################
+
+# La messagerie vocale est correctement configurée si :
+#
+# [ ] La messagerie vocale est activée sur les extensions concernées.
+#
+# [ ] Chaque boîte vocale possède un mot de passe.
+#
+# [ ] Le code *97 permet d'accéder à la messagerie personnelle.
+#
+# [ ] Un appel sans réponse peut être dirigé vers la messagerie vocale.
+#
+# [ ] Un correspondant peut laisser un message.
+#
+# [ ] Le message est correctement enregistré.
+#
+# [ ] L'utilisateur peut consulter ses messages depuis son softphone.
+#
+# [ ] Les boîtes vocales sont reconnues par Asterisk.
+#
+# [ ] La messagerie vocale fonctionne correctement.
+###############################################################################

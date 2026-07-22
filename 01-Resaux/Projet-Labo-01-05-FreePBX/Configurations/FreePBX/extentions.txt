@@ -1,0 +1,137 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration des extensions FreePBX
+#
+# Environnement :
+# - FreePBX 15
+# - Asterisk 16
+###############################################################################
+
+
+###############################################################################
+# EXTENSION 100 - STANDARD
+###############################################################################
+
+Extension        : 100
+Nom d'affichage  : Standard
+Type             : PJSIP
+Secret / Password: MOT-DE-PASSE-SIP-100
+
+Messagerie vocale : Activée
+Accès messagerie  : *97
+
+
+###############################################################################
+# EXTENSION 101 - BOB
+###############################################################################
+
+Extension        : 101
+Nom d'affichage  : Bob
+Type             : PJSIP
+Secret / Password: MOT-DE-PASSE-SIP-101
+
+Messagerie vocale : Activée
+Accès messagerie  : *97
+
+
+###############################################################################
+# EXTENSION 102 - ALICE
+###############################################################################
+
+Extension        : 102
+Nom d'affichage  : Alice
+Type             : PJSIP
+Secret / Password: MOT-DE-PASSE-SIP-102
+
+Messagerie vocale : Activée
+Accès messagerie  : *97
+
+
+###############################################################################
+# RÉCAPITULATIF
+###############################################################################
+
+Extension 100
+└── Standard
+
+Extension 101
+└── Bob
+
+Extension 102
+└── Alice
+
+
+###############################################################################
+# CONFIGURATION DES SOFTPHONES
+###############################################################################
+
+# Standard
+#
+# Extension : 100
+# Utilisateur : 100
+# Serveur : ADRESSE-IP-FREEPBX
+# Mot de passe : MOT-DE-PASSE-SIP-100
+
+
+# Bob
+#
+# Extension : 101
+# Utilisateur : 101
+# Serveur : ADRESSE-IP-FREEPBX
+# Mot de passe : MOT-DE-PASSE-SIP-101
+
+
+# Alice
+#
+# Extension : 102
+# Utilisateur : 102
+# Serveur : ADRESSE-IP-FREEPBX
+# Mot de passe : MOT-DE-PASSE-SIP-102
+
+
+###############################################################################
+# CODEC
+###############################################################################
+
+Codec utilisé dans le laboratoire :
+
+PCMA / G.711A
+
+
+###############################################################################
+# TESTS D'APPELS
+###############################################################################
+
+Bob (101) --------> Alice (102)
+
+Alice (102) ------> Bob (101)
+
+Standard (100) ---> Bob (101)
+
+Standard (100) ---> Alice (102)
+
+
+###############################################################################
+# RING GROUP
+###############################################################################
+
+Numéro : 6000
+
+Stratégie : Ring All
+
+Membres :
+
+101 - Bob
+102 - Alice
+
+
+###############################################################################
+# SÉCURITÉ
+###############################################################################
+
+# Les mots de passe SIP/PJSIP réels ne doivent pas être publiés
+# dans le dépôt GitHub.
+#
+# Les valeurs MOT-DE-PASSE-SIP-100, MOT-DE-PASSE-SIP-101 et
+# MOT-DE-PASSE-SIP-102 doivent rester des valeurs d'exemple.
+###############################################################################

@@ -1,0 +1,22 @@
+# =========================================================
+# Projet-Labo-01-5-FreePBX
+# Configuration réseau du serveur FreePBX
+# Fichier : /etc/sysconfig/network-scripts/ifcfg-eth0
+# =========================================================
+
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+NAME=eth0
+DEVICE=eth0
+ONBOOT=yes
+
+# Configuration IPv4 statique
+IPADDR=ADRESSE-IP-FREEPBX
+PREFIX=24
+GATEWAY=ADRESSE-PASSERELLE
+DNS1=ADRESSE-DNS

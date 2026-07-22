@@ -1,0 +1,317 @@
+###############################################################################
+# Projet-Labo-01-5-FreePBX
+# Configuration du groupe d'appel (Ring Group)
+#
+# Serveur :
+# - FreePBX 15
+# - Asterisk 16
+#
+# Ring Group :
+# - Numéro : 6000
+# - Membres : Bob (101) et Alice (102)
+###############################################################################
+
+
+###############################################################################
+# 1. INFORMATIONS DU RING GROUP
+###############################################################################
+
+Ring Group Number : 6000
+
+Group Description : Groupe Bob et Alice
+
+Ring Strategy      : ringall
+
+
+###############################################################################
+# 2. MEMBRES DU GROUPE
+###############################################################################
+
+Extension 101
+└── Bob
+
+Extension 102
+└── Alice
+
+
+###############################################################################
+# 3. LISTE DES EXTENSIONS
+###############################################################################
+
+Extension List :
+
+101
+102
+
+
+###############################################################################
+# 4. STRATÉGIE D'APPEL
+###############################################################################
+
+Ring Strategy : ringall
+
+# La stratégie "ringall" permet de faire sonner
+# simultanément toutes les extensions membres du groupe.
+#
+# Lorsqu'un appel est effectué vers le numéro 6000 :
+#
+#                     Appel vers 6000
+#                           |
+#                    Ring Group 6000
+#                           |
+#               +-----------+-----------+
+#               |                       |
+#               v                       v
+#          Bob - 101               Alice - 102
+#               |                       |
+#               +-----------+-----------+
+#                           |
+#                  Premier à décrocher
+#                           |
+#                           v
+#                    Appel connecté
+
+
+###############################################################################
+# 5. CONFIGURATION DANS FREEPBX
+###############################################################################
+
+# Depuis l'interface Web FreePBX :
+#
+# Applications
+#     └── Ring Groups
+#
+# Créer un nouveau Ring Group.
+#
+# Renseigner :
+#
+# Ring Group Number :
+# 6000
+#
+# Group Description :
+# Groupe Bob et Alice
+#
+# Ring Strategy :
+# ringall
+#
+# Extension List :
+#
+# 101
+# 102
+
+
+###############################################################################
+# 6. DESTINATION EN CAS DE NON-RÉPONSE
+###############################################################################
+
+# Paramètre FreePBX :
+#
+# Destination if no answer
+#
+# Configurer la destination prévue dans le laboratoire.
+#
+# Cette destination peut correspondre, selon la configuration choisie, à :
+#
+# - une messagerie vocale ;
+# - une extension ;
+# - une autre destination FreePBX.
+#
+# Ne pas renseigner de valeur dans ce fichier si elle n'est
+# pas définie dans le laboratoire.
+
+
+###############################################################################
+# 7. ENREGISTREMENT DE LA CONFIGURATION
+###############################################################################
+
+# Après avoir renseigné les paramètres :
+#
+# Cliquer sur :
+#
+# Submit
+#
+# puis :
+#
+# Apply Config
+#
+# afin d'appliquer la configuration.
+
+
+###############################################################################
+# 8. FONCTIONNEMENT ATTENDU
+###############################################################################
+
+# Depuis l'extension Standard (100) :
+#
+# Composer :
+#
+# 6000
+#
+# Le serveur FreePBX reçoit l'appel et le dirige
+# vers le Ring Group 6000.
+#
+# Les extensions suivantes doivent sonner simultanément :
+#
+# 101 - Bob
+# 102 - Alice
+#
+# Lorsque Bob ou Alice décroche :
+#
+# - l'appel est établi avec l'utilisateur ayant décroché ;
+# - l'autre extension cesse de sonner.
+
+
+###############################################################################
+# 9. TEST DEPUIS LE STANDARD
+###############################################################################
+
+# Poste appelant :
+#
+# 100 - Standard
+#
+# Numéro composé :
+#
+# 6000
+#
+# Résultat attendu :
+#
+# [ ] Bob (101) sonne.
+# [ ] Alice (102) sonne.
+# [ ] Les deux extensions sonnent simultanément.
+# [ ] Le premier utilisateur qui décroche prend l'appel.
+# [ ] L'autre extension cesse de sonner.
+# [ ] La communication audio fonctionne dans les deux sens.
+
+
+###############################################################################
+# 10. TEST AVEC BOB
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Appeler :
+#
+# 6000
+#
+# Faire décrocher :
+#
+# Bob (101)
+#
+# Vérifier :
+#
+# [ ] L'appel est établi entre Standard et Bob.
+# [ ] Alice cesse de sonner.
+# [ ] La communication audio fonctionne.
+
+
+###############################################################################
+# 11. TEST AVEC ALICE
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Appeler :
+#
+# 6000
+#
+# Faire décrocher :
+#
+# Alice (102)
+#
+# Vérifier :
+#
+# [ ] L'appel est établi entre Standard et Alice.
+# [ ] Bob cesse de sonner.
+# [ ] La communication audio fonctionne.
+
+
+###############################################################################
+# 12. TEST DE NON-RÉPONSE
+###############################################################################
+
+# Depuis Standard (100) :
+#
+# Composer :
+#
+# 6000
+#
+# Ne pas répondre depuis :
+#
+# - Bob (101) ;
+# - Alice (102).
+#
+# Attendre la fin du délai de sonnerie.
+#
+# Vérifier que l'appel est dirigé vers la destination
+# configurée dans "Destination if no answer".
+
+
+###############################################################################
+# 13. VÉRIFICATION DEPUIS ASTERISK
+###############################################################################
+
+# Afficher le dialplan associé au numéro 6000 :
+
+asterisk -rx "dialplan show 6000"
+
+# Vérifier les canaux actifs pendant un appel :
+
+asterisk -rx "core show channels"
+
+# Affichage détaillé :
+
+asterisk -rx "core show channels verbose"
+
+
+###############################################################################
+# 14. RÉCAPITULATIF
+###############################################################################
+
+Standard (100)
+      |
+      | Appel 6000
+      v
+Ring Group (6000)
+      |
+      | Stratégie : Ring All
+      |
+      +-------------------+
+      |                   |
+      v                   v
+  Bob (101)           Alice (102)
+      |                   |
+      +---------+---------+
+                |
+                v
+      Premier à décrocher
+                |
+                v
+        Appel connecté
+
+
+###############################################################################
+# 15. VALIDATION FINALE
+###############################################################################
+
+# Le Ring Group est correctement configuré si :
+#
+# [ ] Le numéro du groupe est 6000.
+#
+# [ ] La stratégie utilisée est Ring All.
+#
+# [ ] L'extension 101 - Bob appartient au groupe.
+#
+# [ ] L'extension 102 - Alice appartient au groupe.
+#
+# [ ] Un appel vers 6000 fait sonner Bob et Alice.
+#
+# [ ] Les deux extensions sonnent simultanément.
+#
+# [ ] Le premier utilisateur qui décroche prend l'appel.
+#
+# [ ] L'autre extension cesse de sonner.
+#
+# [ ] La communication audio fonctionne correctement.
+#
+# [ ] La destination de non-réponse fonctionne si elle est configurée.
+###############################################################################
