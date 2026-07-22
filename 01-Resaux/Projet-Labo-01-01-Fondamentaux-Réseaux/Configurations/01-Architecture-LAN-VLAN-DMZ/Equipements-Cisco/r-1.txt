@@ -1,0 +1,58 @@
+enable
+configure terminal
+
+hostname R-1
+
+interface GigabitEthernet0/0
+ ip address 192.168.30.254 255.255.255.0
+ ip nat inside
+ no shutdown
+exit
+
+interface GigabitEthernet0/1
+ ip address 100.0.1.253 255.255.255.0
+ ip nat outside
+ no shutdown
+exit
+
+interface GigabitEthernet0/0/0
+ ip address 192.168.10.254 255.255.255.0
+ ip nat inside
+ no shutdown
+exit
+
+ip domain-name maison.org
+username giosue secret poseidon
+enable secret poseidon
+
+crypto key generate rsa general-keys modulus 4096
+
+line vty 0 4
+ login local
+ transport input ssh
+exit
+
+ip access-list standard 1
+ permit any
+exit
+
+ip nat inside source list 1 interface GigabitEthernet0/1 overload
+
+ip nat inside source static tcp 192.168.10.250 80 100.0.1.253 80
+
+ip access-list extended 103
+ permit tcp any 192.168.10.0 0.0.0.255 eq 80
+ permit tcp 192.168.10.0 0.0.0.255 any established
+ deny ip any any
+exit
+
+interface GigabitEthernet0/0/0
+ ip access-group 103 in
+exit
+
+ip route 0.0.0.0 0.0.0.0 100.0.1.254
+ip route 192.168.0.0 255.255.252.0 192.168.30.253
+ip route 192.168.10.0 255.255.255.0 192.168.30.253
+
+end
+write memory
