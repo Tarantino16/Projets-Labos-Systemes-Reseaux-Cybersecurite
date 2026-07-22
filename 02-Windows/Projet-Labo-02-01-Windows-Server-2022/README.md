@@ -366,35 +366,35 @@ Projet-Labo-02-1-Windows-Server-2022/
 │
 ├── README.md
 │
-├── documentation/
+├── Documentation/
 │   └── Projet-Labo-02-1-Windows-Server-2022.pdf
 │
-├── machines-virtuelles/
+├── Machines-Virtuelles/
 │   ├── windows-server-2022-core.txt
 │   └── client-windows-10.txt
 │
-├── configurations/
-│   ├── windows-server/
+├── Configurations/
+│   ├── Windows-Server/
 │   │   └── reseau.txt
 │   │
-│   ├── dhcp/
+│   ├── DHCP/
 │   │   ├── etendue.txt
 │   │   ├── options-dhcp.txt
 │   │   ├── classes-utilisateurs.txt
 │   │   └── strategies-dhcp.txt
 │   │
-│   ├── dns/
+│   ├── DNS/
 │   │   ├── zone-directe.txt
 │   │   ├── zone-inversee.txt
 │   │   └── enregistrements-dns.txt
 │   │
-│   └── active-directory/
+│   └── Active-Directory/
 │       ├── domaine.txt
 │       ├── unites-organisation.txt
 │       ├── groupes-securite.txt
 │       └── utilisateurs.txt
 │
-├── commandes/
+├── Commandes/
 │   ├── installation-windows-server.txt
 │   ├── configuration-reseau.txt
 │   ├── installation-dhcp.txt
@@ -406,16 +406,16 @@ Projet-Labo-02-1-Windows-Server-2022/
 │   ├── installation-rsat.txt
 │   └── verification.txt
 │
-├── scripts/
+├── Scripts/
 │   ├── powershell/
 │   │   ├── creation-ou-groupes.ps1
 │   │   └── creation-utilisateurs.ps1
 │   │
-│   └── csv/
+│   └── CSV/
 │       ├── OU.csv
 │       └── users.csv
 │
-└── schemas/
+└── Schemas/
     ├── topologie-reseau.png
     ├── architecture-active-directory.png
     ├── fonctionnement-dhcp.png
