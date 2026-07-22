@@ -1,0 +1,672 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Configuration des attributs de fichiers
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Documenter les attributs utilisés dans le laboratoire
+# - Comprendre le rôle de chattr
+# - Comprendre le rôle de lsattr
+# - Appliquer l'attribut immutable
+# - Vérifier les attributs d'un fichier
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Sous Linux, les fichiers peuvent posséder des attributs
+# supplémentaires en complément des permissions classiques UGO.
+#
+# Ces attributs permettent de modifier le comportement
+# d'un fichier ou d'un répertoire.
+#
+# Les principales commandes utilisées sont :
+
+chattr
+
+lsattr
+
+
+###############################################################################
+# 2. COMMANDES PRINCIPALES
+###############################################################################
+
+# chattr :
+#
+# permet de modifier les attributs d'un fichier
+# ou d'un répertoire.
+
+
+# lsattr :
+#
+# permet d'afficher les attributs actuellement
+# appliqués.
+
+
+###############################################################################
+# 3. FICHIER UTILISÉ DANS LE LABORATOIRE
+###############################################################################
+
+Fichier :
+
+bob.txt
+
+
+Répertoire de travail :
+
+/var/exos
+
+
+Chemin complet :
+
+/var/exos/bob.txt
+
+
+###############################################################################
+# 4. ATTRIBUT IMMUTABLE
+###############################################################################
+
+# L'attribut étudié dans le laboratoire est :
+
+i
+
+
+# i signifie :
+
+immutable
+
+
+# En français :
+
+immuable
+
+
+###############################################################################
+# 5. APPLICATION DE L'ATTRIBUT
+###############################################################################
+
+# Pour rendre bob.txt immuable :
+
+chattr +i bob.txt
+
+
+###############################################################################
+# 6. SIGNIFICATION DE +i
+###############################################################################
+
+# Le symbole :
+
++
+
+# signifie que l'on ajoute un attribut.
+
+
+# La lettre :
+
+i
+
+# correspond à l'attribut :
+
+immutable
+
+
+# La commande :
+
+chattr +i bob.txt
+
+# signifie donc :
+#
+# ajouter l'attribut immutable au fichier bob.txt.
+
+
+###############################################################################
+# 7. VÉRIFICATION DE L'ATTRIBUT
+###############################################################################
+
+lsattr bob.txt
+
+
+###############################################################################
+# 8. RÉSULTAT ATTENDU
+###############################################################################
+
+# L'attribut :
+
+i
+
+# doit apparaître dans la sortie de lsattr.
+#
+# Exemple de principe :
+
+----i--------- bob.txt
+
+
+# L'affichage exact peut varier selon
+# le système de fichiers utilisé.
+
+
+###############################################################################
+# 9. CONSÉQUENCES DE L'ATTRIBUT IMMUTABLE
+###############################################################################
+
+# Lorsqu'un fichier possède l'attribut immutable,
+# il ne peut normalement plus être :
+#
+# - modifié ;
+# - supprimé ;
+# - renommé ;
+# - remplacé ;
+#
+# tant que cet attribut reste actif.
+
+
+###############################################################################
+# 10. TEST DE MODIFICATION
+###############################################################################
+
+# Tester une modification :
+
+echo "test" >> bob.txt
+
+
+# Si l'attribut immutable est actif,
+# la modification doit être refusée.
+
+
+###############################################################################
+# 11. TEST AVEC NANO
+###############################################################################
+
+nano bob.txt
+
+
+# Le fichier peut éventuellement être affiché,
+# mais l'enregistrement des modifications
+# doit être refusé tant que l'attribut est actif.
+
+
+###############################################################################
+# 12. TEST DE SUPPRESSION
+###############################################################################
+
+rm bob.txt
+
+
+# Si l'attribut immutable est actif,
+# la suppression doit être refusée.
+
+
+###############################################################################
+# 13. TEST DE RENOMMAGE
+###############################################################################
+
+mv bob.txt bob2.txt
+
+
+# Si l'attribut immutable est actif,
+# le renommage doit être refusé.
+
+
+###############################################################################
+# 14. RETRAIT DE L'ATTRIBUT IMMUTABLE
+###############################################################################
+
+# Pour retirer l'attribut :
+
+chattr -i bob.txt
+
+
+###############################################################################
+# 15. SIGNIFICATION DE -i
+###############################################################################
+
+# Le symbole :
+
+-
+
+# signifie que l'on retire un attribut.
+
+
+# La commande :
+
+chattr -i bob.txt
+
+# retire donc l'attribut immutable.
+
+
+###############################################################################
+# 16. VÉRIFICATION APRÈS RETRAIT
+###############################################################################
+
+lsattr bob.txt
+
+
+# L'attribut :
+
+i
+
+# ne doit plus apparaître.
+
+
+###############################################################################
+# 17. NOUVEAU TEST DE MODIFICATION
+###############################################################################
+
+echo "test" >> bob.txt
+
+
+# La modification doit maintenant être possible
+# si les permissions UGO l'autorisent.
+
+
+###############################################################################
+# 18. NOUVEAU TEST DE SUPPRESSION
+###############################################################################
+
+rm bob.txt
+
+
+# La suppression redevient possible
+# si les permissions et droits du répertoire
+# l'autorisent.
+
+
+###############################################################################
+# 19. ATTRIBUT APPEND ONLY
+###############################################################################
+
+# Un autre attribut intéressant est :
+
+a
+
+
+# a signifie :
+
+append only
+
+
+# Cela signifie que les données peuvent être ajoutées
+# à la fin du fichier, mais que son contenu existant
+# ne peut pas être modifié normalement.
+
+
+###############################################################################
+# 20. APPLICATION DE APPEND ONLY
+###############################################################################
+
+chattr +a fichier.txt
+
+
+###############################################################################
+# 21. VÉRIFICATION
+###############################################################################
+
+lsattr fichier.txt
+
+
+###############################################################################
+# 22. RETRAIT DE APPEND ONLY
+###############################################################################
+
+chattr -a fichier.txt
+
+
+###############################################################################
+# 23. COMPARAISON IMMUTABLE / APPEND ONLY
+###############################################################################
+
+# i = immutable
+#
+# Le fichier ne peut normalement plus être modifié,
+# supprimé ou renommé.
+
+
+# a = append only
+#
+# Le contenu existant ne peut pas être modifié,
+# mais des données peuvent être ajoutées
+# à la fin du fichier.
+
+
+###############################################################################
+# 24. RELATION AVEC LES PERMISSIONS UGO
+###############################################################################
+
+# Les attributs sont différents des permissions classiques.
+#
+# Les permissions UGO utilisent :
+
+chmod
+chown
+chgrp
+
+
+# Exemple :
+
+chmod 775 fichier.txt
+
+
+# Les attributs utilisent :
+
+chattr
+lsattr
+
+
+# Exemple :
+
+chattr +i fichier.txt
+
+
+###############################################################################
+# 25. EXEMPLE DE LOGIQUE
+###############################################################################
+
+# Un fichier peut avoir les permissions :
+
+-rwxrwxrwx
+
+
+# donc être théoriquement modifiable
+# par plusieurs utilisateurs.
+
+
+# Mais si l'attribut immutable est ajouté :
+
+chattr +i fichier.txt
+
+
+# le fichier reste protégé contre les modifications
+# tant que l'attribut est actif.
+
+
+###############################################################################
+# 26. RELATION AVEC LES ACL
+###############################################################################
+
+# Les ACL permettent d'ajouter des permissions
+# précises pour certains utilisateurs ou groupes.
+#
+# Exemple :
+
+setfacl -m u:bob:r-- fichier.txt
+
+
+# Les attributs, eux, agissent directement
+# sur le comportement global du fichier.
+
+
+###############################################################################
+# 27. LES TROIS MÉCANISMES DU LABORATOIRE
+###############################################################################
+
+# Dans ce laboratoire, trois niveaux
+# de gestion des fichiers sont étudiés :
+
+
+# 1 - Permissions UGO
+
+chmod
+chown
+chgrp
+
+
+# 2 - Attributs
+
+chattr
+lsattr
+
+
+# 3 - ACL
+
+setfacl
+getfacl
+
+
+###############################################################################
+# 28. SCHÉMA RÉCAPITULATIF
+###############################################################################
+
+#                      Fichier Linux
+#                           │
+#          ┌────────────────┼────────────────┐
+#          │                │                │
+#          ▼                ▼                ▼
+#         UGO           Attributs           ACL
+#          │                │                │
+#          ▼                ▼                ▼
+#       chmod            chattr           setfacl
+#       chown            lsattr           getfacl
+#       chgrp
+#
+#
+# UGO :
+# permissions classiques.
+#
+# Attributs :
+# comportement supplémentaire du fichier.
+#
+# ACL :
+# permissions précises pour des utilisateurs
+# ou groupes particuliers.
+
+
+###############################################################################
+# 29. PROCÉDURE DU LABORATOIRE
+###############################################################################
+
+# 1 - Accéder au répertoire de travail :
+
+cd /var/exos
+
+
+# 2 - Vérifier la présence du fichier :
+
+ls -l bob.txt
+
+
+# 3 - Vérifier les attributs actuels :
+
+lsattr bob.txt
+
+
+# 4 - Ajouter l'attribut immutable :
+
+chattr +i bob.txt
+
+
+# 5 - Vérifier :
+
+lsattr bob.txt
+
+
+# 6 - Tester une modification :
+
+echo "test" >> bob.txt
+
+
+# 7 - Tester une suppression :
+
+rm bob.txt
+
+
+# 8 - Retirer l'attribut :
+
+chattr -i bob.txt
+
+
+# 9 - Vérifier de nouveau :
+
+lsattr bob.txt
+
+
+###############################################################################
+# 30. CONFIGURATION RÉCAPITULATIVE
+###############################################################################
+
+Fichier :
+
+bob.txt
+
+
+Chemin :
+
+/var/exos/bob.txt
+
+
+Attribut étudié :
+
+i
+
+
+Nom :
+
+immutable
+
+
+Commande d'application :
+
+chattr +i bob.txt
+
+
+Commande de vérification :
+
+lsattr bob.txt
+
+
+Commande de retrait :
+
+chattr -i bob.txt
+
+
+###############################################################################
+# 31. DROITS ADMINISTRATEUR
+###############################################################################
+
+# La modification de certains attributs peut nécessiter
+# des privilèges administrateur.
+#
+# Depuis une session root :
+
+chattr +i bob.txt
+
+
+# Avec sudo si disponible :
+
+sudo chattr +i bob.txt
+
+
+###############################################################################
+# 32. AFFICHER LES ATTRIBUTS DU RÉPERTOIRE COURANT
+###############################################################################
+
+lsattr
+
+
+###############################################################################
+# 33. AFFICHAGE RÉCURSIF
+###############################################################################
+
+lsattr -R
+
+
+# L'option -R permet de parcourir
+# récursivement les sous-répertoires.
+
+
+###############################################################################
+# 34. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Afficher les attributs :
+
+lsattr fichier
+
+
+# Ajouter immutable :
+
+chattr +i fichier
+
+
+# Retirer immutable :
+
+chattr -i fichier
+
+
+# Ajouter append only :
+
+chattr +a fichier
+
+
+# Retirer append only :
+
+chattr -a fichier
+
+
+# Affichage récursif :
+
+lsattr -R
+
+
+###############################################################################
+# 35. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Procédure détaillée :
+
+commandes/attributs-fichiers.txt
+
+
+# Permissions UGO :
+
+permissions/permissions-ugo.txt
+
+
+# ACL :
+
+permissions/acl.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Vérification globale :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 36. VALIDATION
+###############################################################################
+
+# La configuration des attributs est correcte si :
+#
+# [ ] La commande lsattr fonctionne.
+#
+# [ ] La commande chattr fonctionne.
+#
+# [ ] L'attribut i est compris.
+#
+# [ ] chattr +i applique l'attribut immutable.
+#
+# [ ] lsattr affiche l'attribut i.
+#
+# [ ] bob.txt ne peut pas être modifié
+#     lorsque l'attribut est actif.
+#
+# [ ] bob.txt ne peut pas être supprimé
+#     lorsque l'attribut est actif.
+#
+# [ ] chattr -i retire l'attribut.
+#
+# [ ] Le fichier redevient modifiable
+#     si ses permissions UGO l'autorisent.
+#
+# [ ] La différence entre UGO,
+#     attributs et ACL est comprise.
+###############################################################################

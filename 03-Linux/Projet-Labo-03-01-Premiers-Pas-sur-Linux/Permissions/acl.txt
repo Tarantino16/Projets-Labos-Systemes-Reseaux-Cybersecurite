@@ -1,0 +1,727 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Configuration des permissions ACL
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectif :
+# - Documenter les règles ACL utilisées dans le laboratoire
+# - Compléter les permissions classiques UGO
+# - Appliquer des droits spécifiques à certains utilisateurs
+# - Vérifier les permissions effectives
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# ACL signifie :
+
+Access Control List
+
+
+# Les ACL permettent d'ajouter des règles de permissions
+# spécifiques en complément du modèle classique :
+
+U = User
+G = Group
+O = Other
+
+
+# Elles sont utiles lorsqu'il est nécessaire
+# d'attribuer une règle particulière à :
+#
+# - un utilisateur ;
+# - un groupe ;
+#
+# sans modifier le propriétaire ou le groupe
+# propriétaire principal du fichier.
+
+
+###############################################################################
+# 2. PAQUET NÉCESSAIRE
+###############################################################################
+
+# Les commandes ACL sont fournies par le paquet :
+
+acl
+
+
+# Installation :
+
+apt install acl
+
+
+###############################################################################
+# 3. COMMANDES PRINCIPALES
+###############################################################################
+
+# Afficher les ACL :
+
+getfacl
+
+
+# Modifier les ACL :
+
+setfacl
+
+
+###############################################################################
+# 4. FICHIER UTILISÉ DANS LE LABORATOIRE
+###############################################################################
+
+Fichier :
+
+giosue.txt
+
+
+Propriétaire :
+
+giosue
+
+
+Groupe propriétaire :
+
+direction
+
+
+###############################################################################
+# 5. UTILISATEUR CONCERNÉ PAR L'ACL
+###############################################################################
+
+Utilisateur :
+
+bob
+
+
+###############################################################################
+# 6. RÈGLE ACL DU LABORATOIRE
+###############################################################################
+
+# L'utilisateur Bob ne doit disposer
+# d'aucun droit sur le fichier giosue.txt.
+
+setfacl -m u:bob:--- giosue.txt
+
+
+###############################################################################
+# 7. ÉCRITURE UTILISÉE DANS LE TUTORIEL
+###############################################################################
+
+# La forme suivante peut également être utilisée :
+
+setfacl -m u:bob:- giosue.txt
+
+
+# Elle correspond ici à une règle ne donnant
+# aucun droit à l'utilisateur Bob.
+
+
+###############################################################################
+# 8. SIGNIFICATION DE LA COMMANDE
+###############################################################################
+
+setfacl
+
+# Commande utilisée pour modifier les ACL.
+
+
+-m
+
+# Modify.
+#
+# Permet d'ajouter ou modifier une entrée ACL.
+
+
+u
+
+# User.
+#
+# Indique que la règle concerne un utilisateur.
+
+
+bob
+
+# Nom de l'utilisateur concerné.
+
+
+---
+
+# Aucune permission :
+#
+# lecture    : non
+# écriture   : non
+# exécution  : non
+
+
+giosue.txt
+
+# Fichier sur lequel la règle est appliquée.
+
+
+###############################################################################
+# 9. VÉRIFICATION DE LA RÈGLE
+###############################################################################
+
+getfacl giosue.txt
+
+
+###############################################################################
+# 10. ENTRÉE ATTENDUE
+###############################################################################
+
+# Une entrée similaire doit apparaître :
+
+user:bob:---
+
+
+###############################################################################
+# 11. EXEMPLE D'AFFICHAGE ACL
+###############################################################################
+
+# Exemple de résultat :
+
+# file: giosue.txt
+# owner: giosue
+# group: direction
+
+user::rwx
+user:bob:---
+group::rwx
+mask::rwx
+other::r-x
+
+
+# Les permissions exactes peuvent varier
+# selon l'état du fichier.
+
+
+###############################################################################
+# 12. SYMBOLE + DANS ls -l
+###############################################################################
+
+# Lorsqu'une ACL étendue est présente,
+# la commande :
+
+ls -l giosue.txt
+
+
+# peut afficher un symbole :
+
++
+
+
+# Exemple :
+
+-rwxrwxr-x+
+
+
+# Le symbole + indique que le fichier possède
+# des informations ACL supplémentaires.
+
+
+###############################################################################
+# 13. RELATION AVEC LES PERMISSIONS UGO
+###############################################################################
+
+# Avant application des ACL, le fichier
+# peut utiliser des permissions classiques :
+
+chmod 775 giosue.txt
+
+
+# Soit :
+
+User  = rwx
+Group = rwx
+Other = r-x
+
+
+# Les ACL permettent ensuite d'ajouter
+# une règle plus précise.
+
+
+###############################################################################
+# 14. EXEMPLE DE LOGIQUE
+###############################################################################
+
+# Fichier :
+
+giosue.txt
+
+
+# Propriétaire :
+
+giosue
+
+
+# Groupe :
+
+direction
+
+
+# Permissions UGO :
+
+775
+
+
+# Mais :
+
+bob
+
+# possède une règle ACL spécifique :
+
+---
+
+
+###############################################################################
+# 15. SCHÉMA
+###############################################################################
+
+#                         giosue.txt
+#                             │
+#              ┌──────────────┼──────────────┐
+#              │              │              │
+#              ▼              ▼              ▼
+#            User           Group          Other
+#           giosue        direction
+#            rwx            rwx             r-x
+#
+#                             │
+#                             ▼
+#                            ACL
+#                             │
+#                             ▼
+#                            bob
+#                             │
+#                             ▼
+#                            ---
+
+
+###############################################################################
+# 16. TEST AVEC BOB
+###############################################################################
+
+# Passer sur le compte Bob :
+
+su - bob
+
+
+# Tester la lecture :
+
+cat /var/exos/giosue.txt
+
+
+# Si l'ACL est correctement appliquée,
+# Bob doit obtenir un refus d'accès.
+
+
+###############################################################################
+# 17. RETOUR À LA SESSION PRÉCÉDENTE
+###############################################################################
+
+exit
+
+
+###############################################################################
+# 18. MODIFICATION DE LA RÈGLE ACL
+###############################################################################
+
+# Autoriser uniquement la lecture :
+
+setfacl -m u:bob:r-- giosue.txt
+
+
+# Vérifier :
+
+getfacl giosue.txt
+
+
+###############################################################################
+# 19. AUTORISER LECTURE ET ÉCRITURE
+###############################################################################
+
+setfacl -m u:bob:rw- giosue.txt
+
+
+###############################################################################
+# 20. AUTORISER TOUS LES DROITS
+###############################################################################
+
+setfacl -m u:bob:rwx giosue.txt
+
+
+###############################################################################
+# 21. RETIRER LES DROITS
+###############################################################################
+
+setfacl -m u:bob:--- giosue.txt
+
+
+###############################################################################
+# 22. SUPPRIMER L'ENTRÉE ACL DE BOB
+###############################################################################
+
+setfacl -x u:bob giosue.txt
+
+
+###############################################################################
+# 23. VÉRIFICATION APRÈS SUPPRESSION
+###############################################################################
+
+getfacl giosue.txt
+
+
+# L'entrée :
+
+user:bob:
+
+# ne doit plus être présente.
+
+
+###############################################################################
+# 24. ACL POUR UN GROUPE
+###############################################################################
+
+# Il est également possible d'ajouter
+# une ACL pour un groupe.
+#
+# Exemple :
+
+setfacl -m g:travail:r-- giosue.txt
+
+
+###############################################################################
+# 25. VÉRIFICATION DE L'ACL GROUPE
+###############################################################################
+
+getfacl giosue.txt
+
+
+###############################################################################
+# 26. SUPPRESSION DE L'ACL GROUPE
+###############################################################################
+
+setfacl -x g:travail giosue.txt
+
+
+###############################################################################
+# 27. MASQUE ACL
+###############################################################################
+
+# Une ACL peut contenir une entrée :
+
+mask::
+
+
+# Exemple :
+
+mask::rwx
+
+
+# Le masque limite les permissions effectives
+# applicables notamment :
+#
+# - aux utilisateurs nommés ;
+# - aux groupes nommés ;
+# - au groupe propriétaire.
+
+
+###############################################################################
+# 28. MODIFICATION DU MASQUE
+###############################################################################
+
+setfacl -m m::rwx giosue.txt
+
+
+###############################################################################
+# 29. ACL SUR UN RÉPERTOIRE
+###############################################################################
+
+# Exemple d'ACL sur :
+
+/var/exos
+
+
+# Autoriser Bob :
+
+setfacl -m u:bob:rwx /var/exos
+
+
+###############################################################################
+# 30. ACL PAR DÉFAUT
+###############################################################################
+
+# Une ACL par défaut peut être appliquée
+# sur un répertoire :
+
+setfacl -m d:u:bob:rwx /var/exos
+
+
+# Les nouveaux éléments créés dans le répertoire
+# peuvent alors hériter de cette règle.
+
+
+###############################################################################
+# 31. VÉRIFICATION
+###############################################################################
+
+getfacl /var/exos
+
+
+###############################################################################
+# 32. SUPPRESSION DES ACL ÉTENDUES
+###############################################################################
+
+# Pour supprimer les entrées ACL étendues :
+
+setfacl -b giosue.txt
+
+
+# ATTENTION :
+#
+# Vérifier les permissions avant cette opération.
+
+
+###############################################################################
+# 33. LES TROIS COUCHES ÉTUDIÉES
+###############################################################################
+
+# Dans ce laboratoire, la protection des fichiers
+# est abordée avec trois mécanismes :
+
+
+# 1 - UGO
+
+chmod
+chown
+chgrp
+
+
+# 2 - Attributs
+
+chattr
+lsattr
+
+
+# 3 - ACL
+
+setfacl
+getfacl
+
+
+###############################################################################
+# 34. COMPARAISON
+###############################################################################
+
+# UGO :
+#
+# permissions classiques attribuées à :
+#
+# - User ;
+# - Group ;
+# - Other.
+
+
+# Attributs :
+#
+# protections supplémentaires appliquées
+# directement au fichier.
+#
+# Exemple :
+
+chattr +i bob.txt
+
+
+# ACL :
+#
+# règles plus précises appliquées
+# à des utilisateurs ou groupes particuliers.
+#
+# Exemple :
+
+setfacl -m u:bob:--- giosue.txt
+
+
+###############################################################################
+# 35. PROCÉDURE DE VÉRIFICATION
+###############################################################################
+
+# Vérifier les permissions classiques :
+
+ls -l giosue.txt
+
+
+# Vérifier les ACL :
+
+getfacl giosue.txt
+
+
+# Tester avec Bob :
+
+su - bob
+
+
+# Tester la lecture :
+
+cat /var/exos/giosue.txt
+
+
+# Revenir à la session précédente :
+
+exit
+
+
+###############################################################################
+# 36. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Installer ACL :
+
+apt install acl
+
+
+# Afficher les ACL :
+
+getfacl fichier
+
+
+# Ajouter/modifier une ACL utilisateur :
+
+setfacl -m u:utilisateur:permissions fichier
+
+
+# Exemple du laboratoire :
+
+setfacl -m u:bob:--- giosue.txt
+
+
+# Ajouter/modifier une ACL groupe :
+
+setfacl -m g:groupe:permissions fichier
+
+
+# Supprimer une ACL utilisateur :
+
+setfacl -x u:utilisateur fichier
+
+
+# Supprimer une ACL groupe :
+
+setfacl -x g:groupe fichier
+
+
+# Supprimer les ACL étendues :
+
+setfacl -b fichier
+
+
+###############################################################################
+# 37. CONFIGURATION RÉCAPITULATIVE
+###############################################################################
+
+Fichier :
+
+giosue.txt
+
+
+Propriétaire :
+
+giosue
+
+
+Groupe propriétaire :
+
+direction
+
+
+Permissions classiques :
+
+775
+
+
+Utilisateur ACL :
+
+bob
+
+
+Permissions ACL de Bob :
+
+---
+
+
+Commande :
+
+setfacl -m u:bob:--- giosue.txt
+
+
+Vérification :
+
+getfacl giosue.txt
+
+
+###############################################################################
+# 38. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Procédure détaillée ACL :
+
+commandes/permissions-acl.txt
+
+
+# Permissions UGO :
+
+permissions/permissions-ugo.txt
+
+
+# Attributs :
+
+permissions/attributs.txt
+
+
+# Utilisateurs :
+
+configurations/utilisateurs.txt
+
+
+# Groupes :
+
+configurations/groupes.txt
+
+
+# Vérification globale :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 39. VALIDATION
+###############################################################################
+
+# La configuration ACL est correcte si :
+#
+# [ ] Le paquet acl est installé.
+#
+# [ ] getfacl fonctionne.
+#
+# [ ] setfacl fonctionne.
+#
+# [ ] giosue.txt possède le propriétaire attendu.
+#
+# [ ] giosue.txt possède le groupe direction.
+#
+# [ ] Les permissions UGO sont correctement configurées.
+#
+# [ ] Une ACL spécifique existe pour Bob.
+#
+# [ ] L'entrée user:bob:--- est visible avec getfacl.
+#
+# [ ] Bob ne peut pas accéder au fichier
+#     lorsque la règle lui retire tous les droits.
+#
+# [ ] La différence entre UGO et ACL est comprise.
+#
+# [ ] Le rôle du masque ACL est compris.
+###############################################################################
