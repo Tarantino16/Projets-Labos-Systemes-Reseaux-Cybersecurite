@@ -1,0 +1,91 @@
+enable
+configure terminal
+
+hostname SW-3
+
+!
+! VLAN
+!
+vlan 10
+ name jaune
+exit
+
+vlan 11
+ name marron
+exit
+
+vlan 12
+ name violet
+exit
+
+vlan 13
+ name peche
+exit
+
+vlan 14
+ name beige
+exit
+
+!
+! EtherChannel
+!
+interface range FastEthernet0/1-8
+ channel-group 1 mode active
+exit
+
+interface Port-channel1
+ switchport mode trunk
+exit
+
+!
+! Interfaces FastEthernet
+!
+interface FastEthernet0/9
+ switchport mode access
+ switchport access vlan 11
+exit
+
+interface range FastEthernet0/10-23
+ switchport mode access
+exit
+
+interface FastEthernet0/24
+ switchport mode access
+ switchport access vlan 12
+exit
+
+!
+! Interfaces Gigabit
+!
+interface range GigabitEthernet0/1-2
+ switchport mode access
+exit
+
+!
+! Interface de management
+!
+interface Vlan14
+ ip address 192.168.14.3 255.255.255.0
+ no shutdown
+exit
+
+ip default-gateway 192.168.14.254
+
+!
+! SSH
+!
+ip domain-name maison.org
+
+username giosue secret poseidon
+
+crypto key generate rsa general-keys modulus 4096
+
+line vty 0 4
+ login local
+ transport input ssh
+exit
+
+enable secret poseidon
+
+end
+write memory
