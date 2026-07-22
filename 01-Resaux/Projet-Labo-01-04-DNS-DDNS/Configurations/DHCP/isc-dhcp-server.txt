@@ -1,0 +1,31 @@
+# =========================================================
+# Projet-Labo-01-4-DNS-DDNS
+# Serveur DHCP
+# Fichier : /etc/default/isc-dhcp-server
+#
+# Description :
+# Définition de l’interface réseau utilisée par le
+# serveur ISC DHCP pour distribuer les configurations IPv4.
+# =========================================================
+
+
+# Fichiers de configuration du service DHCP
+DHCPDv4_CONF=/etc/dhcp/dhcpd.conf
+DHCPDv6_CONF=/etc/dhcp/dhcpd6.conf
+
+
+# Fichiers PID du service DHCP
+DHCPDv4_PID=/var/run/dhcpd.pid
+DHCPDv6_PID=/var/run/dhcpd6.pid
+
+
+# Options supplémentaires du service
+OPTIONS=""
+
+
+# Interface utilisée pour distribuer les configurations IPv4
+INTERFACESv4="enp0s3"
+
+
+# Aucune interface IPv6 utilisée dans ce laboratoire
+INTERFACESv6=""
