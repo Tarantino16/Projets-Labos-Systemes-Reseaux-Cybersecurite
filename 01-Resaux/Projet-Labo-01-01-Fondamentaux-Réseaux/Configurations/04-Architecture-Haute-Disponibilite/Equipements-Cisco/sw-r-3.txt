@@ -1,0 +1,200 @@
+enable
+configure terminal
+
+hostname SW-R-3
+
+!
+! VLAN
+!
+vlan 10
+ name red
+exit
+
+vlan 20
+ name orange
+exit
+
+vlan 30
+ name grey
+exit
+
+vlan 40
+ name brown
+exit
+
+vlan 50
+ name black
+exit
+
+vlan 60
+ name yellow
+exit
+
+vlan 70
+ name gold
+exit
+
+vlan 80
+ name green
+exit
+
+vlan 90
+ name cyan
+exit
+
+vlan 100
+ name copper
+exit
+
+vlan 110
+ name silver
+exit
+
+vlan 120
+ name salmon
+exit
+
+vlan 150
+ name purple
+exit
+
+!
+! Interfaces physiques
+!
+interface range GigabitEthernet1/0/1-2
+ switchport mode trunk
+exit
+
+interface range GigabitEthernet1/0/3-23
+ switchport mode access
+exit
+
+interface GigabitEthernet1/0/24
+ no switchport
+ ip address 192.168.17.3 255.255.255.0
+ no shutdown
+exit
+
+interface range GigabitEthernet1/1/1-4
+ switchport mode access
+exit
+
+!
+! Interfaces VLAN
+!
+interface Vlan10
+ ip address 192.168.1.3 255.255.255.0
+ standby 1 ip 192.168.1.254
+ standby 1 priority 90
+ no shutdown
+exit
+
+interface Vlan20
+ ip address 192.168.2.3 255.255.255.0
+ standby 2 ip 192.168.2.254
+ standby 2 priority 90
+ no shutdown
+exit
+
+interface Vlan30
+ ip address 192.168.3.3 255.255.255.0
+ standby 3 ip 192.168.3.254
+ standby 3 priority 90
+ no shutdown
+exit
+
+interface Vlan40
+ ip address 192.168.4.3 255.255.255.0
+ standby 4 ip 192.168.4.254
+ standby 4 priority 90
+ no shutdown
+exit
+
+interface Vlan50
+ ip address 192.168.5.3 255.255.255.0
+ standby 5 ip 192.168.5.254
+ standby 5 priority 90
+ no shutdown
+exit
+
+interface Vlan60
+ ip address 192.168.6.3 255.255.255.0
+ standby 6 ip 192.168.6.254
+ standby 6 priority 90
+ no shutdown
+exit
+
+interface Vlan70
+ ip address 192.168.7.3 255.255.255.0
+ standby 7 ip 192.168.7.254
+ standby 7 priority 90
+ no shutdown
+exit
+
+interface Vlan80
+ ip address 192.168.8.3 255.255.255.0
+ standby 8 ip 192.168.8.254
+ standby 8 priority 90
+ no shutdown
+exit
+
+interface Vlan90
+ ip address 192.168.9.3 255.255.255.0
+ standby 9 ip 192.168.9.254
+ standby 9 priority 90
+ no shutdown
+exit
+
+interface Vlan100
+ ip address 192.168.10.3 255.255.255.0
+ standby 10 ip 192.168.10.254
+ standby 10 priority 90
+ no shutdown
+exit
+
+interface Vlan110
+ ip address 192.168.11.3 255.255.255.0
+ standby 11 ip 192.168.11.254
+ standby 11 priority 90
+ no shutdown
+exit
+
+interface Vlan120
+ ip address 192.168.12.3 255.255.255.0
+ standby 12 ip 192.168.12.254
+ standby 12 priority 90
+ no shutdown
+exit
+
+interface Vlan150
+ ip address 192.168.15.3 255.255.255.0
+ standby 15 ip 192.168.15.254
+ standby 15 priority 90
+ no shutdown
+exit
+
+!
+! Routage
+!
+ip routing
+
+ip default-gateway 192.168.17.254
+
+!
+! SSH
+!
+ip domain-name maison.org
+
+username giosue secret poseidon
+
+crypto key generate rsa general-keys modulus 2048
+
+line vty 0 4
+ login local
+ transport input ssh
+exit
+
+enable secret poseidon
+
+end
+write memory
