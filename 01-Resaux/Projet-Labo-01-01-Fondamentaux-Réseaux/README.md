@@ -264,11 +264,11 @@ Projet-Labo-01-01-Fondamentaux-Réseaux/
 │   └── Projet-Labo-01-01-Fondamentaux-Réseaux.pdf
 │
 └── Schemas/
-    ├── architecture-1.png
-    ├── architecture-2.png
-    ├── architecture-3.png
-    ├── architecture-4.png
-    └── architecture-globale.png
+    ├── Topologie-Reseau-Architecture-1.png
+    ├── Topologie-Reseau-Architecture-2.png
+    ├── Topologie-Reseau-Architecture-3.png
+    ├── Topologie-Reseau-Architecture-4.png
+    └── Topologie-Reseau-Architecture-Globale.png
 ```
 
 ---
