@@ -1,0 +1,748 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Gestion des groupes sous Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Commandes principales :
+# - addgroup
+# - delgroup
+# - adduser
+# - groups
+# - id
+# - getent
+# - cat /etc/group
+#
+# Objectifs :
+# - Comprendre le fonctionnement des groupes Linux
+# - Créer des groupes
+# - Ajouter des utilisateurs à des groupes
+# - Vérifier l'appartenance d'un utilisateur à un groupe
+# - Consulter les groupes présents sur le système
+# - Comprendre la relation entre utilisateurs, groupes et permissions
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Sous Linux, les groupes permettent de regrouper plusieurs utilisateurs.
+#
+# Ils sont notamment utilisés pour faciliter :
+#
+# - la gestion des permissions ;
+# - l'accès aux fichiers et répertoires ;
+# - l'administration des utilisateurs ;
+# - le partage de ressources entre plusieurs comptes.
+#
+# Chaque utilisateur possède généralement :
+#
+# - un groupe principal ;
+# - éventuellement plusieurs groupes secondaires.
+
+
+###############################################################################
+# 2. CONSULTER LES GROUPES DU SYSTÈME
+###############################################################################
+
+# Les informations relatives aux groupes locaux
+# sont notamment disponibles dans :
+
+/etc/group
+
+
+# Pour afficher le contenu du fichier :
+
+cat /etc/group
+
+
+###############################################################################
+# 3. STRUCTURE DU FICHIER /etc/group
+###############################################################################
+
+# Une entrée du fichier /etc/group possède généralement
+# la structure suivante :
+
+nom_groupe:x:GID:utilisateurs
+
+
+# Exemple :
+
+direction:x:1002:giosue,bob
+
+
+# Les différents champs correspondent à :
+#
+# nom_groupe
+#     Nom du groupe.
+#
+# x
+#     Indique que les informations sensibles éventuelles
+#     sont gérées séparément.
+#
+# GID
+#     Group Identifier.
+#     Identifiant numérique unique du groupe.
+#
+# utilisateurs
+#     Liste des utilisateurs membres du groupe
+#     en tant que membres supplémentaires.
+
+
+###############################################################################
+# 4. RECHERCHER UN GROUPE
+###############################################################################
+
+# La commande getent permet d'interroger la base
+# des groupes connue par le système.
+
+getent group direction
+
+
+# Pour afficher tous les groupes :
+
+getent group
+
+
+###############################################################################
+# 5. CRÉER UN GROUPE
+###############################################################################
+
+# Sous Debian, la commande addgroup permet
+# de créer simplement un nouveau groupe.
+
+addgroup travail
+
+
+###############################################################################
+# 6. GROUPES CRÉÉS DANS LE LABORATOIRE
+###############################################################################
+
+# Création du groupe travail :
+
+addgroup travail
+
+
+# Création du groupe direction :
+
+addgroup direction
+
+
+# Création du groupe compta :
+
+addgroup compta
+
+
+# Création du groupe rh :
+
+addgroup rh
+
+
+# Création du groupe marketing :
+
+addgroup marketing
+
+
+# Création du groupe manutentionnaires :
+
+addgroup manutentionnaires
+
+
+###############################################################################
+# 7. VÉRIFIER LA CRÉATION DES GROUPES
+###############################################################################
+
+getent group travail
+
+getent group direction
+
+getent group compta
+
+getent group rh
+
+getent group marketing
+
+getent group manutentionnaires
+
+
+###############################################################################
+# 8. VÉRIFICATION AVEC /etc/group
+###############################################################################
+
+cat /etc/group
+
+
+# Il est également possible de filtrer le résultat.
+
+grep direction /etc/group
+
+
+###############################################################################
+# 9. AJOUTER UN UTILISATEUR À UN GROUPE
+###############################################################################
+
+# Sous Debian, la syntaxe suivante permet d'ajouter
+# un utilisateur existant à un groupe existant :
+
+adduser utilisateur groupe
+
+
+# Exemple du laboratoire :
+
+adduser giosue direction
+
+
+###############################################################################
+# 10. SIGNIFICATION DE LA COMMANDE
+###############################################################################
+
+# La commande :
+
+adduser giosue direction
+
+# ajoute l'utilisateur :
+
+giosue
+
+# au groupe secondaire :
+
+direction
+
+
+###############################################################################
+# 11. AJOUTER BOB AU GROUPE TRAVAIL
+###############################################################################
+
+# Exemple :
+
+adduser bob travail
+
+
+###############################################################################
+# 12. AJOUTER UN UTILISATEUR À PLUSIEURS GROUPES
+###############################################################################
+
+# Un même utilisateur peut appartenir
+# à plusieurs groupes secondaires.
+#
+# Exemple :
+
+adduser bob travail
+
+adduser bob direction
+
+
+# Bob peut alors être membre simultanément
+# des groupes travail et direction.
+
+
+###############################################################################
+# 13. AFFICHER LES GROUPES D'UN UTILISATEUR
+###############################################################################
+
+# La commande groups permet d'afficher
+# les groupes auxquels appartient un utilisateur.
+
+groups giosue
+
+
+# Exemple :
+
+groups bob
+
+
+###############################################################################
+# 14. AFFICHER LES INFORMATIONS D'IDENTITÉ
+###############################################################################
+
+# La commande id fournit davantage d'informations
+# sur un utilisateur.
+
+id giosue
+
+
+# Elle permet notamment d'afficher :
+#
+# - UID ;
+# - GID principal ;
+# - groupes supplémentaires.
+
+
+###############################################################################
+# 15. UID ET GID
+###############################################################################
+
+# UID signifie :
+
+User Identifier
+
+
+# Il s'agit de l'identifiant numérique
+# associé à un utilisateur.
+
+
+# GID signifie :
+
+Group Identifier
+
+
+# Il s'agit de l'identifiant numérique
+# associé à un groupe.
+
+
+###############################################################################
+# 16. GROUPE PRINCIPAL
+###############################################################################
+
+# Chaque utilisateur possède un groupe principal.
+#
+# Il peut être observé avec :
+
+id giosue
+
+
+# Le champ :
+
+gid=
+
+# indique le groupe principal de l'utilisateur.
+
+
+###############################################################################
+# 17. GROUPES SECONDAIRES
+###############################################################################
+
+# Un utilisateur peut également appartenir
+# à plusieurs groupes supplémentaires.
+#
+# Ils apparaissent notamment dans le champ :
+
+groups=
+
+# de la commande :
+
+id utilisateur
+
+
+###############################################################################
+# 18. VÉRIFIER LES MEMBRES D'UN GROUPE
+###############################################################################
+
+getent group direction
+
+
+# Cette commande permet de consulter l'entrée
+# correspondant au groupe direction.
+
+
+###############################################################################
+# 19. SUPPRIMER UN UTILISATEUR D'UN GROUPE
+###############################################################################
+
+# Sous Debian, deluser peut être utilisé pour retirer
+# un utilisateur d'un groupe secondaire.
+
+deluser bob direction
+
+
+# Cette commande retire Bob du groupe direction
+# sans supprimer son compte utilisateur.
+
+
+###############################################################################
+# 20. VÉRIFIER LE RETRAIT
+###############################################################################
+
+groups bob
+
+
+# ou :
+
+id bob
+
+
+# ou :
+
+getent group direction
+
+
+###############################################################################
+# 21. SUPPRIMER UN GROUPE
+###############################################################################
+
+# La commande delgroup permet de supprimer
+# un groupe local.
+
+delgroup nom_groupe
+
+
+# Exemple :
+
+delgroup travail
+
+
+###############################################################################
+# 22. ATTENTION AVANT SUPPRESSION
+###############################################################################
+
+# Avant de supprimer un groupe, vérifier :
+#
+# - qu'il n'est plus nécessaire ;
+# - qu'aucune ressource importante ne dépend de ce groupe ;
+# - qu'il n'est pas utilisé comme groupe principal
+#   d'un utilisateur.
+#
+# Vérification :
+
+getent group travail
+
+
+###############################################################################
+# 23. GROUPE PROPRIÉTAIRE D'UN FICHIER
+###############################################################################
+
+# Sous Linux, chaque fichier possède notamment :
+#
+# - un utilisateur propriétaire ;
+# - un groupe propriétaire.
+#
+# Ces informations peuvent être observées avec :
+
+ls -l
+
+
+# Exemple de représentation :
+
+-rw-r----- 1 giosue direction 100 fichier.txt
+
+
+# Dans cet exemple :
+#
+# giosue
+#     est l'utilisateur propriétaire.
+#
+# direction
+#     est le groupe propriétaire.
+
+
+###############################################################################
+# 24. MODIFIER LE GROUPE PROPRIÉTAIRE
+###############################################################################
+
+# La commande chgrp permet de modifier
+# le groupe propriétaire d'un fichier.
+
+chgrp direction giosue.txt
+
+
+###############################################################################
+# 25. VÉRIFIER LE GROUPE PROPRIÉTAIRE
+###############################################################################
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 26. RELATION ENTRE GROUPES ET PERMISSIONS
+###############################################################################
+
+# Les permissions Linux classiques sont organisées
+# autour de trois catégories :
+
+U = User
+
+G = Group
+
+O = Other
+
+
+# Le groupe propriétaire d'un fichier utilise donc
+# les permissions correspondant à :
+
+G
+
+
+###############################################################################
+# 27. EXEMPLE DE PERMISSIONS
+###############################################################################
+
+# Exemple :
+
+-rwxrwxr-x
+
+
+# Décomposition :
+
+rwx   rwx   r-x
+ │     │     │
+ │     │     └── Other
+ │     │
+ │     └──────── Group
+ │
+ └────────────── User
+
+
+# Les membres du groupe propriétaire utilisent
+# donc la deuxième série de permissions.
+
+
+###############################################################################
+# 28. EXEMPLE AVEC LE GROUPE DIRECTION
+###############################################################################
+
+# Attribution du groupe direction :
+
+chgrp direction giosue.txt
+
+
+# Attribution des permissions :
+
+chmod 775 giosue.txt
+
+
+# Vérification :
+
+ls -l giosue.txt
+
+
+# Résultat attendu dans le principe :
+
+-rwxrwxr-x ... giosue direction ... giosue.txt
+
+
+###############################################################################
+# 29. INTERPRÉTATION DE 775
+###############################################################################
+
+# 7 = rwx
+#
+# 7 = rwx
+#
+# 5 = r-x
+
+
+# Donc :
+
+User   = rwx
+
+Group  = rwx
+
+Other  = r-x
+
+
+# Les membres du groupe direction disposent ainsi
+# des permissions associées à la partie Group.
+
+
+###############################################################################
+# 30. PROCÉDURE DU LABORATOIRE
+###############################################################################
+
+# 1 - Créer les groupes :
+
+addgroup travail
+
+addgroup direction
+
+addgroup compta
+
+addgroup rh
+
+addgroup marketing
+
+addgroup manutentionnaires
+
+
+# 2 - Vérifier les groupes :
+
+cat /etc/group
+
+
+# 3 - Ajouter un utilisateur à un groupe :
+
+adduser giosue direction
+
+
+# 4 - Vérifier l'appartenance :
+
+groups giosue
+
+
+# 5 - Afficher les informations détaillées :
+
+id giosue
+
+
+# 6 - Vérifier directement le groupe :
+
+getent group direction
+
+
+###############################################################################
+# 31. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Créer un groupe :
+
+addgroup nom_groupe
+
+
+# Afficher les groupes :
+
+cat /etc/group
+
+
+# Rechercher un groupe :
+
+getent group nom_groupe
+
+
+# Ajouter un utilisateur à un groupe :
+
+adduser utilisateur groupe
+
+
+# Afficher les groupes d'un utilisateur :
+
+groups utilisateur
+
+
+# Afficher les informations détaillées :
+
+id utilisateur
+
+
+# Retirer un utilisateur d'un groupe :
+
+deluser utilisateur groupe
+
+
+# Supprimer un groupe :
+
+delgroup nom_groupe
+
+
+# Modifier le groupe propriétaire d'un fichier :
+
+chgrp groupe fichier
+
+
+# Vérifier le propriétaire et le groupe :
+
+ls -l fichier
+
+
+###############################################################################
+# 32. COMMANDES DU LABORATOIRE
+###############################################################################
+
+addgroup travail
+
+addgroup direction
+
+addgroup compta
+
+addgroup rh
+
+addgroup marketing
+
+addgroup manutentionnaires
+
+
+# Ajout au groupe direction :
+
+adduser giosue direction
+
+
+# Vérification :
+
+groups giosue
+
+id giosue
+
+getent group direction
+
+
+###############################################################################
+# 33. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Permissions classiques UGO :
+
+commandes/permissions-ugo.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# Permissions ACL :
+
+commandes/permissions-acl.txt
+
+
+# Configuration des groupes :
+
+configurations/groupes.txt
+
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 34. VALIDATION
+###############################################################################
+
+# La gestion des groupes est maîtrisée si :
+#
+# [ ] Le rôle d'un groupe Linux est compris.
+#
+# [ ] La différence entre utilisateur et groupe
+#     est comprise.
+#
+# [ ] La différence entre groupe principal
+#     et groupes secondaires est comprise.
+#
+# [ ] addgroup permet de créer un groupe.
+#
+# [ ] adduser utilisateur groupe permet d'ajouter
+#     un utilisateur à un groupe sous Debian.
+#
+# [ ] groups permet de vérifier les groupes
+#     d'un utilisateur.
+#
+# [ ] id permet d'afficher l'UID, le GID
+#     et les groupes d'un utilisateur.
+#
+# [ ] /etc/group permet de consulter
+#     les groupes locaux.
+#
+# [ ] getent group permet de rechercher
+#     les informations relatives à un groupe.
+#
+# [ ] deluser permet de retirer un utilisateur
+#     d'un groupe secondaire.
+#
+# [ ] delgroup permet de supprimer un groupe.
+#
+# [ ] chgrp permet de modifier le groupe
+#     propriétaire d'un fichier.
+#
+# [ ] La relation entre groupes et permissions UGO
+#     est comprise.
+###############################################################################

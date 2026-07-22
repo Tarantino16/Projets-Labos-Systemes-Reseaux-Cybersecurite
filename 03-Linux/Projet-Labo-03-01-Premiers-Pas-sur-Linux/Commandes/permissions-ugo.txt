@@ -1,0 +1,1074 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Gestion des permissions UGO sous Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Commandes principales :
+# - ls -l
+# - chmod
+# - chown
+# - chgrp
+#
+# Objectifs :
+# - Comprendre les permissions classiques Linux
+# - Comprendre le modèle UGO
+# - Comprendre les droits Read / Write / Execute
+# - Comprendre la notation symbolique
+# - Comprendre la notation numérique
+# - Modifier les permissions d'un fichier ou répertoire
+# - Modifier le propriétaire
+# - Modifier le groupe propriétaire
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Sous Linux, chaque fichier et chaque répertoire possède
+# des permissions permettant de contrôler les accès.
+#
+# Les permissions classiques sont organisées selon
+# le modèle :
+
+U = User
+G = Group
+O = Other
+
+
+# U correspond à l'utilisateur propriétaire.
+#
+# G correspond au groupe propriétaire.
+#
+# O correspond aux autres utilisateurs.
+
+
+###############################################################################
+# 2. LES TROIS TYPES DE PERMISSIONS
+###############################################################################
+
+# Les trois permissions principales sont :
+
+R = Read
+W = Write
+X = Execute
+
+
+# En français :
+
+R = Lecture
+W = Écriture
+X = Exécution
+
+
+###############################################################################
+# 3. SIGNIFICATION DE READ
+###############################################################################
+
+# Read correspond à la permission :
+
+r
+
+
+# Pour un fichier :
+#
+# permet de lire son contenu.
+#
+# Pour un répertoire :
+#
+# permet notamment de consulter la liste
+# des éléments qu'il contient.
+
+
+###############################################################################
+# 4. SIGNIFICATION DE WRITE
+###############################################################################
+
+# Write correspond à :
+
+w
+
+
+# Pour un fichier :
+#
+# permet de modifier son contenu.
+#
+# Pour un répertoire :
+#
+# permet notamment de créer, supprimer ou renommer
+# des éléments selon les autres permissions disponibles.
+
+
+###############################################################################
+# 5. SIGNIFICATION DE EXECUTE
+###############################################################################
+
+# Execute correspond à :
+
+x
+
+
+# Pour un fichier :
+#
+# permet de l'exécuter lorsqu'il s'agit
+# d'un programme ou script exécutable.
+#
+# Pour un répertoire :
+#
+# permet notamment de traverser le répertoire
+# et d'accéder aux éléments qu'il contient.
+
+
+###############################################################################
+# 6. AFFICHER LES PERMISSIONS
+###############################################################################
+
+# La commande ls -l permet d'afficher
+# les permissions des fichiers et répertoires.
+
+ls -l
+
+
+###############################################################################
+# 7. EXEMPLE D'AFFICHAGE
+###############################################################################
+
+# Exemple :
+
+-rwxrwxr-x 1 giosue direction 100 giosue.txt
+
+
+# Décomposition :
+
+-      rwx      rwx      r-x
+│       │        │        │
+│       │        │        └── Other
+│       │        │
+│       │        └─────────── Group
+│       │
+│       └──────────────────── User
+│
+└──────────────────────────── Type de fichier
+
+
+###############################################################################
+# 8. TYPE DE FICHIER
+###############################################################################
+
+# Le premier caractère indique notamment
+# le type d'objet.
+#
+# Exemple :
+
+-
+
+# correspond généralement à un fichier classique.
+
+
+# Exemple :
+
+d
+
+# correspond à un répertoire.
+
+
+###############################################################################
+# 9. DÉCOMPOSITION UGO
+###############################################################################
+
+# Exemple :
+
+rwxrwxr-x
+
+
+# peut être séparé en :
+
+rwx   rwx   r-x
+ U     G     O
+
+
+# User :
+
+rwx
+
+
+# Group :
+
+rwx
+
+
+# Other :
+
+r-x
+
+
+###############################################################################
+# 10. NOTATION NUMÉRIQUE
+###############################################################################
+
+# Chaque permission possède une valeur numérique :
+
+r = 4
+w = 2
+x = 1
+
+
+###############################################################################
+# 11. CALCUL DES PERMISSIONS
+###############################################################################
+
+# Les valeurs sont additionnées.
+#
+# Exemple :
+
+rwx
+
+# donne :
+
+4 + 2 + 1 = 7
+
+
+# Exemple :
+
+rw-
+
+# donne :
+
+4 + 2 = 6
+
+
+# Exemple :
+
+r-x
+
+# donne :
+
+4 + 1 = 5
+
+
+# Exemple :
+
+r--
+
+# donne :
+
+4
+
+
+###############################################################################
+# 12. TABLEAU DES VALEURS
+###############################################################################
+
+# Valeur | Permission
+#
+# 0      | ---
+# 1      | --x
+# 2      | -w-
+# 3      | -wx
+# 4      | r--
+# 5      | r-x
+# 6      | rw-
+# 7      | rwx
+
+
+###############################################################################
+# 13. EXEMPLE 777
+###############################################################################
+
+# La permission :
+
+777
+
+
+# correspond à :
+
+User  = 7 = rwx
+Group = 7 = rwx
+Other = 7 = rwx
+
+
+# Représentation :
+
+rwxrwxrwx
+
+
+# Tous les utilisateurs disposent donc
+# de toutes les permissions.
+
+
+###############################################################################
+# 14. EXEMPLE 775
+###############################################################################
+
+# Dans le laboratoire, la permission suivante
+# est notamment utilisée :
+
+775
+
+
+# Décomposition :
+
+User  = 7 = rwx
+Group = 7 = rwx
+Other = 5 = r-x
+
+
+# Représentation :
+
+rwxrwxr-x
+
+
+###############################################################################
+# 15. EXEMPLE DU LABORATOIRE
+###############################################################################
+
+# Le fichier giosue.txt reçoit notamment
+# les permissions :
+
+chmod 775 giosue.txt
+
+
+# Cela signifie :
+#
+# Propriétaire :
+# lecture + écriture + exécution
+#
+# Groupe propriétaire :
+# lecture + écriture + exécution
+#
+# Autres :
+# lecture + exécution
+
+
+###############################################################################
+# 16. CHANGER LES PERMISSIONS AVEC CHMOD
+###############################################################################
+
+# La commande chmod permet de modifier
+# les permissions d'un fichier ou répertoire.
+#
+# Syntaxe numérique :
+
+chmod permissions fichier
+
+
+# Exemple :
+
+chmod 775 giosue.txt
+
+
+###############################################################################
+# 17. VÉRIFIER LES PERMISSIONS
+###############################################################################
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 18. EXEMPLE 644
+###############################################################################
+
+chmod 644 fichier.txt
+
+
+# Correspond à :
+
+User  = rw-
+Group = r--
+Other = r--
+
+
+# Représentation :
+
+rw-r--r--
+
+
+###############################################################################
+# 19. EXEMPLE 600
+###############################################################################
+
+chmod 600 fichier.txt
+
+
+# Correspond à :
+
+User  = rw-
+Group = ---
+Other = ---
+
+
+# Représentation :
+
+rw-------
+
+
+###############################################################################
+# 20. EXEMPLE 755
+###############################################################################
+
+chmod 755 script.sh
+
+
+# Correspond à :
+
+User  = rwx
+Group = r-x
+Other = r-x
+
+
+# Cette configuration est couramment utilisée
+# pour des scripts ou programmes exécutables.
+
+
+###############################################################################
+# 21. NOTATION SYMBOLIQUE
+###############################################################################
+
+# chmod peut également utiliser une notation symbolique.
+#
+# Les catégories sont :
+
+u = user
+g = group
+o = other
+a = all
+
+
+###############################################################################
+# 22. AJOUTER UNE PERMISSION
+###############################################################################
+
+# Ajouter l'exécution pour l'utilisateur :
+
+chmod u+x script.sh
+
+
+# Ajouter l'écriture pour le groupe :
+
+chmod g+w fichier.txt
+
+
+# Ajouter la lecture pour les autres :
+
+chmod o+r fichier.txt
+
+
+###############################################################################
+# 23. RETIRER UNE PERMISSION
+###############################################################################
+
+# Retirer l'écriture aux autres :
+
+chmod o-w fichier.txt
+
+
+# Retirer l'exécution au groupe :
+
+chmod g-x script.sh
+
+
+###############################################################################
+# 24. ATTRIBUER EXACTEMENT DES PERMISSIONS
+###############################################################################
+
+# Exemple :
+
+chmod u=rw,g=r,o= fichier.txt
+
+
+# Cela donne :
+#
+# User  = rw-
+# Group = r--
+# Other = ---
+
+
+###############################################################################
+# 25. AJOUTER UNE PERMISSION À TOUS
+###############################################################################
+
+chmod a+r fichier.txt
+
+
+# Ajoute la permission de lecture
+# à User, Group et Other.
+
+
+###############################################################################
+# 26. PROPRIÉTAIRE D'UN FICHIER
+###############################################################################
+
+# Chaque fichier possède un utilisateur propriétaire.
+#
+# Cette information apparaît avec :
+
+ls -l
+
+
+# Exemple :
+
+-rw-r--r-- 1 giosue direction 100 giosue.txt
+
+
+# Ici :
+
+giosue
+
+# est le propriétaire.
+
+
+###############################################################################
+# 27. MODIFIER LE PROPRIÉTAIRE
+###############################################################################
+
+# La commande chown permet de modifier
+# le propriétaire du fichier.
+
+chown giosue giosue.txt
+
+
+###############################################################################
+# 28. VÉRIFIER LE PROPRIÉTAIRE
+###############################################################################
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 29. GROUPE PROPRIÉTAIRE
+###############################################################################
+
+# Un fichier possède également un groupe propriétaire.
+#
+# Exemple :
+
+direction
+
+
+# dans :
+
+-rw-r--r-- 1 giosue direction 100 giosue.txt
+
+
+###############################################################################
+# 30. MODIFIER LE GROUPE PROPRIÉTAIRE
+###############################################################################
+
+# La commande chgrp permet de modifier
+# le groupe propriétaire.
+
+chgrp direction giosue.txt
+
+
+###############################################################################
+# 31. MODIFIER PROPRIÉTAIRE ET GROUPE EN UNE FOIS
+###############################################################################
+
+# Avec chown :
+
+chown giosue:direction giosue.txt
+
+
+###############################################################################
+# 32. VÉRIFICATION COMPLÈTE
+###############################################################################
+
+ls -l giosue.txt
+
+
+# Vérifier :
+#
+# - les permissions ;
+# - le propriétaire ;
+# - le groupe propriétaire.
+
+
+###############################################################################
+# 33. EXEMPLE COMPLET DU LABORATOIRE
+###############################################################################
+
+# Création du fichier :
+
+echo "directeur" > giosue.txt
+
+
+# Attribution du propriétaire :
+
+chown giosue giosue.txt
+
+
+# Attribution du groupe :
+
+chgrp direction giosue.txt
+
+
+# Attribution des permissions :
+
+chmod 775 giosue.txt
+
+
+# Vérification :
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 34. RÉSULTAT ATTENDU
+###############################################################################
+
+# Dans le principe :
+
+-rwxrwxr-x ... giosue direction ... giosue.txt
+
+
+# Cela signifie :
+#
+# Propriétaire :
+# giosue
+#
+# Groupe :
+# direction
+#
+# Permissions utilisateur :
+# rwx
+#
+# Permissions groupe :
+# rwx
+#
+# Permissions autres :
+# r-x
+
+
+###############################################################################
+# 35. PERMISSIONS SUR LES RÉPERTOIRES
+###############################################################################
+
+# Les permissions s'appliquent également
+# aux répertoires.
+#
+# Exemple :
+
+chmod 775 /var/exos
+
+
+###############################################################################
+# 36. PERMISSION READ SUR UN RÉPERTOIRE
+###############################################################################
+
+# r permet notamment de consulter
+# la liste des noms contenus dans le répertoire.
+
+
+###############################################################################
+# 37. PERMISSION WRITE SUR UN RÉPERTOIRE
+###############################################################################
+
+# w permet notamment de créer ou supprimer
+# des entrées dans le répertoire,
+# selon les autres permissions.
+
+
+###############################################################################
+# 38. PERMISSION EXECUTE SUR UN RÉPERTOIRE
+###############################################################################
+
+# x permet de traverser le répertoire
+# et d'accéder aux fichiers qu'il contient.
+
+
+###############################################################################
+# 39. IMPORTANCE DE X SUR LES RÉPERTOIRES
+###############################################################################
+
+# Sur un répertoire, la permission x est essentielle
+# pour pouvoir accéder à son contenu.
+#
+# Il est donc possible d'avoir la permission
+# de lecture sans pouvoir réellement ouvrir
+# les fichiers si la traversée du répertoire
+# n'est pas autorisée.
+
+
+###############################################################################
+# 40. MODIFICATION RÉCURSIVE
+###############################################################################
+
+# Pour appliquer des permissions récursivement :
+
+chmod -R 755 repertoire
+
+
+# ATTENTION :
+#
+# Cette commande modifie les permissions
+# du répertoire et de son contenu.
+#
+# À utiliser avec précaution.
+
+
+###############################################################################
+# 41. MODIFICATION RÉCURSIVE DU PROPRIÉTAIRE
+###############################################################################
+
+chown -R giosue:direction repertoire
+
+
+# Cette commande modifie récursivement :
+#
+# - le propriétaire ;
+# - le groupe propriétaire.
+
+
+###############################################################################
+# 42. TEST DES PERMISSIONS
+###############################################################################
+
+# Afficher les permissions :
+
+ls -l
+
+
+# Changer d'utilisateur :
+
+su - bob
+
+
+# Puis essayer d'accéder ou de modifier
+# le fichier concerné.
+#
+# Cette méthode permet de vérifier concrètement
+# les permissions accordées.
+
+
+###############################################################################
+# 43. RELATION AVEC LES GROUPES
+###############################################################################
+
+# Les permissions Group s'appliquent
+# aux membres du groupe propriétaire.
+#
+# Exemple :
+#
+# Groupe propriétaire :
+
+direction
+
+
+# Si l'utilisateur Bob appartient au groupe :
+
+direction
+
+
+# il peut bénéficier des permissions
+# définies dans la partie Group.
+
+
+###############################################################################
+# 44. VÉRIFIER LES GROUPES D'UN UTILISATEUR
+###############################################################################
+
+groups bob
+
+
+# ou :
+
+id bob
+
+
+###############################################################################
+# 45. AJOUTER BOB AU GROUPE DIRECTION
+###############################################################################
+
+adduser bob direction
+
+
+# Vérification :
+
+groups bob
+
+
+###############################################################################
+# 46. RETESTER LES PERMISSIONS
+###############################################################################
+
+# Après ajout au groupe :
+
+su - bob
+
+
+# Tester ensuite l'accès au fichier :
+
+cat /var/exos/giosue.txt
+
+
+###############################################################################
+# 47. ATTENTION AUX PERMISSIONS 777
+###############################################################################
+
+# chmod 777 donne toutes les permissions
+# à tous les utilisateurs.
+#
+# Exemple :
+
+chmod 777 fichier
+
+
+# Cela signifie :
+
+User  = rwx
+Group = rwx
+Other = rwx
+
+
+# Cette configuration peut être utile
+# pour certains tests en laboratoire,
+# mais elle est généralement trop permissive
+# pour une utilisation normale.
+
+
+###############################################################################
+# 48. PRINCIPE DU MOINDRE PRIVILÈGE
+###############################################################################
+
+# Il est préférable d'accorder uniquement
+# les permissions réellement nécessaires.
+#
+# Exemple :
+#
+# Au lieu de :
+
+chmod 777 fichier.txt
+
+
+# une configuration plus restrictive peut être :
+
+chmod 640 fichier.txt
+
+
+# correspondant à :
+
+User  = rw-
+Group = r--
+Other = ---
+
+
+###############################################################################
+# 49. PROCÉDURE DU LABORATOIRE
+###############################################################################
+
+# 1 - Aller dans le répertoire :
+
+cd /var/exos
+
+
+# 2 - Créer le fichier :
+
+echo "directeur" > giosue.txt
+
+
+# 3 - Modifier le propriétaire :
+
+chown giosue giosue.txt
+
+
+# 4 - Modifier le groupe :
+
+chgrp direction giosue.txt
+
+
+# 5 - Attribuer les permissions :
+
+chmod 775 giosue.txt
+
+
+# 6 - Vérifier :
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 50. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Afficher les permissions :
+
+ls -l
+
+
+# Modifier les permissions :
+
+chmod 775 fichier
+
+
+# Ajouter une permission :
+
+chmod u+x fichier
+
+
+# Retirer une permission :
+
+chmod o-w fichier
+
+
+# Modifier le propriétaire :
+
+chown utilisateur fichier
+
+
+# Modifier le groupe :
+
+chgrp groupe fichier
+
+
+# Modifier propriétaire et groupe :
+
+chown utilisateur:groupe fichier
+
+
+# Modifier récursivement :
+
+chmod -R permissions repertoire
+
+
+# Modifier récursivement propriétaire/groupe :
+
+chown -R utilisateur:groupe repertoire
+
+
+###############################################################################
+# 51. COMPARAISON AVEC LES AUTRES MÉCANISMES
+###############################################################################
+
+# Dans ce laboratoire, trois couches
+# de contrôle des fichiers sont abordées :
+
+
+# 1 - Permissions UGO
+#
+# Commandes principales :
+
+chmod
+chown
+chgrp
+
+
+# 2 - Attributs
+
+chattr
+lsattr
+
+
+# 3 - ACL
+
+setfacl
+getfacl
+
+
+###############################################################################
+# 52. SCHÉMA RÉCAPITULATIF
+###############################################################################
+
+#                  Permissions Linux
+#                        │
+#                        ▼
+#                       UGO
+#                        │
+#             ┌──────────┼──────────┐
+#             │          │          │
+#             ▼          ▼          ▼
+#           User       Group       Other
+#             │          │          │
+#             ▼          ▼          ▼
+#          r / w / x  r / w / x  r / w / x
+#
+#
+# Commandes :
+#
+# chmod
+#     Modifie les permissions.
+#
+# chown
+#     Modifie le propriétaire.
+#
+# chgrp
+#     Modifie le groupe propriétaire.
+
+
+###############################################################################
+# 53. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# ACL :
+
+commandes/permissions-acl.txt
+
+
+# Configuration des permissions UGO :
+
+configurations/permissions/permissions-ugo.txt
+
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 54. VALIDATION
+###############################################################################
+
+# Les permissions UGO sont maîtrisées si :
+#
+# [ ] La signification de U, G et O est comprise.
+#
+# [ ] La signification de r, w et x est comprise.
+#
+# [ ] La différence entre permissions de fichiers
+#     et permissions de répertoires est comprise.
+#
+# [ ] ls -l permet d'identifier les permissions.
+#
+# [ ] La notation numérique 4 / 2 / 1 est comprise.
+#
+# [ ] Les valeurs 7, 6, 5, 4 et 0
+#     peuvent être interprétées.
+#
+# [ ] chmod permet de modifier les permissions.
+#
+# [ ] chmod 775 peut être interprété correctement.
+#
+# [ ] La notation symbolique de chmod est comprise.
+#
+# [ ] chown permet de modifier le propriétaire.
+#
+# [ ] chgrp permet de modifier le groupe propriétaire.
+#
+# [ ] La relation entre groupes et permissions
+#     est comprise.
+#
+# [ ] La différence entre UGO, attributs
+#     et ACL est comprise.
+###############################################################################
+

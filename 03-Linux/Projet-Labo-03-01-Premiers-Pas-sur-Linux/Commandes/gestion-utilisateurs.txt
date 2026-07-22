@@ -1,0 +1,968 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Gestion des utilisateurs sous Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Commandes principales :
+# - adduser
+# - deluser
+# - passwd
+# - id
+# - whoami
+# - groups
+# - getent
+# - cat /etc/passwd
+#
+# Objectifs :
+# - Comprendre le fonctionnement des utilisateurs Linux
+# - Créer des comptes utilisateurs
+# - Définir et modifier les mots de passe
+# - Consulter les informations d'un utilisateur
+# - Comprendre les UID et GID
+# - Vérifier l'appartenance aux groupes
+# - Comprendre les répertoires personnels
+# - Supprimer un utilisateur
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Linux est un système multi-utilisateur.
+#
+# Plusieurs comptes peuvent donc exister sur une même machine.
+#
+# Chaque utilisateur possède notamment :
+#
+# - un nom d'utilisateur ;
+# - un identifiant numérique UID ;
+# - un groupe principal ;
+# - un identifiant de groupe GID ;
+# - un répertoire personnel ;
+# - un shell ;
+# - éventuellement plusieurs groupes secondaires.
+#
+# Les utilisateurs permettent notamment de séparer :
+#
+# - les comptes personnels ;
+# - les permissions ;
+# - les fichiers ;
+# - les processus ;
+# - les ressources accessibles.
+
+
+###############################################################################
+# 2. UTILISATEUR ROOT
+###############################################################################
+
+# root est le compte administrateur principal
+# des systèmes Linux.
+#
+# Son UID est :
+
+0
+
+
+# root dispose de privilèges très importants
+# sur le système.
+#
+# Il peut notamment :
+#
+# - créer des utilisateurs ;
+# - supprimer des utilisateurs ;
+# - créer des groupes ;
+# - modifier les permissions ;
+# - installer des logiciels ;
+# - modifier la configuration du système.
+
+
+###############################################################################
+# 3. AFFICHER L'UTILISATEUR ACTUEL
+###############################################################################
+
+# La commande whoami permet d'afficher
+# le nom de l'utilisateur actuellement connecté.
+
+whoami
+
+
+###############################################################################
+# 4. AFFICHER LES INFORMATIONS DE L'UTILISATEUR ACTUEL
+###############################################################################
+
+id
+
+
+# Cette commande permet notamment d'afficher :
+#
+# - UID ;
+# - GID ;
+# - groupes supplémentaires.
+
+
+###############################################################################
+# 5. AFFICHER LES INFORMATIONS D'UN UTILISATEUR
+###############################################################################
+
+# Il est également possible d'indiquer
+# directement le nom d'un utilisateur.
+
+id giosue
+
+
+# Exemple pour Bob :
+
+id bob
+
+
+###############################################################################
+# 6. UID
+###############################################################################
+
+# UID signifie :
+
+User Identifier
+
+
+# Il s'agit de l'identifiant numérique
+# associé à un utilisateur.
+#
+# Exemple :
+
+uid=1001(giosue)
+
+
+# Le système Linux utilise principalement
+# cet identifiant pour reconnaître l'utilisateur.
+
+
+###############################################################################
+# 7. GID
+###############################################################################
+
+# GID signifie :
+
+Group Identifier
+
+
+# Il correspond à l'identifiant numérique
+# du groupe principal de l'utilisateur.
+#
+# Exemple :
+
+gid=1001(giosue)
+
+
+###############################################################################
+# 8. CONSULTER LES UTILISATEURS
+###############################################################################
+
+# Les informations concernant les comptes utilisateurs
+# locaux sont notamment disponibles dans :
+
+/etc/passwd
+
+
+# Pour afficher son contenu :
+
+cat /etc/passwd
+
+
+###############################################################################
+# 9. STRUCTURE DE /etc/passwd
+###############################################################################
+
+# Une ligne du fichier /etc/passwd possède
+# généralement la structure suivante :
+
+utilisateur:x:UID:GID:informations:home:shell
+
+
+# Exemple :
+
+giosue:x:1001:1001:Giosue:/home/giosue:/bin/bash
+
+
+# Les différents champs correspondent à :
+#
+# utilisateur
+#     Nom du compte.
+#
+# x
+#     Le mot de passe n'est pas stocké directement
+#     dans /etc/passwd.
+#
+# UID
+#     Identifiant numérique de l'utilisateur.
+#
+# GID
+#     Identifiant numérique du groupe principal.
+#
+# informations
+#     Informations descriptives concernant le compte.
+#
+# home
+#     Répertoire personnel.
+#
+# shell
+#     Shell utilisé par l'utilisateur.
+
+
+###############################################################################
+# 10. RECHERCHER UN UTILISATEUR
+###############################################################################
+
+# La commande getent permet d'interroger
+# la base des utilisateurs connue par le système.
+
+getent passwd giosue
+
+
+# Exemple :
+
+getent passwd bob
+
+
+###############################################################################
+# 11. RECHERCHER UN UTILISATEUR DANS /etc/passwd
+###############################################################################
+
+grep giosue /etc/passwd
+
+
+# Exemple :
+
+grep bob /etc/passwd
+
+
+###############################################################################
+# 12. CRÉER UN UTILISATEUR
+###############################################################################
+
+# Sous Debian, la commande adduser permet
+# de créer simplement un utilisateur.
+
+adduser bob
+
+
+###############################################################################
+# 13. CRÉATION DU COMPTE BOB
+###############################################################################
+
+# Commande utilisée :
+
+adduser bob
+
+
+# Lors de la création, Debian peut demander
+# différentes informations concernant l'utilisateur.
+#
+# La procédure permet notamment :
+#
+# - de créer le compte bob ;
+# - de définir son mot de passe ;
+# - de créer son groupe principal ;
+# - de créer son répertoire personnel ;
+# - de préparer son environnement utilisateur.
+
+
+###############################################################################
+# 14. RÉPERTOIRE PERSONNEL
+###############################################################################
+
+# Le répertoire personnel d'un utilisateur
+# se trouve généralement dans :
+
+/home/
+
+
+# Exemple pour Bob :
+
+/home/bob
+
+
+# Exemple pour Giosue :
+
+/home/giosue
+
+
+###############################################################################
+# 15. VÉRIFIER LE RÉPERTOIRE PERSONNEL
+###############################################################################
+
+ls -l /home
+
+
+# Pour afficher directement le contenu
+# du répertoire de Bob :
+
+ls -la /home/bob
+
+
+###############################################################################
+# 16. VÉRIFIER LA CRÉATION DE BOB
+###############################################################################
+
+getent passwd bob
+
+
+# ou :
+
+grep bob /etc/passwd
+
+
+# ou :
+
+id bob
+
+
+###############################################################################
+# 17. AFFICHER LES GROUPES DE BOB
+###############################################################################
+
+groups bob
+
+
+# Cette commande permet d'afficher les groupes
+# auxquels appartient l'utilisateur.
+
+
+###############################################################################
+# 18. MODIFIER LE MOT DE PASSE D'UN UTILISATEUR
+###############################################################################
+
+# La commande passwd permet de modifier
+# le mot de passe d'un utilisateur.
+
+passwd bob
+
+
+# Le nouveau mot de passe doit ensuite être
+# saisi conformément aux règles du système.
+
+
+###############################################################################
+# 19. MODIFIER SON PROPRE MOT DE PASSE
+###############################################################################
+
+# Un utilisateur peut modifier son propre
+# mot de passe avec :
+
+passwd
+
+
+###############################################################################
+# 20. MOTS DE PASSE SOUS LINUX
+###############################################################################
+
+# Les mots de passe ne sont pas stockés
+# directement en clair dans :
+
+/etc/passwd
+
+
+# Les informations d'authentification protégées
+# des comptes locaux sont notamment associées à :
+
+/etc/shadow
+
+
+# Ce fichier est protégé et n'est normalement
+# accessible qu'avec les privilèges nécessaires.
+
+
+###############################################################################
+# 21. AFFICHER LES INFORMATIONS D'IDENTITÉ
+###############################################################################
+
+id bob
+
+
+# Exemple d'informations retournées :
+
+uid=1002(bob)
+gid=1002(bob)
+groups=1002(bob)
+
+
+# Les valeurs exactes des UID et GID dépendent
+# de l'environnement dans lequel les comptes
+# ont été créés.
+
+
+###############################################################################
+# 22. GROUPE PRINCIPAL
+###############################################################################
+
+# Lors de la création d'un utilisateur avec adduser,
+# Debian crée généralement un groupe principal
+# associé à l'utilisateur.
+#
+# Exemple :
+
+Utilisateur : bob
+Groupe principal : bob
+
+
+# Vérification :
+
+id bob
+
+
+###############################################################################
+# 23. GROUPES SECONDAIRES
+###############################################################################
+
+# Un utilisateur peut appartenir à plusieurs
+# groupes supplémentaires.
+#
+# Exemple :
+
+adduser bob travail
+
+
+# Cette commande ajoute Bob au groupe :
+
+travail
+
+
+###############################################################################
+# 24. AJOUTER UN UTILISATEUR AU GROUPE DIRECTION
+###############################################################################
+
+# Exemple :
+
+adduser giosue direction
+
+
+# Cette commande ajoute l'utilisateur giosue
+# au groupe secondaire direction.
+
+
+###############################################################################
+# 25. VÉRIFIER L'APPARTENANCE AUX GROUPES
+###############################################################################
+
+groups giosue
+
+
+# ou :
+
+id giosue
+
+
+# Exemple pour Bob :
+
+groups bob
+
+id bob
+
+
+###############################################################################
+# 26. CHANGER D'UTILISATEUR
+###############################################################################
+
+# La commande su permet d'ouvrir une session
+# avec un autre utilisateur.
+
+su - bob
+
+
+# Le symbole - permet de charger l'environnement
+# de connexion de l'utilisateur.
+
+
+###############################################################################
+# 27. VÉRIFIER LE CHANGEMENT D'UTILISATEUR
+###############################################################################
+
+whoami
+
+
+# Résultat attendu :
+
+bob
+
+
+###############################################################################
+# 28. VÉRIFIER LE RÉPERTOIRE COURANT
+###############################################################################
+
+pwd
+
+
+# Après :
+
+su - bob
+
+# le répertoire courant doit normalement
+# correspondre au répertoire personnel :
+
+/home/bob
+
+
+###############################################################################
+# 29. QUITTER LA SESSION DE L'UTILISATEUR
+###############################################################################
+
+exit
+
+
+# Cette commande permet de revenir
+# à la session précédente.
+
+
+###############################################################################
+# 30. UTILISATEUR PROPRIÉTAIRE D'UN FICHIER
+###############################################################################
+
+# Chaque fichier Linux possède notamment
+# un utilisateur propriétaire.
+#
+# Cette information peut être consultée avec :
+
+ls -l
+
+
+# Exemple :
+
+-rw-r--r-- 1 giosue direction 100 giosue.txt
+
+
+# Dans cet exemple :
+
+giosue
+
+# est le propriétaire du fichier.
+
+
+###############################################################################
+# 31. MODIFIER LE PROPRIÉTAIRE D'UN FICHIER
+###############################################################################
+
+# La commande chown permet de modifier
+# le propriétaire d'un fichier.
+
+chown giosue giosue.txt
+
+
+###############################################################################
+# 32. VÉRIFIER LE PROPRIÉTAIRE
+###############################################################################
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 33. MODIFIER PROPRIÉTAIRE ET GROUPE
+###############################################################################
+
+# Il est également possible de modifier simultanément
+# le propriétaire et le groupe.
+
+chown giosue:direction giosue.txt
+
+
+###############################################################################
+# 34. VÉRIFICATION
+###############################################################################
+
+ls -l giosue.txt
+
+
+# Le fichier doit maintenant appartenir :
+#
+# Utilisateur :
+# giosue
+#
+# Groupe :
+# direction
+
+
+###############################################################################
+# 35. RELATION ENTRE UTILISATEURS ET PERMISSIONS
+###############################################################################
+
+# Les permissions Linux classiques sont divisées
+# en trois catégories :
+
+U = User
+
+G = Group
+
+O = Other
+
+
+# U correspond au propriétaire du fichier.
+#
+# G correspond au groupe propriétaire.
+#
+# O correspond aux autres utilisateurs.
+
+
+###############################################################################
+# 36. EXEMPLE
+###############################################################################
+
+# Exemple de permissions :
+
+-rwxrwxr-x
+
+
+# Décomposition :
+
+rwx   rwx   r-x
+ │     │     │
+ │     │     └── Other
+ │     │
+ │     └──────── Group
+ │
+ └────────────── User
+
+
+# Le propriétaire du fichier utilise donc
+# la première série de permissions.
+
+
+###############################################################################
+# 37. SUPPRIMER UN UTILISATEUR
+###############################################################################
+
+# Sous Debian, la commande deluser permet
+# de supprimer un compte utilisateur.
+
+deluser bob
+
+
+###############################################################################
+# 38. SUPPRESSION DU RÉPERTOIRE PERSONNEL
+###############################################################################
+
+# Selon le besoin, il est possible de demander
+# également la suppression du répertoire personnel.
+
+deluser --remove-home bob
+
+
+# ATTENTION :
+#
+# Cette opération supprime le compte ainsi que
+# son répertoire personnel.
+#
+# Vérifier les données avant son exécution.
+
+
+###############################################################################
+# 39. VÉRIFIER LA SUPPRESSION
+###############################################################################
+
+getent passwd bob
+
+
+# Si l'utilisateur n'existe plus,
+# aucune entrée correspondant à Bob
+# ne doit être retournée.
+
+
+###############################################################################
+# 40. VÉRIFICATION DANS /etc/passwd
+###############################################################################
+
+grep bob /etc/passwd
+
+
+###############################################################################
+# 41. VÉRIFIER LE RÉPERTOIRE PERSONNEL
+###############################################################################
+
+ls -l /home
+
+
+# Si l'option --remove-home a été utilisée,
+# le répertoire /home/bob ne doit plus être présent.
+
+
+###############################################################################
+# 42. UTILISATEURS DU LABORATOIRE
+###############################################################################
+
+# Les exercices du laboratoire utilisent notamment
+# plusieurs comptes utilisateurs.
+#
+# Parmi les utilisateurs manipulés :
+
+giosue
+
+bob
+
+alice
+
+marc
+
+jenny
+
+
+# La configuration des utilisateurs est documentée dans :
+
+configurations/utilisateurs.txt
+
+
+###############################################################################
+# 43. PROCÉDURE DE CRÉATION D'UN UTILISATEUR
+###############################################################################
+
+# 1 - Créer l'utilisateur :
+
+adduser bob
+
+
+# 2 - Vérifier sa présence :
+
+getent passwd bob
+
+
+# 3 - Afficher ses informations :
+
+id bob
+
+
+# 4 - Vérifier ses groupes :
+
+groups bob
+
+
+# 5 - Vérifier son répertoire personnel :
+
+ls -la /home/bob
+
+
+# 6 - Tester une connexion :
+
+su - bob
+
+
+# 7 - Vérifier l'utilisateur :
+
+whoami
+
+
+# 8 - Quitter :
+
+exit
+
+
+###############################################################################
+# 44. PROCÉDURE D'AJOUT À UN GROUPE
+###############################################################################
+
+# Vérifier que le groupe existe :
+
+getent group direction
+
+
+# Ajouter l'utilisateur :
+
+adduser giosue direction
+
+
+# Vérifier :
+
+groups giosue
+
+
+# Vérification détaillée :
+
+id giosue
+
+
+###############################################################################
+# 45. PROCÉDURE DE MODIFICATION DU PROPRIÉTAIRE
+###############################################################################
+
+# Vérifier le fichier :
+
+ls -l giosue.txt
+
+
+# Modifier le propriétaire :
+
+chown giosue giosue.txt
+
+
+# Modifier le groupe :
+
+chgrp direction giosue.txt
+
+
+# Vérifier :
+
+ls -l giosue.txt
+
+
+###############################################################################
+# 46. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Afficher l'utilisateur actuel :
+
+whoami
+
+
+# Afficher les informations d'identité :
+
+id
+
+
+# Informations d'un utilisateur :
+
+id utilisateur
+
+
+# Consulter les comptes :
+
+cat /etc/passwd
+
+
+# Rechercher un utilisateur :
+
+getent passwd utilisateur
+
+
+# Créer un utilisateur :
+
+adduser utilisateur
+
+
+# Modifier un mot de passe :
+
+passwd utilisateur
+
+
+# Afficher les groupes :
+
+groups utilisateur
+
+
+# Ajouter à un groupe :
+
+adduser utilisateur groupe
+
+
+# Changer d'utilisateur :
+
+su - utilisateur
+
+
+# Quitter une session :
+
+exit
+
+
+# Modifier le propriétaire d'un fichier :
+
+chown utilisateur fichier
+
+
+# Modifier propriétaire et groupe :
+
+chown utilisateur:groupe fichier
+
+
+# Supprimer un utilisateur :
+
+deluser utilisateur
+
+
+# Supprimer utilisateur et répertoire personnel :
+
+deluser --remove-home utilisateur
+
+
+###############################################################################
+# 47. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Permissions classiques UGO :
+
+commandes/permissions-ugo.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# Permissions ACL :
+
+commandes/permissions-acl.txt
+
+
+# Configuration des utilisateurs :
+
+configurations/utilisateurs.txt
+
+
+# Configuration des groupes :
+
+configurations/groupes.txt
+
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 48. VALIDATION
+###############################################################################
+
+# La gestion des utilisateurs est maîtrisée si :
+#
+# [ ] Le rôle d'un utilisateur Linux est compris.
+#
+# [ ] La différence entre utilisateur standard
+#     et compte root est comprise.
+#
+# [ ] whoami permet d'identifier l'utilisateur connecté.
+#
+# [ ] id permet d'afficher l'UID, le GID
+#     et les groupes d'un utilisateur.
+#
+# [ ] /etc/passwd permet de consulter
+#     les informations des comptes locaux.
+#
+# [ ] adduser permet de créer un utilisateur.
+#
+# [ ] passwd permet de modifier un mot de passe.
+#
+# [ ] Le rôle du répertoire /home est compris.
+#
+# [ ] groups permet de vérifier l'appartenance
+#     d'un utilisateur aux groupes.
+#
+# [ ] adduser utilisateur groupe permet d'ajouter
+#     un utilisateur à un groupe sous Debian.
+#
+# [ ] su - utilisateur permet de changer d'utilisateur.
+#
+# [ ] chown permet de modifier le propriétaire
+#     d'un fichier.
+#
+# [ ] deluser permet de supprimer un utilisateur.
+#
+# [ ] La relation entre utilisateur, groupe,
+#     propriétaire et permissions est comprise.
+###############################################################################

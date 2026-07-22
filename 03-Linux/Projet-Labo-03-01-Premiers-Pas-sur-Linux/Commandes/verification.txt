@@ -1,0 +1,942 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Vérification globale du laboratoire
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Vérifier l'installation de Debian
+# - Vérifier la configuration générale du système
+# - Vérifier les utilisateurs
+# - Vérifier les groupes
+# - Vérifier les fichiers et répertoires
+# - Vérifier les permissions UGO
+# - Vérifier les attributs de fichiers
+# - Vérifier les ACL
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DU SYSTÈME
+###############################################################################
+
+# Vérifier la distribution installée :
+
+cat /etc/os-release
+
+
+# Vérifier les informations du noyau :
+
+uname -a
+
+
+# Vérifier le nom de la machine :
+
+hostname
+
+
+###############################################################################
+# 2. VÉRIFICATION DE L'UTILISATEUR CONNECTÉ
+###############################################################################
+
+whoami
+
+
+# Afficher les informations détaillées :
+
+id
+
+
+###############################################################################
+# 3. VÉRIFICATION DU RÉPERTOIRE COURANT
+###############################################################################
+
+pwd
+
+
+# Afficher le contenu du répertoire :
+
+ls
+
+
+# Affichage détaillé :
+
+ls -l
+
+
+###############################################################################
+# 4. VÉRIFICATION DE LA CONFIGURATION RÉSEAU
+###############################################################################
+
+# Afficher les interfaces réseau :
+
+ip a
+
+
+# Afficher les routes :
+
+ip route
+
+
+# Vérifier la connectivité IP :
+
+ping -c 4 8.8.8.8
+
+
+# Vérifier la résolution DNS :
+
+ping -c 4 debian.org
+
+
+###############################################################################
+# 5. VÉRIFICATION DU SERVICE SSH
+###############################################################################
+
+# Si SSH a été installé pendant le laboratoire :
+
+systemctl status ssh
+
+
+# Vérifier le port TCP 22 :
+
+ss -tln
+
+
+###############################################################################
+# 6. VÉRIFICATION DU GESTIONNAIRE DE PAQUETS
+###############################################################################
+
+# Actualiser les informations des dépôts :
+
+apt update
+
+
+# Vérifier les paquets pouvant être mis à jour :
+
+apt list --upgradable
+
+
+###############################################################################
+# 7. VÉRIFICATION DES UTILISATEURS
+###############################################################################
+
+# Afficher les utilisateurs locaux :
+
+cat /etc/passwd
+
+
+# Vérifier un utilisateur précis :
+
+getent passwd giosue
+
+getent passwd bob
+
+getent passwd alice
+
+getent passwd marc
+
+getent passwd jenny
+
+
+###############################################################################
+# 8. VÉRIFICATION DES UID ET GID
+###############################################################################
+
+id giosue
+
+id bob
+
+id alice
+
+id marc
+
+id jenny
+
+
+###############################################################################
+# 9. VÉRIFICATION DES RÉPERTOIRES PERSONNELS
+###############################################################################
+
+ls -l /home
+
+
+# Vérifier par exemple :
+
+ls -la /home/bob
+
+ls -la /home/giosue
+
+
+###############################################################################
+# 10. VÉRIFICATION DES GROUPES
+###############################################################################
+
+# Afficher les groupes locaux :
+
+cat /etc/group
+
+
+# Vérifier les groupes du laboratoire :
+
+getent group travail
+
+getent group direction
+
+getent group compta
+
+getent group rh
+
+getent group marketing
+
+getent group manutentionnaires
+
+
+###############################################################################
+# 11. VÉRIFICATION DES GROUPES D'UN UTILISATEUR
+###############################################################################
+
+groups giosue
+
+groups bob
+
+
+# Affichage détaillé :
+
+id giosue
+
+id bob
+
+
+###############################################################################
+# 12. VÉRIFICATION DE L'APPARTENANCE AU GROUPE DIRECTION
+###############################################################################
+
+getent group direction
+
+
+# Vérifier que l'utilisateur attendu
+# apparaît comme membre du groupe.
+
+
+###############################################################################
+# 13. VÉRIFICATION DU RÉPERTOIRE DE TRAVAIL
+###############################################################################
+
+# Vérifier l'existence de :
+
+/var/exos
+
+
+# Commande :
+
+ls -ld /var/exos
+
+
+# Accéder au répertoire :
+
+cd /var/exos
+
+
+# Vérifier :
+
+pwd
+
+
+###############################################################################
+# 14. VÉRIFICATION DES FICHIERS
+###############################################################################
+
+ls -la /var/exos
+
+
+# Vérifier notamment les fichiers créés
+# pendant les exercices.
+
+
+###############################################################################
+# 15. VÉRIFICATION DU FICHIER GIOSUE.TXT
+###############################################################################
+
+ls -l /var/exos/giosue.txt
+
+
+# Lire son contenu :
+
+cat /var/exos/giosue.txt
+
+
+###############################################################################
+# 16. VÉRIFICATION DU FICHIER BOB.TXT
+###############################################################################
+
+ls -l /var/exos/bob.txt
+
+
+# Lire son contenu :
+
+cat /var/exos/bob.txt
+
+
+###############################################################################
+# 17. VÉRIFICATION DES PERMISSIONS UGO
+###############################################################################
+
+# Afficher les permissions :
+
+ls -l /var/exos
+
+
+# Exemple attendu pour un fichier configuré en 775 :
+
+-rwxrwxr-x
+
+
+###############################################################################
+# 18. VÉRIFICATION DE GIOSUE.TXT
+###############################################################################
+
+ls -l /var/exos/giosue.txt
+
+
+# Vérifier notamment :
+#
+# Propriétaire :
+# giosue
+#
+# Groupe :
+# direction
+#
+# Permissions :
+# rwxrwxr-x
+#
+# si chmod 775 a été appliqué.
+
+
+###############################################################################
+# 19. VÉRIFICATION NUMÉRIQUE DES PERMISSIONS
+###############################################################################
+
+# Afficher les permissions sous forme numérique :
+
+stat -c "%a %n" /var/exos/giosue.txt
+
+
+# Exemple attendu :
+
+775 /var/exos/giosue.txt
+
+
+###############################################################################
+# 20. VÉRIFICATION DU PROPRIÉTAIRE
+###############################################################################
+
+stat -c "%U %n" /var/exos/giosue.txt
+
+
+# Résultat attendu :
+
+giosue /var/exos/giosue.txt
+
+
+###############################################################################
+# 21. VÉRIFICATION DU GROUPE PROPRIÉTAIRE
+###############################################################################
+
+stat -c "%G %n" /var/exos/giosue.txt
+
+
+# Résultat attendu :
+
+direction /var/exos/giosue.txt
+
+
+###############################################################################
+# 22. VÉRIFICATION DES ATTRIBUTS
+###############################################################################
+
+# Afficher les attributs du fichier bob.txt :
+
+lsattr /var/exos/bob.txt
+
+
+###############################################################################
+# 23. VÉRIFICATION DE L'ATTRIBUT IMMUTABLE
+###############################################################################
+
+# Si l'attribut +i a été appliqué :
+
+lsattr /var/exos/bob.txt
+
+
+# Vérifier la présence de :
+
+i
+
+
+# dans les attributs affichés.
+
+
+###############################################################################
+# 24. TEST DE L'ATTRIBUT IMMUTABLE
+###############################################################################
+
+# Tester une modification :
+
+echo "test" >> /var/exos/bob.txt
+
+
+# Si l'attribut immutable est actif,
+# la modification doit être refusée.
+
+
+###############################################################################
+# 25. TEST DE SUPPRESSION DU FICHIER IMMUTABLE
+###############################################################################
+
+rm /var/exos/bob.txt
+
+
+# Si l'attribut immutable est actif,
+# la suppression doit être refusée.
+
+
+###############################################################################
+# 26. RETRAIT DE L'ATTRIBUT IMMUTABLE
+###############################################################################
+
+chattr -i /var/exos/bob.txt
+
+
+# Vérifier :
+
+lsattr /var/exos/bob.txt
+
+
+###############################################################################
+# 27. VÉRIFICATION DU PAQUET ACL
+###############################################################################
+
+# Vérifier que getfacl est disponible :
+
+getfacl --version
+
+
+# Vérifier setfacl :
+
+setfacl --version
+
+
+###############################################################################
+# 28. VÉRIFICATION DES ACL DE GIOSUE.TXT
+###############################################################################
+
+getfacl /var/exos/giosue.txt
+
+
+# Vérifier notamment :
+#
+# - le propriétaire ;
+# - le groupe ;
+# - les permissions classiques ;
+# - les ACL supplémentaires éventuelles.
+
+
+###############################################################################
+# 29. VÉRIFICATION DE L'ACL POUR BOB
+###############################################################################
+
+# Si cette règle a été appliquée :
+
+setfacl -m u:bob:--- /var/exos/giosue.txt
+
+
+# Vérifier avec :
+
+getfacl /var/exos/giosue.txt
+
+
+# Une entrée similaire doit apparaître :
+
+user:bob:---
+
+
+###############################################################################
+# 30. VÉRIFICATION DU SYMBOLE +
+###############################################################################
+
+ls -l /var/exos/giosue.txt
+
+
+# Lorsqu'une ACL étendue est présente,
+# un symbole + peut apparaître après
+# les permissions classiques.
+#
+# Exemple :
+
+-rwxrwxr-x+
+
+
+###############################################################################
+# 31. TEST DE L'ACL AVEC BOB
+###############################################################################
+
+# Passer sur le compte Bob :
+
+su - bob
+
+
+# Tester la lecture du fichier :
+
+cat /var/exos/giosue.txt
+
+
+# Si Bob possède l'ACL :
+
+user:bob:---
+
+# l'accès doit être refusé.
+
+
+###############################################################################
+# 32. RETOUR À LA SESSION PRÉCÉDENTE
+###############################################################################
+
+exit
+
+
+###############################################################################
+# 33. VÉRIFICATION DES TROIS COUCHES DE PERMISSIONS
+###############################################################################
+
+# Dans ce laboratoire, trois mécanismes
+# sont étudiés :
+
+
+# 1 - UGO
+
+ls -l /var/exos/giosue.txt
+
+
+# 2 - Attributs
+
+lsattr /var/exos/bob.txt
+
+
+# 3 - ACL
+
+getfacl /var/exos/giosue.txt
+
+
+###############################################################################
+# 34. SCHÉMA DE VÉRIFICATION
+###############################################################################
+
+#                  Fichier Linux
+#                       │
+#          ┌────────────┼────────────┐
+#          │            │            │
+#          ▼            ▼            ▼
+#         UGO        Attributs       ACL
+#          │            │            │
+#          ▼            ▼            ▼
+#       ls -l        lsattr       getfacl
+#       chmod        chattr       setfacl
+#       chown
+#       chgrp
+
+
+###############################################################################
+# 35. VÉRIFICATION DES COMMANDES PRINCIPALES
+###############################################################################
+
+# Utilisateurs :
+
+adduser
+
+deluser
+
+passwd
+
+whoami
+
+id
+
+
+# Groupes :
+
+addgroup
+
+delgroup
+
+groups
+
+getent
+
+
+# Fichiers et répertoires :
+
+pwd
+
+ls
+
+cd
+
+mkdir
+
+touch
+
+nano
+
+cat
+
+cp
+
+mv
+
+rm
+
+
+# Permissions :
+
+chmod
+
+chown
+
+chgrp
+
+
+# Attributs :
+
+chattr
+
+lsattr
+
+
+# ACL :
+
+setfacl
+
+getfacl
+
+
+###############################################################################
+# 36. COMMANDES DE DIAGNOSTIC RAPIDE
+###############################################################################
+
+# Système :
+
+cat /etc/os-release
+
+uname -a
+
+
+# Utilisateur :
+
+whoami
+
+id
+
+
+# Réseau :
+
+ip a
+
+ip route
+
+
+# Utilisateurs :
+
+cat /etc/passwd
+
+
+# Groupes :
+
+cat /etc/group
+
+
+# Fichiers :
+
+ls -la /var/exos
+
+
+# Permissions :
+
+ls -l /var/exos
+
+
+# Attributs :
+
+lsattr /var/exos/bob.txt
+
+
+# ACL :
+
+getfacl /var/exos/giosue.txt
+
+
+###############################################################################
+# 37. ORDRE DE VÉRIFICATION CONSEILLÉ
+###############################################################################
+
+# En cas de problème, vérifier dans cet ordre :
+#
+# 1. Le système Debian démarre.
+#        |
+#        v
+# 2. L'utilisateur peut se connecter.
+#        |
+#        v
+# 3. La configuration réseau fonctionne.
+#        |
+#        v
+# 4. Les utilisateurs existent.
+#        |
+#        v
+# 5. Les groupes existent.
+#        |
+#        v
+# 6. Les fichiers et répertoires existent.
+#        |
+#        v
+# 7. Les propriétaires sont corrects.
+#        |
+#        v
+# 8. Les permissions UGO sont correctes.
+#        |
+#        v
+# 9. Les attributs sont corrects.
+#        |
+#        v
+# 10. Les ACL sont correctes.
+
+
+###############################################################################
+# 38. VALIDATION - INSTALLATION DEBIAN
+###############################################################################
+
+# [ ] Debian démarre correctement.
+#
+# [ ] GRUB fonctionne.
+#
+# [ ] L'utilisateur peut ouvrir une session.
+#
+# [ ] whoami retourne correctement l'utilisateur.
+#
+# [ ] hostname retourne le nom de la machine.
+#
+# [ ] cat /etc/os-release identifie Debian.
+#
+# [ ] Le réseau est opérationnel.
+#
+# [ ] SSH fonctionne s'il a été installé.
+
+
+###############################################################################
+# 39. VALIDATION - UTILISATEURS
+###############################################################################
+
+# [ ] Les utilisateurs nécessaires existent.
+#
+# [ ] Les comptes sont visibles dans /etc/passwd.
+#
+# [ ] Les UID et GID peuvent être vérifiés avec id.
+#
+# [ ] Les répertoires personnels existent.
+#
+# [ ] Les utilisateurs peuvent changer de session
+#     avec su lorsque cela est autorisé.
+
+
+###############################################################################
+# 40. VALIDATION - GROUPES
+###############################################################################
+
+# [ ] Les groupes du laboratoire existent.
+#
+# [ ] Les groupes apparaissent dans /etc/group.
+#
+# [ ] getent group retourne les groupes attendus.
+#
+# [ ] Les utilisateurs appartiennent
+#     aux groupes prévus.
+#
+# [ ] groups et id permettent
+#     de vérifier leur appartenance.
+
+
+###############################################################################
+# 41. VALIDATION - FICHIERS ET RÉPERTOIRES
+###############################################################################
+
+# [ ] /var/exos existe.
+#
+# [ ] Les fichiers du laboratoire existent.
+#
+# [ ] mkdir permet de créer des répertoires.
+#
+# [ ] touch permet de créer des fichiers.
+#
+# [ ] nano permet de modifier les fichiers.
+#
+# [ ] cat permet d'afficher leur contenu.
+#
+# [ ] cp permet de copier.
+#
+# [ ] mv permet de déplacer ou renommer.
+#
+# [ ] rm permet de supprimer les éléments
+#     lorsque les permissions l'autorisent.
+
+
+###############################################################################
+# 42. VALIDATION - PERMISSIONS UGO
+###############################################################################
+
+# [ ] La signification de U, G et O est comprise.
+#
+# [ ] La signification de R, W et X est comprise.
+#
+# [ ] Les valeurs 4, 2 et 1 sont comprises.
+#
+# [ ] chmod permet de modifier les permissions.
+#
+# [ ] chown permet de modifier le propriétaire.
+#
+# [ ] chgrp permet de modifier le groupe.
+#
+# [ ] chmod 775 est correctement interprété.
+#
+# [ ] Les permissions peuvent être contrôlées
+#     avec ls -l et stat.
+
+
+###############################################################################
+# 43. VALIDATION - ATTRIBUTS
+###############################################################################
+
+# [ ] chattr +i permet de rendre un fichier immuable.
+#
+# [ ] lsattr permet de vérifier les attributs.
+#
+# [ ] Un fichier immutable ne peut pas être
+#     modifié normalement.
+#
+# [ ] Un fichier immutable ne peut pas être
+#     supprimé normalement.
+#
+# [ ] chattr -i permet de retirer l'attribut.
+
+
+###############################################################################
+# 44. VALIDATION - ACL
+###############################################################################
+
+# [ ] Le paquet acl est installé.
+#
+# [ ] getfacl permet de consulter les ACL.
+#
+# [ ] setfacl permet d'ajouter une ACL.
+#
+# [ ] Une règle spécifique peut être appliquée
+#     à Bob sur giosue.txt.
+#
+# [ ] La présence d'une ACL est vérifiable
+#     avec getfacl.
+#
+# [ ] Le symbole + peut être identifié
+#     dans ls -l lorsqu'une ACL étendue existe.
+#
+# [ ] Les permissions effectives peuvent être testées
+#     en changeant d'utilisateur.
+
+
+###############################################################################
+# 45. VALIDATION FINALE DU LABORATOIRE
+###############################################################################
+
+# Le laboratoire est considéré comme terminé si :
+#
+# [ ] Debian GNU/Linux est installé et opérationnel.
+#
+# [ ] Les premières commandes Linux sont maîtrisées.
+#
+# [ ] Les utilisateurs peuvent être créés et administrés.
+#
+# [ ] Les groupes peuvent être créés et administrés.
+#
+# [ ] Les utilisateurs peuvent être affectés à des groupes.
+#
+# [ ] Les fichiers et répertoires peuvent être manipulés.
+#
+# [ ] Les propriétaires et groupes propriétaires
+#     peuvent être modifiés.
+#
+# [ ] Les permissions UGO sont comprises et configurables.
+#
+# [ ] Les attributs de fichiers sont compris.
+#
+# [ ] L'attribut immutable peut être appliqué et retiré.
+#
+# [ ] Les ACL permettent de définir
+#     des autorisations plus précises.
+#
+# [ ] Les commandes de vérification permettent
+#     de contrôler l'état de la configuration.
+#
+# [ ] Le système est prêt pour des laboratoires
+#     Linux plus avancés.
+###############################################################################
+
+
+###############################################################################
+# 46. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Installation Debian :
+
+commandes/installation-debian.txt
+
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Permissions UGO :
+
+commandes/permissions-ugo.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# Permissions ACL :
+
+commandes/permissions-acl.txt
+
+
+# Configurations :
+
+configurations/utilisateurs.txt
+
+configurations/groupes.txt
+
+configurations/permissions/permissions-ugo.txt
+
+configurations/permissions/attributs.txt
+
+configurations/permissions/acl.txt
+###############################################################################

@@ -1,0 +1,969 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Installation de Debian GNU/Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Environnement :
+# - Machine virtuelle
+# - VirtualBox
+#
+# Objectifs :
+# - Installer Debian GNU/Linux
+# - Comprendre les principales étapes d'installation
+# - Configurer les paramètres de base du système
+# - Créer les comptes nécessaires
+# - Configurer le partitionnement
+# - Installer les composants du système
+# - Installer le chargeur d'amorçage GRUB
+# - Vérifier le fonctionnement du système après installation
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Debian est une distribution GNU/Linux.
+#
+# Dans ce laboratoire, Debian est installé dans une machine virtuelle
+# afin de disposer d'un environnement permettant de découvrir
+# progressivement l'administration d'un système Linux.
+#
+# Le laboratoire permet notamment d'aborder :
+#
+# - l'installation du système ;
+# - l'utilisation du terminal ;
+# - la gestion des utilisateurs ;
+# - la gestion des groupes ;
+# - la manipulation des fichiers et répertoires ;
+# - les permissions UGO ;
+# - les attributs de fichiers ;
+# - les ACL.
+
+
+###############################################################################
+# 2. PRÉPARATION DE LA MACHINE VIRTUELLE
+###############################################################################
+
+# Créer une nouvelle machine virtuelle destinée à Debian.
+#
+# Paramètres utilisés dans le laboratoire :
+#
+# Système :
+# Debian GNU/Linux
+#
+# Mémoire vive :
+# 1024 Mo
+#
+# Stockage :
+# 10 Go
+#
+# Réseau :
+# Accès par pont
+#
+# Un fichier ISO Debian est utilisé comme support
+# d'installation du système.
+
+
+###############################################################################
+# 3. DÉMARRAGE DE LA MACHINE VIRTUELLE
+###############################################################################
+
+# Démarrer la machine virtuelle.
+#
+# Vérifier que la machine démarre sur l'image ISO Debian.
+#
+# Le programme d'installation Debian doit apparaître.
+
+
+###############################################################################
+# 4. LANCEMENT DE L'INSTALLATION
+###############################################################################
+
+# Depuis le menu d'installation Debian,
+# lancer l'installation du système.
+#
+# Suivre ensuite les différentes étapes proposées
+# par l'installateur Debian.
+
+
+###############################################################################
+# 5. SÉLECTION DE LA LANGUE
+###############################################################################
+
+# Sélectionner la langue utilisée pendant
+# l'installation et pour le système.
+#
+# Exemple :
+
+Français
+
+
+###############################################################################
+# 6. SÉLECTION DE LA LOCALISATION
+###############################################################################
+
+# Sélectionner la localisation géographique
+# correspondant à l'environnement.
+#
+# Exemple :
+
+France
+
+
+###############################################################################
+# 7. CONFIGURATION DU CLAVIER
+###############################################################################
+
+# Sélectionner la disposition du clavier.
+#
+# Exemple :
+
+Français
+
+
+# Vérifier que la disposition correspond bien
+# au clavier utilisé avant de poursuivre.
+
+
+###############################################################################
+# 8. CHARGEMENT DES COMPOSANTS
+###############################################################################
+
+# L'installateur Debian charge automatiquement
+# les composants nécessaires à la poursuite
+# de l'installation.
+#
+# Patienter jusqu'à la fin de cette étape.
+
+
+###############################################################################
+# 9. DÉTECTION DU MATÉRIEL RÉSEAU
+###############################################################################
+
+# Debian détecte les interfaces réseau disponibles
+# dans la machine virtuelle.
+#
+# La carte réseau virtuelle configurée dans VirtualBox
+# doit être détectée par le système.
+
+
+###############################################################################
+# 10. CONFIGURATION DU RÉSEAU
+###############################################################################
+
+# L'installateur procède à la configuration
+# du réseau.
+#
+# Selon l'environnement, une configuration réseau
+# peut être obtenue automatiquement.
+#
+# Vérifier que l'interface réseau est correctement
+# détectée avant de poursuivre.
+
+
+###############################################################################
+# 11. CONFIGURATION DU NOM DE MACHINE
+###############################################################################
+
+# Définir le nom permettant d'identifier
+# la machine Debian sur le réseau.
+#
+# Le nom choisi doit permettre d'identifier
+# facilement le système dans le laboratoire.
+
+
+###############################################################################
+# 12. CONFIGURATION DU NOM DE DOMAINE
+###############################################################################
+
+# Si l'installateur demande un nom de domaine,
+# renseigner celui prévu pour l'environnement
+# ou laisser le champ vide lorsqu'aucun domaine
+# particulier n'est utilisé dans le laboratoire.
+
+
+###############################################################################
+# 13. CONFIGURATION DU COMPTE ROOT
+###############################################################################
+
+# Selon la méthode d'installation choisie,
+# Debian peut proposer la configuration
+# du compte administrateur root.
+#
+# root correspond au compte disposant
+# des privilèges administrateur du système.
+#
+# Utiliser uniquement un mot de passe de laboratoire.
+#
+# Ne jamais publier un véritable mot de passe
+# dans le dépôt GitHub.
+
+
+###############################################################################
+# 14. CRÉATION DE L'UTILISATEUR PRINCIPAL
+###############################################################################
+
+# L'installation permet également de créer
+# un compte utilisateur standard.
+#
+# Ce compte sera utilisé pour les opérations
+# quotidiennes sur le système.
+#
+# L'installateur demande notamment :
+#
+# - le nom complet ;
+# - le nom du compte utilisateur ;
+# - le mot de passe.
+
+
+###############################################################################
+# 15. UTILISATEUR STANDARD ET ROOT
+###############################################################################
+
+# Il est important de distinguer :
+#
+# root
+#     Compte administrateur disposant de privilèges élevés.
+#
+# utilisateur standard
+#     Compte utilisé pour les opérations courantes.
+#
+# L'utilisation d'un compte standard permet de limiter
+# les opérations réalisées directement avec
+# les privilèges administrateur.
+
+
+###############################################################################
+# 16. CONFIGURATION DE L'HORLOGE
+###############################################################################
+
+# Configurer le fuseau horaire proposé
+# par l'installateur.
+#
+# Vérifier que la localisation correspond
+# à l'environnement utilisé.
+
+
+###############################################################################
+# 17. PARTITIONNEMENT DU DISQUE
+###############################################################################
+
+# L'installateur Debian propose plusieurs méthodes
+# de partitionnement.
+#
+# Dans un environnement de laboratoire,
+# le partitionnement guidé permet de simplifier
+# l'installation.
+#
+# Le disque virtuel concerné est celui créé
+# pour la machine virtuelle.
+
+
+###############################################################################
+# 18. SÉLECTION DU DISQUE
+###############################################################################
+
+# Sélectionner le disque virtuel destiné
+# à l'installation de Debian.
+#
+# Vérifier attentivement le disque sélectionné
+# avant de valider le partitionnement.
+
+
+###############################################################################
+# 19. ORGANISATION DES PARTITIONS
+###############################################################################
+
+# Sélectionner l'organisation des partitions
+# prévue dans le laboratoire.
+#
+# Pour un premier environnement Linux,
+# une organisation simple permet de faciliter
+# la compréhension et l'administration du système.
+
+
+###############################################################################
+# 20. VALIDATION DU PARTITIONNEMENT
+###############################################################################
+
+# Vérifier le récapitulatif proposé
+# par l'installateur.
+#
+# Terminer le partitionnement puis confirmer
+# l'écriture des modifications sur le disque.
+#
+# ATTENTION :
+#
+# Cette opération modifie le contenu du disque
+# sélectionné.
+#
+# Dans ce laboratoire, il s'agit du disque virtuel
+# réservé à la machine Debian.
+
+
+###############################################################################
+# 21. INSTALLATION DU SYSTÈME DE BASE
+###############################################################################
+
+# Debian installe ensuite le système de base.
+#
+# Cette étape copie et configure les composants
+# nécessaires au fonctionnement initial
+# du système GNU/Linux.
+#
+# Patienter jusqu'à la fin de l'installation.
+
+
+###############################################################################
+# 22. CONFIGURATION DU GESTIONNAIRE DE PAQUETS
+###############################################################################
+
+# Debian utilise le système de gestion
+# de paquets APT.
+#
+# Durant l'installation, le programme peut proposer
+# la configuration d'un miroir Debian.
+#
+# Ce miroir permettra notamment de :
+#
+# - télécharger les paquets ;
+# - installer des logiciels ;
+# - récupérer les mises à jour.
+
+
+###############################################################################
+# 23. SÉLECTION DU PAYS DU MIROIR
+###############################################################################
+
+# Sélectionner le pays correspondant au miroir
+# Debian souhaité.
+#
+# Exemple :
+
+France
+
+
+###############################################################################
+# 24. SÉLECTION DU MIROIR DEBIAN
+###############################################################################
+
+# Sélectionner ensuite un serveur miroir Debian
+# proposé par l'installateur.
+#
+# Le miroir sera utilisé par le gestionnaire
+# de paquets pour récupérer les logiciels.
+
+
+###############################################################################
+# 25. PROXY HTTP
+###############################################################################
+
+# Si aucun proxy HTTP n'est utilisé dans
+# l'environnement de laboratoire, laisser
+# le champ correspondant vide.
+#
+# Si un proxy est nécessaire, renseigner
+# les paramètres correspondant à l'environnement.
+
+
+###############################################################################
+# 26. CONFIGURATION D'APT
+###############################################################################
+
+# L'installateur configure ensuite automatiquement
+# les sources de paquets nécessaires.
+#
+# Une fois le système installé, APT pourra
+# notamment être utilisé avec :
+
+apt update
+
+apt install nom_paquet
+
+
+###############################################################################
+# 27. SÉLECTION DES LOGICIELS
+###############################################################################
+
+# L'installateur Debian permet de sélectionner
+# les logiciels et services à installer.
+#
+# Dans le cadre de ce laboratoire, l'objectif
+# est de disposer d'un système permettant
+# principalement de travailler en ligne de commande.
+
+
+###############################################################################
+# 28. INSTALLATION DU SERVEUR SSH
+###############################################################################
+
+# Le serveur SSH peut être sélectionné
+# pendant l'installation.
+#
+# SSH permet d'administrer une machine Linux
+# à distance depuis un autre équipement.
+#
+# Le service pourra ensuite être contrôlé
+# après l'installation.
+
+
+###############################################################################
+# 29. INSTALLATION DES UTILITAIRES STANDARD
+###############################################################################
+
+# Conserver les utilitaires système standard
+# nécessaires à l'utilisation et à l'administration
+# de Debian.
+
+
+###############################################################################
+# 30. INSTALLATION DES PAQUETS
+###############################################################################
+
+# Debian procède ensuite à l'installation
+# des logiciels sélectionnés.
+#
+# Patienter jusqu'à la fin de cette étape.
+
+
+###############################################################################
+# 31. INSTALLATION DE GRUB
+###############################################################################
+
+# GRUB signifie :
+
+GRand Unified Bootloader
+
+
+# GRUB est le chargeur d'amorçage utilisé
+# pour permettre le démarrage du système.
+#
+# Accepter l'installation de GRUB lorsque
+# l'installateur Debian le propose.
+
+
+###############################################################################
+# 32. SÉLECTION DU DISQUE POUR GRUB
+###############################################################################
+
+# Sélectionner le disque virtuel sur lequel
+# Debian vient d'être installé.
+#
+# GRUB sera installé sur ce disque afin
+# de permettre le démarrage du système.
+
+
+###############################################################################
+# 33. FIN DE L'INSTALLATION
+###############################################################################
+
+# Une fois l'installation terminée,
+# Debian affiche un message indiquant
+# que l'installation est terminée.
+#
+# Valider pour redémarrer la machine.
+
+
+###############################################################################
+# 34. RETRAIT DU SUPPORT D'INSTALLATION
+###############################################################################
+
+# Après l'installation, vérifier que la machine
+# ne redémarre plus sur l'image ISO d'installation.
+#
+# Si nécessaire, retirer l'image ISO du lecteur
+# virtuel de la machine.
+
+
+###############################################################################
+# 35. PREMIER DÉMARRAGE
+###############################################################################
+
+# Après le redémarrage, GRUB doit apparaître
+# puis Debian doit démarrer depuis le disque virtuel.
+#
+# Attendre l'apparition de l'écran de connexion.
+
+
+###############################################################################
+# 36. PREMIÈRE CONNEXION
+###############################################################################
+
+# Se connecter avec le compte utilisateur
+# créé pendant l'installation.
+#
+# Saisir :
+#
+# login
+#
+# puis :
+#
+# mot de passe
+
+
+###############################################################################
+# 37. VÉRIFIER L'UTILISATEUR CONNECTÉ
+###############################################################################
+
+whoami
+
+
+# Cette commande doit afficher le nom
+# de l'utilisateur actuellement connecté.
+
+
+###############################################################################
+# 38. VÉRIFIER LES INFORMATIONS DE L'UTILISATEUR
+###############################################################################
+
+id
+
+
+# Cette commande permet notamment d'afficher :
+#
+# - UID ;
+# - GID ;
+# - groupes.
+
+
+###############################################################################
+# 39. VÉRIFIER LE RÉPERTOIRE COURANT
+###############################################################################
+
+pwd
+
+
+# Après une connexion utilisateur classique,
+# le répertoire courant se situe généralement
+# dans le répertoire personnel de l'utilisateur.
+#
+# Exemple :
+
+/home/utilisateur
+
+
+###############################################################################
+# 40. VÉRIFIER LE SYSTÈME
+###############################################################################
+
+# Afficher les informations du noyau :
+
+uname -a
+
+
+# Afficher les informations de la distribution :
+
+cat /etc/os-release
+
+
+###############################################################################
+# 41. VÉRIFIER LE NOM DE LA MACHINE
+###############################################################################
+
+hostname
+
+
+# Cette commande affiche le nom configuré
+# pour la machine Debian.
+
+
+###############################################################################
+# 42. VÉRIFIER LA CONFIGURATION RÉSEAU
+###############################################################################
+
+ip addr
+
+
+# ou sous forme abrégée :
+
+ip a
+
+
+# Cette commande permet notamment de vérifier :
+#
+# - les interfaces réseau ;
+# - leur état ;
+# - les adresses IP.
+
+
+###############################################################################
+# 43. AFFICHER LES ROUTES
+###############################################################################
+
+ip route
+
+
+# Cette commande permet notamment d'identifier
+# la route par défaut utilisée par le système.
+
+
+###############################################################################
+# 44. TESTER LA CONNECTIVITÉ RÉSEAU
+###############################################################################
+
+# Exemple de test vers une adresse IP :
+
+ping -c 4 8.8.8.8
+
+
+# Ce test permet de vérifier la connectivité IP
+# si l'environnement dispose d'un accès réseau.
+
+
+###############################################################################
+# 45. TESTER LA RÉSOLUTION DNS
+###############################################################################
+
+# Exemple :
+
+ping -c 4 debian.org
+
+
+# Si le nom est correctement résolu,
+# la configuration DNS fonctionne.
+
+
+###############################################################################
+# 46. VÉRIFIER LE SERVICE SSH
+###############################################################################
+
+# Si le serveur SSH a été installé :
+
+systemctl status ssh
+
+
+# Cette commande permet de consulter
+# l'état du service SSH.
+
+
+###############################################################################
+# 47. VÉRIFIER LE PORT SSH
+###############################################################################
+
+# Selon les outils disponibles :
+
+ss -tln
+
+
+# Le service SSH utilise généralement
+# le port TCP 22 par défaut.
+
+
+###############################################################################
+# 48. METTRE À JOUR LA LISTE DES PAQUETS
+###############################################################################
+
+# Avec les privilèges nécessaires :
+
+apt update
+
+
+# Cette commande récupère les informations
+# disponibles depuis les dépôts configurés.
+
+
+###############################################################################
+# 49. MISE À JOUR DES PAQUETS
+###############################################################################
+
+# Pour installer les mises à jour disponibles :
+
+apt upgrade
+
+
+# Vérifier les paquets concernés avant
+# de confirmer l'opération.
+
+
+###############################################################################
+# 50. VÉRIFIER LES SOURCES APT
+###############################################################################
+
+# Selon la version/configuration de Debian,
+# les sources APT peuvent notamment être consultées
+# dans /etc/apt/ et ses fichiers de configuration.
+#
+# Exemple :
+
+ls -l /etc/apt/
+
+
+###############################################################################
+# 51. PREMIÈRES COMMANDES LINUX
+###############################################################################
+
+# Une fois Debian installé, plusieurs commandes
+# permettent de commencer à manipuler le système.
+
+
+# Utilisateur actuel :
+
+whoami
+
+
+# Informations utilisateur :
+
+id
+
+
+# Répertoire courant :
+
+pwd
+
+
+# Contenu du répertoire :
+
+ls
+
+
+# Affichage détaillé :
+
+ls -l
+
+
+# Changer de répertoire :
+
+cd /var
+
+
+# Revenir au répertoire personnel :
+
+cd ~
+
+
+###############################################################################
+# 52. PASSAGE EN ROOT
+###############################################################################
+
+# Si un mot de passe root a été configuré,
+# il est possible d'ouvrir une session root avec :
+
+su -
+
+
+# Vérifier ensuite :
+
+whoami
+
+
+# Résultat attendu :
+
+root
+
+
+###############################################################################
+# 53. QUITTER LA SESSION ROOT
+###############################################################################
+
+exit
+
+
+# Cette commande permet de revenir
+# à la session utilisateur précédente.
+
+
+###############################################################################
+# 54. CRÉATION DU RÉPERTOIRE DE TRAVAIL
+###############################################################################
+
+# Les exercices suivants du laboratoire utilisent
+# notamment le répertoire :
+
+/var/exos
+
+
+# Création :
+
+mkdir /var/exos
+
+
+# Accès :
+
+cd /var/exos
+
+
+# Vérification :
+
+pwd
+
+
+###############################################################################
+# 55. SUITE DU LABORATOIRE
+###############################################################################
+
+# Après l'installation de Debian, le laboratoire
+# se poursuit avec plusieurs notions fondamentales :
+#
+# 1 - Gestion des utilisateurs
+#
+# 2 - Gestion des groupes
+#
+# 3 - Gestion des fichiers et répertoires
+#
+# 4 - Permissions UGO
+#
+# 5 - Attributs de fichiers
+#
+# 6 - Permissions ACL
+
+
+###############################################################################
+# 56. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Utilisateur connecté :
+
+whoami
+
+
+# Informations utilisateur :
+
+id
+
+
+# Informations système :
+
+uname -a
+
+
+# Informations Debian :
+
+cat /etc/os-release
+
+
+# Nom de la machine :
+
+hostname
+
+
+# Configuration réseau :
+
+ip a
+
+
+# Routes :
+
+ip route
+
+
+# Test réseau :
+
+ping -c 4 adresse_ip
+
+
+# État SSH :
+
+systemctl status ssh
+
+
+# Liste des ports en écoute :
+
+ss -tln
+
+
+# Actualiser les informations des paquets :
+
+apt update
+
+
+# Mettre à jour les paquets :
+
+apt upgrade
+
+
+# Passer en root :
+
+su -
+
+
+# Quitter une session :
+
+exit
+
+
+###############################################################################
+# 57. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Gestion des fichiers et répertoires :
+
+commandes/gestion-fichiers-repertoires.txt
+
+
+# Permissions classiques UGO :
+
+commandes/permissions-ugo.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# Permissions ACL :
+
+commandes/permissions-acl.txt
+
+
+# Vérifications générales :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 58. VALIDATION
+###############################################################################
+
+# L'installation est considérée comme fonctionnelle si :
+#
+# [ ] La machine virtuelle démarre correctement.
+#
+# [ ] Debian démarre depuis le disque virtuel.
+#
+# [ ] GRUB est fonctionnel.
+#
+# [ ] L'écran de connexion Debian apparaît.
+#
+# [ ] L'utilisateur créé pendant l'installation
+#     peut ouvrir une session.
+#
+# [ ] whoami retourne correctement
+#     l'utilisateur connecté.
+#
+# [ ] id affiche les informations de l'utilisateur.
+#
+# [ ] hostname affiche le nom de la machine.
+#
+# [ ] cat /etc/os-release permet d'identifier Debian.
+#
+# [ ] ip a affiche l'interface réseau.
+#
+# [ ] ip route affiche la table de routage.
+#
+# [ ] La connectivité réseau fonctionne
+#     lorsque le réseau est disponible.
+#
+# [ ] La résolution DNS fonctionne
+#     lorsque le réseau est disponible.
+#
+# [ ] Le service SSH fonctionne
+#     s'il a été installé.
+#
+# [ ] APT peut accéder aux dépôts configurés.
+#
+# [ ] Le système est prêt pour la suite
+#     des exercices d'administration Linux.
+###############################################################################

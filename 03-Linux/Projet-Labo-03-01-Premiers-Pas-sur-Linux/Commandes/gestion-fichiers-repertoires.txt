@@ -1,0 +1,847 @@
+###############################################################################
+# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Gestion des fichiers et répertoires sous Linux
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Commandes principales :
+# - pwd
+# - ls
+# - cd
+# - mkdir
+# - touch
+# - nano
+# - cat
+# - cp
+# - mv
+# - rm
+# - rmdir
+#
+# Objectifs :
+# - Comprendre l'arborescence Linux
+# - Naviguer dans les répertoires
+# - Créer et manipuler des fichiers
+# - Créer et supprimer des répertoires
+# - Copier et déplacer des fichiers
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+# Linux utilise une organisation hiérarchique des fichiers
+# et des répertoires.
+#
+# Le point de départ de cette arborescence est :
+
+/
+
+# Il représente la racine du système de fichiers.
+#
+# Exemple simplifié :
+
+/
+├── bin
+├── boot
+├── dev
+├── etc
+├── home
+├── root
+├── tmp
+├── usr
+└── var
+
+
+###############################################################################
+# 2. AFFICHER LE RÉPERTOIRE COURANT
+###############################################################################
+
+# La commande pwd permet d'afficher le chemin absolu
+# du répertoire dans lequel l'utilisateur se trouve.
+
+pwd
+
+
+###############################################################################
+# 3. AFFICHER LE CONTENU D'UN RÉPERTOIRE
+###############################################################################
+
+ls
+
+# Affiche les fichiers et répertoires présents
+# dans le répertoire courant.
+
+
+###############################################################################
+# 4. AFFICHAGE DÉTAILLÉ
+###############################################################################
+
+ls -l
+
+# L'option -l permet d'obtenir un affichage détaillé.
+#
+# Les informations affichées comprennent notamment :
+#
+# - le type de fichier ;
+# - les permissions ;
+# - le nombre de liens ;
+# - le propriétaire ;
+# - le groupe ;
+# - la taille ;
+# - la date de modification ;
+# - le nom du fichier.
+
+
+###############################################################################
+# 5. AFFICHER LES FICHIERS CACHÉS
+###############################################################################
+
+ls -a
+
+# Sous Linux, les fichiers dont le nom commence
+# par un point sont considérés comme cachés.
+
+
+###############################################################################
+# 6. AFFICHAGE DÉTAILLÉ AVEC FICHIERS CACHÉS
+###############################################################################
+
+ls -la
+
+# Combine :
+#
+# -l = affichage détaillé
+# -a = affichage des fichiers cachés
+
+
+###############################################################################
+# 7. CHANGER DE RÉPERTOIRE
+###############################################################################
+
+# La commande cd permet de changer de répertoire.
+
+cd /var
+
+
+###############################################################################
+# 8. REVENIR AU RÉPERTOIRE PARENT
+###############################################################################
+
+cd ..
+
+# Exemple :
+#
+# Si le répertoire courant est :
+
+/var/exos
+
+# après :
+
+cd ..
+
+# le répertoire courant devient :
+
+/var
+
+
+###############################################################################
+# 9. REVENIR AU RÉPERTOIRE PERSONNEL
+###############################################################################
+
+cd ~
+
+# ou simplement :
+
+cd
+
+
+###############################################################################
+# 10. ACCÉDER À LA RACINE
+###############################################################################
+
+cd /
+
+
+###############################################################################
+# 11. CRÉER UN RÉPERTOIRE
+###############################################################################
+
+# La commande mkdir permet de créer un répertoire.
+
+mkdir /var/exos
+
+# Dans le laboratoire, le répertoire :
+
+/var/exos
+
+# est utilisé pour réaliser différents exercices
+# de manipulation des fichiers et permissions.
+
+
+###############################################################################
+# 12. VÉRIFIER LA CRÉATION DU RÉPERTOIRE
+###############################################################################
+
+ls -l /var
+
+# Vérifier la présence du répertoire :
+
+exos
+
+
+###############################################################################
+# 13. ACCÉDER AU RÉPERTOIRE EXOS
+###############################################################################
+
+cd /var/exos
+
+
+###############################################################################
+# 14. VÉRIFIER LE RÉPERTOIRE COURANT
+###############################################################################
+
+pwd
+
+# Résultat attendu :
+
+/var/exos
+
+
+###############################################################################
+# 15. CRÉER PLUSIEURS RÉPERTOIRES
+###############################################################################
+
+mkdir repertoire1 repertoire2 repertoire3
+
+
+###############################################################################
+# 16. CRÉER UNE ARBORESCENCE
+###############################################################################
+
+# L'option -p permet de créer plusieurs niveaux
+# de répertoires en une seule commande.
+
+mkdir -p dossier1/dossier2/dossier3
+
+
+###############################################################################
+# 17. CRÉER UN FICHIER VIDE
+###############################################################################
+
+# La commande touch permet notamment de créer
+# un fichier vide.
+
+touch bob.txt
+
+
+###############################################################################
+# 18. VÉRIFIER LA CRÉATION DU FICHIER
+###############################################################################
+
+ls -l
+
+# Le fichier suivant doit apparaître :
+
+bob.txt
+
+
+###############################################################################
+# 19. CRÉER PLUSIEURS FICHIERS
+###############################################################################
+
+touch fichier1.txt fichier2.txt fichier3.txt
+
+
+###############################################################################
+# 20. MODIFIER UN FICHIER AVEC NANO
+###############################################################################
+
+nano bob.txt
+
+# Nano est un éditeur de texte utilisable
+# directement depuis le terminal.
+#
+# Dans Nano :
+#
+# CTRL + O
+#
+# permet d'enregistrer.
+#
+# CTRL + X
+#
+# permet de quitter.
+
+
+###############################################################################
+# 21. AFFICHER LE CONTENU D'UN FICHIER
+###############################################################################
+
+cat bob.txt
+
+# La commande cat permet d'afficher directement
+# le contenu du fichier dans le terminal.
+
+
+###############################################################################
+# 22. ÉCRIRE DANS UN FICHIER
+###############################################################################
+
+echo "Premier fichier Linux" > bob.txt
+
+# Le symbole > redirige la sortie vers le fichier.
+#
+# ATTENTION :
+#
+# Le contenu existant est remplacé.
+
+
+###############################################################################
+# 23. AJOUTER DU CONTENU À UN FICHIER
+###############################################################################
+
+echo "Nouvelle ligne" >> bob.txt
+
+# Le symbole >> ajoute le contenu à la fin
+# du fichier sans supprimer le contenu existant.
+
+
+###############################################################################
+# 24. VÉRIFIER LE CONTENU
+###############################################################################
+
+cat bob.txt
+
+
+###############################################################################
+# 25. COPIER UN FICHIER
+###############################################################################
+
+# La commande cp permet de copier un fichier.
+
+cp bob.txt bob-copie.txt
+
+
+###############################################################################
+# 26. VÉRIFIER LA COPIE
+###############################################################################
+
+ls -l
+
+# Vérifier la présence de :
+
+bob.txt
+bob-copie.txt
+
+
+###############################################################################
+# 27. COPIER UN FICHIER VERS UN AUTRE RÉPERTOIRE
+###############################################################################
+
+cp bob.txt /tmp/
+
+
+###############################################################################
+# 28. COPIER UN RÉPERTOIRE
+###############################################################################
+
+# Pour copier un répertoire et son contenu,
+# utiliser l'option -r.
+
+cp -r repertoire1 repertoire1-copie
+
+
+###############################################################################
+# 29. DÉPLACER UN FICHIER
+###############################################################################
+
+# La commande mv permet de déplacer un fichier.
+
+mv bob-copie.txt /tmp/
+
+
+###############################################################################
+# 30. RENOMMER UN FICHIER
+###############################################################################
+
+# La commande mv permet également de renommer
+# un fichier.
+
+mv bob.txt bob-renomme.txt
+
+
+###############################################################################
+# 31. RENOMMER UN RÉPERTOIRE
+###############################################################################
+
+mv repertoire1 nouveau-repertoire
+
+
+###############################################################################
+# 32. SUPPRIMER UN FICHIER
+###############################################################################
+
+# La commande rm permet de supprimer un fichier.
+
+rm bob-renomme.txt
+
+# ATTENTION :
+#
+# La suppression avec rm ne fonctionne pas comme
+# une corbeille graphique classique.
+#
+# Vérifier le fichier ciblé avant l'exécution.
+
+
+###############################################################################
+# 33. SUPPRIMER PLUSIEURS FICHIERS
+###############################################################################
+
+rm fichier1.txt fichier2.txt fichier3.txt
+
+
+###############################################################################
+# 34. SUPPRIMER UN RÉPERTOIRE VIDE
+###############################################################################
+
+# La commande rmdir permet de supprimer
+# un répertoire vide.
+
+rmdir repertoire2
+
+
+###############################################################################
+# 35. SUPPRIMER UN RÉPERTOIRE ET SON CONTENU
+###############################################################################
+
+# L'option -r permet une suppression récursive.
+
+rm -r dossier1
+
+# ATTENTION :
+#
+# Cette commande supprime le répertoire
+# ainsi que son contenu.
+
+
+###############################################################################
+# 36. DEMANDER UNE CONFIRMATION AVANT SUPPRESSION
+###############################################################################
+
+rm -i fichier.txt
+
+# L'option -i demande une confirmation
+# avant la suppression.
+
+
+###############################################################################
+# 37. SUPPRESSION RÉCURSIVE AVEC CONFIRMATION
+###############################################################################
+
+rm -ri repertoire
+
+
+###############################################################################
+# 38. AFFICHER LES INFORMATIONS D'UN FICHIER
+###############################################################################
+
+stat bob.txt
+
+# La commande stat permet notamment d'afficher :
+#
+# - la taille ;
+# - les permissions ;
+# - le propriétaire ;
+# - le groupe ;
+# - les dates associées au fichier.
+
+
+###############################################################################
+# 39. IDENTIFIER LE TYPE D'UN FICHIER
+###############################################################################
+
+file bob.txt
+
+# La commande file tente d'identifier
+# le type de contenu du fichier.
+
+
+###############################################################################
+# 40. CHEMIN ABSOLU
+###############################################################################
+
+# Un chemin absolu commence depuis la racine :
+
+/var/exos/bob.txt
+
+# Il indique l'emplacement complet du fichier.
+
+
+###############################################################################
+# 41. CHEMIN RELATIF
+###############################################################################
+
+# Si le répertoire courant est :
+
+/var
+
+# il est possible d'accéder à :
+
+/var/exos
+
+# avec :
+
+cd exos
+
+# "exos" représente ici un chemin relatif.
+
+
+###############################################################################
+# 42. RÉPERTOIRE COURANT
+###############################################################################
+
+# Le symbole :
+
+.
+
+# représente le répertoire courant.
+#
+# Exemple :
+
+ls .
+
+
+###############################################################################
+# 43. RÉPERTOIRE PARENT
+###############################################################################
+
+# Le symbole :
+
+..
+
+# représente le répertoire parent.
+#
+# Exemple :
+
+ls ..
+
+
+###############################################################################
+# 44. RÉPERTOIRE PERSONNEL
+###############################################################################
+
+# Le symbole :
+
+~
+
+# représente généralement le répertoire personnel
+# de l'utilisateur courant.
+
+cd ~
+
+
+###############################################################################
+# 45. EXERCICE DU LABORATOIRE
+###############################################################################
+
+# Création du répertoire de travail :
+
+mkdir /var/exos
+
+
+# Accès au répertoire :
+
+cd /var/exos
+
+
+# Vérification :
+
+pwd
+
+
+# Affichage :
+
+ls -l
+
+
+# Création d'un fichier :
+
+touch bob.txt
+
+
+# Vérification :
+
+ls -l
+
+
+# Modification :
+
+nano bob.txt
+
+
+# Lecture :
+
+cat bob.txt
+
+
+###############################################################################
+# 46. RELATION AVEC LES PERMISSIONS
+###############################################################################
+
+# Chaque fichier ou répertoire possède également
+# des informations de propriétaire, groupe et permissions.
+#
+# Elles peuvent être observées avec :
+
+ls -l
+
+# Exemple de représentation :
+
+-rw-r--r--
+
+# Les permissions sont étudiées plus précisément
+# dans :
+
+commandes/permissions-ugo.txt
+
+
+###############################################################################
+# 47. RELATION AVEC LE PROPRIÉTAIRE
+###############################################################################
+
+# Le propriétaire d'un fichier peut être modifié
+# avec la commande :
+
+chown
+
+# Exemple :
+
+chown giosue giosue.txt
+
+
+###############################################################################
+# 48. RELATION AVEC LE GROUPE
+###############################################################################
+
+# Le groupe propriétaire peut être modifié avec :
+
+chgrp
+
+# Exemple :
+
+chgrp direction giosue.txt
+
+
+###############################################################################
+# 49. ATTRIBUTS DE FICHIERS
+###############################################################################
+
+# En complément des permissions classiques,
+# Linux permet d'utiliser certains attributs.
+#
+# Exemple :
+
+chattr +i bob.txt
+
+# Vérification :
+
+lsattr bob.txt
+
+# Cette partie est documentée dans :
+
+commandes/attributs-fichiers.txt
+
+
+###############################################################################
+# 50. ACL
+###############################################################################
+
+# Des permissions supplémentaires peuvent également
+# être définies avec les ACL.
+#
+# Les principales commandes étudiées sont :
+
+setfacl
+
+getfacl
+
+# Cette partie est documentée dans :
+
+commandes/permissions-acl.txt
+
+
+###############################################################################
+# 51. COMMANDES PRINCIPALES À RETENIR
+###############################################################################
+
+# Afficher le répertoire courant :
+
+pwd
+
+
+# Afficher le contenu :
+
+ls
+
+
+# Affichage détaillé :
+
+ls -l
+
+
+# Fichiers cachés :
+
+ls -la
+
+
+# Changer de répertoire :
+
+cd repertoire
+
+
+# Répertoire parent :
+
+cd ..
+
+
+# Répertoire personnel :
+
+cd ~
+
+
+# Créer un répertoire :
+
+mkdir repertoire
+
+
+# Créer une arborescence :
+
+mkdir -p dossier1/dossier2
+
+
+# Créer un fichier :
+
+touch fichier.txt
+
+
+# Modifier un fichier :
+
+nano fichier.txt
+
+
+# Lire un fichier :
+
+cat fichier.txt
+
+
+# Copier :
+
+cp source destination
+
+
+# Copier un répertoire :
+
+cp -r source destination
+
+
+# Déplacer ou renommer :
+
+mv source destination
+
+
+# Supprimer un fichier :
+
+rm fichier.txt
+
+
+# Supprimer un répertoire vide :
+
+rmdir repertoire
+
+
+# Supprimer récursivement :
+
+rm -r repertoire
+
+
+# Informations détaillées :
+
+stat fichier.txt
+
+
+# Identifier le type :
+
+file fichier.txt
+
+
+###############################################################################
+# 52. FICHIERS ASSOCIÉS
+###############################################################################
+
+# Gestion des utilisateurs :
+
+commandes/gestion-utilisateurs.txt
+
+
+# Gestion des groupes :
+
+commandes/gestion-groupes.txt
+
+
+# Permissions classiques :
+
+commandes/permissions-ugo.txt
+
+
+# Attributs de fichiers :
+
+commandes/attributs-fichiers.txt
+
+
+# ACL :
+
+commandes/permissions-acl.txt
+
+
+# Vérifications :
+
+commandes/verification.txt
+
+
+###############################################################################
+# 53. VALIDATION
+###############################################################################
+
+# La gestion des fichiers et répertoires est maîtrisée si :
+#
+# [ ] pwd permet d'identifier le répertoire courant.
+#
+# [ ] ls permet d'afficher le contenu d'un répertoire.
+#
+# [ ] ls -l permet d'obtenir un affichage détaillé.
+#
+# [ ] cd permet de naviguer dans l'arborescence.
+#
+# [ ] mkdir permet de créer un répertoire.
+#
+# [ ] touch permet de créer un fichier.
+#
+# [ ] nano permet de modifier un fichier texte.
+#
+# [ ] cat permet d'afficher le contenu d'un fichier.
+#
+# [ ] cp permet de copier un fichier.
+#
+# [ ] mv permet de déplacer ou renommer un fichier.
+#
+# [ ] rm permet de supprimer un fichier.
+#
+# [ ] rmdir permet de supprimer un répertoire vide.
+#
+# [ ] La différence entre chemin absolu
+#     et chemin relatif est comprise.
+#
+# [ ] La relation entre fichiers, propriétaires,
+#     groupes et permissions est comprise.
+###############################################################################
