@@ -1,0 +1,38 @@
+#=========================================================
+# Projet-Labo 02 - Routeur Debian & pfSense
+# Fichier : /etc/network/interfaces
+# Description :
+# Configuration des interfaces réseau du routeur Debian.
+#=========================================================
+
+# Interface de loopback
+auto lo
+iface lo inet loopback
+
+#=========================================================
+# Interface WAN
+# Attribution automatique de l'adresse IP par DHCP
+#=========================================================
+
+allow-hotplug enp0s3
+iface enp0s3 inet dhcp
+
+#=========================================================
+# Interface LAN 1
+# Réseau : 192.168.11.0/24
+# Passerelle des hôtes du LAN 1
+#=========================================================
+
+allow-hotplug enp0s8
+iface enp0s8 inet static
+    address 192.168.11.254/24
+
+#=========================================================
+# Interface LAN 2
+# Réseau : 192.168.12.0/24
+# Passerelle des hôtes du LAN 2
+#=========================================================
+
+allow-hotplug enp0s9
+iface enp0s9 inet static
+    address 192.168.12.254/24
