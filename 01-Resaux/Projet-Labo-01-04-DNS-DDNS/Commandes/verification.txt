@@ -1,5 +1,5 @@
 ###############################################################################
-# Projet-Labo-01-4-DNS-DDNS
+# Projet-Labo-01-04-DNS-DDNS
 # Vérification complète du laboratoire
 #
 # Ce document permet de contrôler l'ensemble du laboratoire une fois
