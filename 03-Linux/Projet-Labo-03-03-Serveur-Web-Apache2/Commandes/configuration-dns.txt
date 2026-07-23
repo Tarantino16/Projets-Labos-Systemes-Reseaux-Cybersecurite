@@ -1,5 +1,5 @@
 ###############################################################################
-# Projet-Labo-03-3-Serveur-Web-Apache2
+# Projet-Labo-03-03-Serveur-Web-Apache2
 # Configuration DNS du serveur Web
 #
 # Objectifs :
