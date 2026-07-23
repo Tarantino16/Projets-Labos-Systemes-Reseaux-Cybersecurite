@@ -1,0 +1,173 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Téléchargement d'un fichier avec FileZilla
+###############################################################################
+
+Objectif :
+
+Télécharger un fichier présent sur le serveur FTP
+vers le poste client.
+
+
+###############################################################################
+# Répertoire distant
+###############################################################################
+
+Serveur FTP :
+
+/srv/ftp
+
+
+###############################################################################
+# Fichier téléchargé
+###############################################################################
+
+Nom du fichier :
+
+mega-fichier.txt
+
+
+###############################################################################
+# Prérequis
+###############################################################################
+
+- Le serveur ProFTPD est démarré.
+- La connexion anonyme est fonctionnelle.
+- Le dossier /srv/ftp est accessible.
+- Le fichier mega-fichier.txt est présent.
+
+
+###############################################################################
+# Procédure
+###############################################################################
+
+1. Ouvrir FileZilla Client.
+
+2. Se connecter au serveur FTP.
+
+3. Dans la partie distante,
+   ouvrir le dossier :
+
+   /srv/ftp
+
+4. Sélectionner :
+
+   mega-fichier.txt
+
+5. Télécharger le fichier :
+
+   - Double-clic
+
+   ou
+
+   - Clic droit → Télécharger
+
+   ou
+
+   - Glisser-déposer vers le poste local.
+
+
+###############################################################################
+# Destination locale
+###############################################################################
+
+Le fichier est enregistré dans
+le dossier actuellement sélectionné
+dans la partie locale de FileZilla.
+
+Exemple :
+
+C:\Users\Utilisateur\Desktop
+
+
+###############################################################################
+# Résultat attendu
+###############################################################################
+
+Le transfert est terminé avec succès.
+
+Le fichier apparaît sur le poste client.
+
+Le journal FileZilla indique :
+
+- Connexion réussie.
+- Début du transfert.
+- Transfert terminé.
+- Aucun message d'erreur.
+
+
+###############################################################################
+# Vérification côté client
+###############################################################################
+
+Ouvrir :
+
+mega-fichier.txt
+
+Vérifier que son contenu est lisible.
+
+Comparer sa taille avec celle
+du fichier présent sur le serveur.
+
+
+###############################################################################
+# Vérification côté serveur
+###############################################################################
+
+Le téléchargement ne modifie pas
+le fichier d'origine.
+
+Contrôle possible :
+
+ls -l /srv/ftp
+
+
+###############################################################################
+# Vérification du journal FileZilla
+###############################################################################
+
+Le journal doit indiquer :
+
+- Ouverture de la connexion.
+- Authentification réussie.
+- Début du téléchargement.
+- Fin du téléchargement.
+- Transfert réussi.
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+Le téléchargement échoue :
+
+- Vérifier que le service ProFTPD est actif.
+- Vérifier la connexion réseau.
+- Vérifier le port 21.
+
+Le fichier est introuvable :
+
+- Vérifier le dossier /srv/ftp.
+- Actualiser l'affichage (F5).
+
+Le transfert est interrompu :
+
+- Vérifier la connexion réseau.
+- Vérifier les journaux FileZilla.
+
+
+###############################################################################
+# Validation
+###############################################################################
+
+✓ Connexion au serveur réussie.
+
+✓ Le fichier distant est visible.
+
+✓ Le téléchargement est terminé.
+
+✓ Le fichier est présent sur le poste client.
+
+✓ Le contenu est identique à celui du serveur.
+
+✓ Aucun message d'erreur n'est affiché.

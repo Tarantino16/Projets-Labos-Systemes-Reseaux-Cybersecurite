@@ -1,0 +1,143 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Configuration de la connexion anonyme FileZilla
+###############################################################################
+
+Nom de la connexion :
+
+Serveur FTP ProFTPD
+
+
+Type de protocole :
+
+FTP
+(File Transfer Protocol)
+
+
+Hôte :
+
+192.168.11.240
+
+
+Port :
+
+21
+
+
+Type d'authentification :
+
+Anonyme (Anonymous)
+
+
+Utilisateur :
+
+anonymous
+
+
+Mot de passe :
+
+Aucun
+
+
+Mode de connexion :
+
+Connexion rapide
+ou
+Gestionnaire de sites
+
+
+###############################################################################
+# Paramètres de la connexion
+###############################################################################
+
+Adresse du serveur :
+
+192.168.11.240
+
+Port :
+
+21
+
+Protocole :
+
+FTP
+
+Chiffrement :
+
+Utiliser FTP simple
+(si aucun chiffrement TLS n'est configuré)
+
+Type d'ouverture de session :
+
+Anonyme
+
+
+###############################################################################
+# Résultat attendu
+###############################################################################
+
+Connexion établie avec succès.
+
+Le journal FileZilla affiche :
+
+- Connexion au serveur réussie.
+- Authentification anonyme acceptée.
+- Récupération de l'arborescence distante.
+- Ouverture du répertoire partagé.
+
+
+###############################################################################
+# Répertoire distant
+###############################################################################
+
+/srv/ftp
+
+
+###############################################################################
+# Contenu attendu
+###############################################################################
+
+Le dossier FTP contient notamment :
+
+- welcome.msg
+- mega-fichier.txt
+
+
+###############################################################################
+# Vérification
+###############################################################################
+
+✓ Le serveur est joignable.
+
+✓ La connexion est acceptée.
+
+✓ Le contenu du dossier distant est affiché.
+
+✓ Les fichiers peuvent être téléchargés.
+
+✓ Les fichiers peuvent être envoyés (selon les permissions).
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+Connexion refusée :
+
+- Vérifier que le service ProFTPD est démarré.
+- Vérifier que le port 21 est ouvert.
+
+Impossible de joindre le serveur :
+
+- Vérifier l'adresse IP.
+- Vérifier la connectivité réseau.
+
+Erreur d'authentification :
+
+- Vérifier que les connexions anonymes sont autorisées
+  dans le fichier proftpd.conf.
+
+Répertoire vide :
+
+- Vérifier que le chemin /srv/ftp est correctement configuré.
+- Vérifier la présence des fichiers de test.

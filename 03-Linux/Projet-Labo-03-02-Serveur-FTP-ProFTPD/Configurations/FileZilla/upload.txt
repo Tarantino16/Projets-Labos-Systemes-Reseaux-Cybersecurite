@@ -1,0 +1,181 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Envoi (Upload) d'un fichier avec FileZilla
+###############################################################################
+
+Objectif :
+
+Transférer un fichier du poste client
+vers le serveur FTP ProFTPD.
+
+
+###############################################################################
+# Répertoire de destination
+###############################################################################
+
+Serveur FTP :
+
+/srv/ftp
+
+
+###############################################################################
+# Fichier envoyé
+###############################################################################
+
+Nom du fichier :
+
+mega-fichier-2.txt
+
+
+###############################################################################
+# Prérequis
+###############################################################################
+
+- Le serveur ProFTPD est en cours d'exécution.
+- La connexion anonyme est établie.
+- Le répertoire /srv/ftp est accessible.
+- Le poste client contient le fichier
+  mega-fichier-2.txt.
+
+
+###############################################################################
+# Procédure
+###############################################################################
+
+1. Ouvrir FileZilla Client.
+
+2. Se connecter au serveur FTP.
+
+3. Dans la partie locale,
+   sélectionner le fichier :
+
+   mega-fichier-2.txt
+
+4. Dans la partie distante,
+   ouvrir le dossier :
+
+   /srv/ftp
+
+5. Envoyer le fichier :
+
+   - Glisser-déposer
+
+   ou
+
+   - Clic droit → Envoyer
+
+
+###############################################################################
+# Résultat attendu
+###############################################################################
+
+Le transfert est effectué avec succès.
+
+Le fichier apparaît dans
+le répertoire distant.
+
+Le journal FileZilla indique :
+
+- Début du transfert.
+- Transfert terminé.
+- Aucun message d'erreur.
+
+
+###############################################################################
+# Vérification côté serveur
+###############################################################################
+
+Lister les fichiers :
+
+ls -l /srv/ftp
+
+Résultat attendu :
+
+mega-fichier-2.txt
+
+est présent dans le répertoire.
+
+
+###############################################################################
+# Vérification du contenu
+###############################################################################
+
+Afficher le contenu :
+
+cat /srv/ftp/mega-fichier-2.txt
+
+Le contenu affiché doit être identique
+à celui du fichier envoyé.
+
+
+###############################################################################
+# Vérification côté client
+###############################################################################
+
+Actualiser la vue distante (F5).
+
+Vérifier que le fichier apparaît
+dans le répertoire du serveur.
+
+Comparer la taille du fichier
+avec celle du fichier local.
+
+
+###############################################################################
+# Journal FileZilla
+###############################################################################
+
+Le journal doit indiquer :
+
+- Connexion réussie.
+- Début de l'envoi.
+- Progression du transfert.
+- Fin du transfert.
+- Transfert réussi.
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+L'envoi est refusé :
+
+- Vérifier les permissions du dossier /srv/ftp.
+- Vérifier les droits de l'utilisateur FTP.
+
+Le fichier n'apparaît pas :
+
+- Actualiser l'affichage (F5).
+- Vérifier le répertoire distant.
+
+Erreur de connexion :
+
+- Vérifier le service ProFTPD.
+- Vérifier l'adresse IP du serveur.
+- Vérifier le port 21.
+
+Transfert interrompu :
+
+- Vérifier la connexion réseau.
+- Consulter les journaux du serveur :
+
+journalctl -u proftpd
+
+
+###############################################################################
+# Validation
+###############################################################################
+
+✓ La connexion au serveur est établie.
+
+✓ Le fichier local est sélectionné.
+
+✓ Le transfert est terminé avec succès.
+
+✓ Le fichier apparaît dans /srv/ftp.
+
+✓ Le contenu du fichier est conforme.
+
+✓ Aucun message d'erreur n'est affiché.
+
+✓ Le journal FileZilla confirme la réussite de l'envoi.

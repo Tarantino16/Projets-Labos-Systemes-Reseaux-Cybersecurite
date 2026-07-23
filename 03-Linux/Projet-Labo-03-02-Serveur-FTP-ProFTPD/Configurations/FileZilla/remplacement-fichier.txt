@@ -1,0 +1,128 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Remplacement d'un fichier avec FileZilla
+###############################################################################
+
+Objectif :
+
+Remplacer un fichier existant sur le serveur FTP
+par une nouvelle version provenant du poste client.
+
+
+###############################################################################
+# Fichier concerné
+###############################################################################
+
+Nom du fichier :
+
+mega-fichier.txt
+
+
+Répertoire distant :
+
+/srv/ftp
+
+
+###############################################################################
+# Procédure
+###############################################################################
+
+1. Télécharger le fichier depuis le serveur.
+
+2. Modifier son contenu sur le poste client.
+
+3. Enregistrer les modifications.
+
+4. Glisser-déposer le fichier modifié
+   vers le dossier distant /srv/ftp.
+
+5. FileZilla détecte qu'un fichier du même nom
+   existe déjà sur le serveur.
+
+6. Une fenêtre de confirmation apparaît.
+
+
+###############################################################################
+# Action choisie
+###############################################################################
+
+Sélection :
+
+Remplacer
+
+
+Appliquer uniquement à cette opération.
+
+
+###############################################################################
+# Résultat attendu
+###############################################################################
+
+Le fichier présent sur le serveur est remplacé
+par la nouvelle version.
+
+La date de modification du fichier est mise à jour.
+
+Le transfert est indiqué comme réussi
+dans le journal de FileZilla.
+
+
+###############################################################################
+# Vérification côté serveur
+###############################################################################
+
+Lister les fichiers :
+
+ls -l /srv/ftp
+
+Contrôler le contenu :
+
+cat /srv/ftp/mega-fichier.txt
+
+
+Le contenu affiché doit correspondre
+à la version modifiée.
+
+
+###############################################################################
+# Vérification côté client
+###############################################################################
+
+Actualiser l'affichage du serveur (F5).
+
+Télécharger à nouveau le fichier.
+
+Comparer son contenu avec la version locale.
+
+Les deux versions doivent être identiques.
+
+
+###############################################################################
+# Comportement de FileZilla
+###############################################################################
+
+Lorsqu'un fichier du même nom existe déjà,
+FileZilla propose plusieurs actions :
+
+- Remplacer
+- Renommer
+- Écraser si la source est plus récente
+- Ignorer
+- Reprendre (selon le type de transfert)
+
+Dans ce laboratoire, l'option utilisée est :
+
+Remplacer
+
+
+###############################################################################
+# Validation
+###############################################################################
+
+✓ Le fichier d'origine est remplacé.
+
+✓ Les modifications sont présentes sur le serveur.
+
+✓ Aucun message d'erreur n'est affiché.
+
+✓ Le transfert est indiqué comme réussi dans FileZilla.
