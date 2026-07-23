@@ -1,0 +1,344 @@
+###############################################################################
+# Projet-Labo-03-03-Serveur-Web-Apache2
+# Configuration DNS - Zone directe
+###############################################################################
+
+
+###############################################################################
+# 1. ZONE DNS
+###############################################################################
+
+Domaine :
+
+tarantino.family
+
+
+Type :
+
+Zone directe
+
+
+Rôle :
+
+Permet de résoudre les noms DNS
+du serveur Web vers son adresse IPv4.
+
+
+###############################################################################
+# 2. SERVEUR WEB
+###############################################################################
+
+Nom d'hôte :
+
+WEB
+
+
+FQDN :
+
+web.tarantino.family
+
+
+Adresse IPv4 :
+
+192.168.11.241
+
+
+Type d'enregistrement :
+
+A
+
+
+###############################################################################
+# 3. ENREGISTREMENT WEB
+###############################################################################
+
+Configuration :
+
+WEB             A       192.168.11.241
+
+
+Résolution obtenue :
+
+web.tarantino.family
+        │
+        ▼
+192.168.11.241
+
+
+###############################################################################
+# 4. ENREGISTREMENT WWW
+###############################################################################
+
+Configuration :
+
+www             A       192.168.11.241
+
+
+Résolution obtenue :
+
+www.tarantino.family
+        │
+        ▼
+192.168.11.241
+
+
+###############################################################################
+# 5. CONFIGURATION FINALE
+###############################################################################
+
+WEB             A       192.168.11.241
+www             A       192.168.11.241
+
+
+###############################################################################
+# 6. CORRESPONDANCE DNS / APACHE2
+###############################################################################
+
+web.tarantino.family ─────┐
+                          │
+                          ▼
+                    192.168.11.241
+                          │
+                          │ HTTP
+                          │ TCP/80
+                          ▼
+                       Apache2
+
+
+www.tarantino.family ─────┐
+                          │
+                          ▼
+                    192.168.11.241
+                          │
+                          │ HTTP
+                          │ TCP/80
+                          ▼
+                       Apache2
+
+
+###############################################################################
+# 7. VÉRIFICATION AVEC NSLOOKUP
+###############################################################################
+
+Tester :
+
+nslookup web.tarantino.family
+
+
+Résultat attendu :
+
+Name:
+
+web.tarantino.family
+
+
+Address:
+
+192.168.11.241
+
+
+Tester également :
+
+nslookup www.tarantino.family
+
+
+Résultat attendu :
+
+Name:
+
+www.tarantino.family
+
+
+Address:
+
+192.168.11.241
+
+
+###############################################################################
+# 8. VÉRIFICATION AVEC DIG
+###############################################################################
+
+Tester :
+
+dig web.tarantino.family
+
+
+Puis :
+
+dig www.tarantino.family
+
+
+Résultat attendu :
+
+192.168.11.241
+
+
+###############################################################################
+# 9. TEST DE CONNECTIVITÉ
+###############################################################################
+
+Tester :
+
+ping web.tarantino.family
+
+
+Puis :
+
+ping www.tarantino.family
+
+
+Les deux noms doivent être résolus vers :
+
+192.168.11.241
+
+
+###############################################################################
+# 10. TEST HTTP
+###############################################################################
+
+Tester :
+
+curl http://web.tarantino.family
+
+
+Puis :
+
+curl http://www.tarantino.family
+
+
+Résultat attendu :
+
+Le serveur Apache2 retourne
+la page Web configurée.
+
+
+###############################################################################
+# 11. TEST DEPUIS LE POSTE CLIENT
+###############################################################################
+
+Depuis un navigateur Web :
+
+http://web.tarantino.family
+
+
+Puis :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page Web hébergée sur le serveur
+192.168.11.241 doit apparaître.
+
+
+###############################################################################
+# 12. DIAGNOSTIC
+###############################################################################
+
+Si web.tarantino.family ne fonctionne pas :
+
+Vérifier :
+
+nslookup web.tarantino.family
+
+
+Si www.tarantino.family ne fonctionne pas :
+
+Vérifier :
+
+nslookup www.tarantino.family
+
+
+Si le nom est correctement résolu
+mais que le site reste inaccessible :
+
+Vérifier Apache2 :
+
+systemctl status apache2
+
+
+Vérifier le port HTTP :
+
+ss -tlnp | grep :80
+
+
+###############################################################################
+# 13. RÉCAPITULATIF
+###############################################################################
+
+Zone :
+
+tarantino.family
+
+
+Type :
+
+Zone directe
+
+
+Serveur Web :
+
+web.tarantino.family
+
+
+Adresse :
+
+192.168.11.241
+
+
+Enregistrement :
+
+WEB     A     192.168.11.241
+
+
+Nom Web :
+
+www.tarantino.family
+
+
+Enregistrement :
+
+www     A     192.168.11.241
+
+
+###############################################################################
+# 14. VALIDATION
+###############################################################################
+
+[ ] L'enregistrement WEB existe.
+
+[ ] WEB pointe vers 192.168.11.241.
+
+[ ] web.tarantino.family est résolu.
+
+[ ] L'enregistrement www existe.
+
+[ ] www pointe vers 192.168.11.241.
+
+[ ] www.tarantino.family est résolu.
+
+[ ] Le serveur répond sur le port TCP 80.
+
+[ ] Le site est accessible par son nom DNS.
+
+
+###############################################################################
+# RÉSULTAT
+###############################################################################
+
+web.tarantino.family
+        │
+        ▼
+192.168.11.241
+
+
+www.tarantino.family
+        │
+        ▼
+192.168.11.241
+
+
+La résolution DNS directe
+du serveur Web est opérationnelle.
+###############################################################################

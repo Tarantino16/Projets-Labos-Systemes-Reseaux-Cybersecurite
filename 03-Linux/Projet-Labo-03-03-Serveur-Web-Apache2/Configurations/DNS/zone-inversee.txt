@@ -1,0 +1,377 @@
+###############################################################################
+# Projet-Labo-03-03-Serveur-Web-Apache2
+# Configuration DNS - Zone inversée
+###############################################################################
+
+
+###############################################################################
+# 1. ZONE DNS INVERSÉE
+###############################################################################
+
+Réseau :
+
+192.168.11.0/24
+
+
+Zone inversée :
+
+11.168.192.in-addr.arpa
+
+
+Rôle :
+
+Permet de retrouver le nom DNS
+du serveur Web à partir de son adresse IPv4.
+
+
+###############################################################################
+# 2. SERVEUR WEB
+###############################################################################
+
+Nom d'hôte :
+
+WEB
+
+
+FQDN :
+
+web.tarantino.family
+
+
+Adresse IPv4 :
+
+192.168.11.241
+
+
+Type d'enregistrement :
+
+PTR
+
+
+###############################################################################
+# 3. ENREGISTREMENT PTR
+###############################################################################
+
+Configuration :
+
+241             PTR     web.tarantino.family.
+
+
+Cet enregistrement permet la résolution :
+
+192.168.11.241
+        │
+        ▼
+web.tarantino.family
+
+
+###############################################################################
+# 4. PRINCIPE DE LA RÉSOLUTION INVERSÉE
+###############################################################################
+
+Adresse IP :
+
+192.168.11.241
+
+
+Zone :
+
+11.168.192.in-addr.arpa
+
+
+Dernier octet :
+
+241
+
+
+Enregistrement :
+
+241     PTR     web.tarantino.family.
+
+
+Résultat :
+
+192.168.11.241
+        │
+        │ Requête DNS inversée
+        ▼
+web.tarantino.family
+
+
+###############################################################################
+# 5. CONFIGURATION FINALE
+###############################################################################
+
+241             PTR     web.tarantino.family.
+
+
+###############################################################################
+# 6. RELATION AVEC LA ZONE DIRECTE
+###############################################################################
+
+Résolution directe :
+
+web.tarantino.family
+        │
+        │ A
+        ▼
+192.168.11.241
+
+
+Résolution inversée :
+
+192.168.11.241
+        │
+        │ PTR
+        ▼
+web.tarantino.family
+
+
+###############################################################################
+# 7. VÉRIFICATION AVEC NSLOOKUP
+###############################################################################
+
+Tester :
+
+nslookup 192.168.11.241
+
+
+Résultat attendu :
+
+Name:
+
+web.tarantino.family
+
+
+Address:
+
+192.168.11.241
+
+
+###############################################################################
+# 8. VÉRIFICATION AVEC DIG
+###############################################################################
+
+Tester :
+
+dig -x 192.168.11.241
+
+
+Résultat attendu :
+
+web.tarantino.family.
+
+
+###############################################################################
+# 9. VÉRIFICATION DU FICHIER DE ZONE
+###############################################################################
+
+Contrôler la syntaxe de la zone :
+
+named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+Résultat attendu :
+
+OK
+
+
+###############################################################################
+# 10. RECHARGEMENT DU SERVICE DNS
+###############################################################################
+
+Après modification de la zone :
+
+systemctl reload bind9
+
+
+Vérifier :
+
+systemctl status bind9
+
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 11. COMPARAISON DIRECTE / INVERSÉE
+###############################################################################
+
+ZONE DIRECTE :
+
+Nom
+ │
+ ▼
+Adresse IP
+
+
+web.tarantino.family
+ │
+ ▼
+192.168.11.241
+
+
+ZONE INVERSÉE :
+
+Adresse IP
+ │
+ ▼
+Nom
+
+
+192.168.11.241
+ │
+ ▼
+web.tarantino.family
+
+
+###############################################################################
+# 12. LIEN AVEC LE SERVEUR WEB
+###############################################################################
+
+192.168.11.241
+        │
+        │ PTR
+        ▼
+web.tarantino.family
+        │
+        │ Serveur Web
+        ▼
+Apache2
+        │
+        │ TCP/80
+        ▼
+/var/www/tarantino.family
+
+
+###############################################################################
+# 13. DIAGNOSTIC
+###############################################################################
+
+Si la résolution inversée échoue :
+
+Vérifier :
+
+dig -x 192.168.11.241
+
+
+Puis :
+
+nslookup 192.168.11.241
+
+
+Vérifier la zone :
+
+named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+Vérifier le service DNS :
+
+systemctl status bind9
+
+
+###############################################################################
+# 14. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Aucun nom n'est retourné :
+
+- Vérifier l'enregistrement PTR.
+- Vérifier le dernier octet de l'adresse IP.
+- Vérifier le FQDN.
+- Vérifier le point final après le FQDN.
+- Vérifier que la zone inversée est chargée.
+
+
+Mauvais nom retourné :
+
+- Vérifier la valeur du PTR.
+- Vérifier la cohérence avec la zone directe.
+
+
+Erreur de zone :
+
+- Vérifier la syntaxe du fichier.
+- Utiliser named-checkzone avant de recharger BIND9.
+
+
+###############################################################################
+# 15. RÉCAPITULATIF
+###############################################################################
+
+Réseau :
+
+192.168.11.0/24
+
+
+Zone inversée :
+
+11.168.192.in-addr.arpa
+
+
+Adresse du serveur Web :
+
+192.168.11.241
+
+
+Dernier octet :
+
+241
+
+
+Type :
+
+PTR
+
+
+Enregistrement :
+
+241     PTR     web.tarantino.family.
+
+
+FQDN retourné :
+
+web.tarantino.family
+
+
+###############################################################################
+# 16. VALIDATION
+###############################################################################
+
+[ ] La zone inversée existe.
+
+[ ] L'enregistrement 241 PTR existe.
+
+[ ] Le PTR pointe vers web.tarantino.family.
+
+[ ] Le FQDN se termine par un point.
+
+[ ] La zone est syntaxiquement valide.
+
+[ ] BIND9 charge correctement la zone.
+
+[ ] nslookup 192.168.11.241 fonctionne.
+
+[ ] dig -x 192.168.11.241 fonctionne.
+
+[ ] La résolution directe et inversée sont cohérentes.
+
+
+###############################################################################
+# RÉSULTAT
+###############################################################################
+
+192.168.11.241
+        │
+        │ PTR
+        ▼
+web.tarantino.family
+
+
+La résolution DNS inversée
+du serveur Web est opérationnelle.
+###############################################################################
