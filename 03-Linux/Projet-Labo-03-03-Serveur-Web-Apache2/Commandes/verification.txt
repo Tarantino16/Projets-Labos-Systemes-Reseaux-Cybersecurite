@@ -1,0 +1,630 @@
+###############################################################################
+# Projet-Labo-03-3-Serveur-Web-Apache2
+# Vérification du serveur Web Apache2
+#
+# Objectifs :
+# - Vérifier le fonctionnement d'Apache2
+# - Vérifier le VirtualHost
+# - Vérifier le réseau
+# - Vérifier la résolution DNS
+# - Vérifier l'accès HTTP depuis le serveur
+# - Vérifier l'accès depuis un poste client
+###############################################################################
+
+
+###############################################################################
+# 1. VÉRIFICATION DE L'ADRESSE IP
+###############################################################################
+
+Afficher les interfaces réseau :
+
+ip a
+
+
+Vérifier que le serveur possède l'adresse :
+
+192.168.11.241
+
+
+###############################################################################
+# 2. VÉRIFICATION DE LA TABLE DE ROUTAGE
+###############################################################################
+
+Afficher les routes :
+
+ip route
+
+
+Vérifier :
+
+- la présence du réseau local ;
+- la route par défaut si une passerelle est utilisée.
+
+
+###############################################################################
+# 3. TEST DE CONNECTIVITÉ LOCALE
+###############################################################################
+
+Tester la pile TCP/IP :
+
+ping -c 4 127.0.0.1
+
+
+Tester l'adresse du serveur :
+
+ping -c 4 192.168.11.241
+
+
+###############################################################################
+# 4. VÉRIFICATION D'APACHE2
+###############################################################################
+
+Afficher l'état du service :
+
+systemctl status apache2
+
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 5. VÉRIFICATION DU DÉMARRAGE AUTOMATIQUE
+###############################################################################
+
+systemctl is-enabled apache2
+
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# 6. VÉRIFICATION DE LA CONFIGURATION APACHE2
+###############################################################################
+
+Tester la syntaxe :
+
+apache2ctl configtest
+
+
+Résultat attendu :
+
+Syntax OK
+
+
+###############################################################################
+# 7. VÉRIFICATION DU PORT HTTP
+###############################################################################
+
+Afficher les ports en écoute :
+
+ss -tln
+
+
+Vérifier la présence du port :
+
+80/TCP
+
+
+Alternative :
+
+ss -tlnp | grep :80
+
+
+###############################################################################
+# 8. VÉRIFICATION DES VIRTUALHOSTS
+###############################################################################
+
+Afficher les VirtualHosts chargés :
+
+apache2ctl -S
+
+
+Vérifier la présence de :
+
+001-tarantino.family.conf
+
+
+###############################################################################
+# 9. VÉRIFICATION DES SITES ACTIVÉS
+###############################################################################
+
+Afficher :
+
+ls -l /etc/apache2/sites-enabled/
+
+
+Vérifier que :
+
+001-tarantino.family.conf
+
+est présent.
+
+
+###############################################################################
+# 10. VÉRIFICATION DU SITE PAR DÉFAUT
+###############################################################################
+
+Vérifier que le site suivant
+n'est plus activé :
+
+000-default.conf
+
+
+Commande :
+
+ls -l /etc/apache2/sites-enabled/
+
+
+###############################################################################
+# 11. VÉRIFICATION DU DOCUMENTROOT
+###############################################################################
+
+Vérifier le répertoire :
+
+ls -ld /var/www/tarantino.family
+
+
+Résultat attendu :
+
+Le répertoire existe.
+
+
+###############################################################################
+# 12. VÉRIFICATION DE LA PAGE WEB
+###############################################################################
+
+Afficher :
+
+ls -l /var/www/tarantino.family/
+
+
+Vérifier la présence de :
+
+index.html
+
+
+###############################################################################
+# 13. VÉRIFICATION DES PERMISSIONS
+###############################################################################
+
+Afficher les permissions :
+
+ls -ld /var/www/tarantino.family
+
+
+Vérifier également :
+
+ls -l /var/www/tarantino.family/
+
+
+Le propriétaire attendu est :
+
+www-data
+
+
+Le groupe attendu est :
+
+www-data
+
+
+###############################################################################
+# 14. TEST HTTP LOCAL
+###############################################################################
+
+Tester depuis le serveur :
+
+curl http://localhost
+
+
+Résultat attendu :
+
+Le contenu HTML de la page est retourné.
+
+
+###############################################################################
+# 15. TEST HTTP AVEC L'ADRESSE IP
+###############################################################################
+
+curl http://192.168.11.241
+
+
+Résultat attendu :
+
+La page Web configurée est retournée.
+
+
+###############################################################################
+# 16. VÉRIFICATION DE LA RÉSOLUTION DNS
+###############################################################################
+
+Tester :
+
+nslookup web.tarantino.family
+
+
+Résultat attendu :
+
+192.168.11.241
+
+
+###############################################################################
+# 17. VÉRIFICATION DE WWW
+###############################################################################
+
+Tester :
+
+nslookup www.tarantino.family
+
+
+Résultat attendu :
+
+192.168.11.241
+
+
+###############################################################################
+# 18. VÉRIFICATION DNS AVEC DIG
+###############################################################################
+
+Résolution directe :
+
+dig web.tarantino.family
+
+
+Puis :
+
+dig www.tarantino.family
+
+
+###############################################################################
+# 19. VÉRIFICATION DE LA RÉSOLUTION INVERSÉE
+###############################################################################
+
+Tester :
+
+nslookup 192.168.11.241
+
+
+Ou :
+
+dig -x 192.168.11.241
+
+
+Résultat attendu :
+
+web.tarantino.family
+
+
+###############################################################################
+# 20. TEST DE CONNECTIVITÉ PAR NOM
+###############################################################################
+
+Tester :
+
+ping -c 4 web.tarantino.family
+
+
+Puis :
+
+ping -c 4 www.tarantino.family
+
+
+###############################################################################
+# 21. TEST HTTP PAR NOM DNS
+###############################################################################
+
+Tester :
+
+curl http://web.tarantino.family
+
+
+Puis :
+
+curl http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page Web doit être retournée.
+
+
+###############################################################################
+# 22. TEST DEPUIS LE POSTE CLIENT
+###############################################################################
+
+Depuis le poste client :
+
+ping 192.168.11.241
+
+
+Puis :
+
+ping web.tarantino.family
+
+
+Puis :
+
+ping www.tarantino.family
+
+
+###############################################################################
+# 23. TEST DEPUIS LE NAVIGATEUR
+###############################################################################
+
+Ouvrir un navigateur Web depuis le poste client.
+
+Premier test :
+
+http://web.tarantino.family
+
+
+Deuxième test :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page Web personnalisée doit apparaître.
+
+
+###############################################################################
+# 24. VÉRIFICATION DES JOURNAUX APACHE2
+###############################################################################
+
+Afficher les dernières erreurs :
+
+tail /var/log/apache2/error.log
+
+
+Afficher les derniers accès :
+
+tail /var/log/apache2/access.log
+
+
+###############################################################################
+# 25. JOURNAUX EN TEMPS RÉEL
+###############################################################################
+
+Suivre les erreurs :
+
+tail -f /var/log/apache2/error.log
+
+
+Suivre les connexions HTTP :
+
+tail -f /var/log/apache2/access.log
+
+
+###############################################################################
+# 26. VÉRIFICATION AVEC JOURNALCTL
+###############################################################################
+
+Afficher les événements Apache2 :
+
+journalctl -u apache2
+
+
+Afficher uniquement les événements récents :
+
+journalctl -u apache2 --since today
+
+
+###############################################################################
+# 27. DIAGNOSTIC RAPIDE
+###############################################################################
+
+Si Apache2 ne fonctionne pas :
+
+systemctl status apache2
+
+
+Tester la configuration :
+
+apache2ctl configtest
+
+
+Vérifier le port :
+
+ss -tlnp | grep :80
+
+
+Vérifier les VirtualHosts :
+
+apache2ctl -S
+
+
+###############################################################################
+# 28. DIAGNOSTIC DNS
+###############################################################################
+
+Si l'adresse IP fonctionne mais pas le nom :
+
+nslookup web.tarantino.family
+
+nslookup www.tarantino.family
+
+
+Vérifier le serveur DNS utilisé par le client.
+
+
+###############################################################################
+# 29. DIAGNOSTIC DU SITE
+###############################################################################
+
+Si la page Apache2 par défaut apparaît :
+
+- Vérifier le VirtualHost actif.
+- Vérifier le DocumentRoot.
+- Vérifier que 000-default.conf est désactivé.
+
+
+Commandes :
+
+apache2ctl -S
+
+ls -l /etc/apache2/sites-enabled/
+
+
+###############################################################################
+# 30. DIAGNOSTIC DES PERMISSIONS
+###############################################################################
+
+En cas d'erreur HTTP 403 :
+
+ls -ld /var/www/tarantino.family
+
+ls -l /var/www/tarantino.family/
+
+
+Vérifier :
+
+www-data:www-data
+
+
+###############################################################################
+# 31. CHAÎNE DE VALIDATION
+###############################################################################
+
+Poste client
+     │
+     │
+     │ DNS
+     ▼
+web.tarantino.family
+     │
+     │ Résolution
+     ▼
+192.168.11.241
+     │
+     │ TCP/80
+     ▼
+Apache2
+     │
+     │ VirtualHost
+     ▼
+001-tarantino.family.conf
+     │
+     │ DocumentRoot
+     ▼
+/var/www/tarantino.family
+     │
+     ▼
+index.html
+
+
+###############################################################################
+# 32. RÉCAPITULATIF DES COMMANDES
+###############################################################################
+
+Adresse IP :
+
+ip a
+
+
+Routes :
+
+ip route
+
+
+État Apache2 :
+
+systemctl status apache2
+
+
+Syntaxe Apache2 :
+
+apache2ctl configtest
+
+
+VirtualHosts :
+
+apache2ctl -S
+
+
+Port HTTP :
+
+ss -tlnp | grep :80
+
+
+DocumentRoot :
+
+ls -ld /var/www/tarantino.family
+
+
+Page Web :
+
+ls -l /var/www/tarantino.family/index.html
+
+
+DNS :
+
+nslookup web.tarantino.family
+
+
+HTTP :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 33. VALIDATION FINALE
+###############################################################################
+
+[ ] Le serveur possède l'adresse 192.168.11.241.
+
+[ ] La configuration réseau est opérationnelle.
+
+[ ] Apache2 est actif.
+
+[ ] Apache2 est activé au démarrage.
+
+[ ] apache2ctl configtest retourne Syntax OK.
+
+[ ] Le port TCP 80 est en écoute.
+
+[ ] Le VirtualHost 001-tarantino.family.conf est actif.
+
+[ ] Le site 000-default.conf est désactivé.
+
+[ ] /var/www/tarantino.family existe.
+
+[ ] index.html existe.
+
+[ ] Les permissions du répertoire sont correctes.
+
+[ ] Le propriétaire est www-data:www-data.
+
+[ ] curl http://localhost fonctionne.
+
+[ ] curl http://192.168.11.241 fonctionne.
+
+[ ] web.tarantino.family pointe vers 192.168.11.241.
+
+[ ] www.tarantino.family pointe vers 192.168.11.241.
+
+[ ] La résolution inverse fonctionne.
+
+[ ] Le poste client peut joindre le serveur.
+
+[ ] http://web.tarantino.family est accessible.
+
+[ ] http://www.tarantino.family est accessible.
+
+[ ] La page Web personnalisée s'affiche correctement.
+
+
+###############################################################################
+# RÉSULTAT
+###############################################################################
+
+Le serveur Web Apache2 est opérationnel.
+
+Le site est accessible depuis le poste client
+à l'aide des noms DNS configurés.
+
+Le laboratoire est validé.
+###############################################################################

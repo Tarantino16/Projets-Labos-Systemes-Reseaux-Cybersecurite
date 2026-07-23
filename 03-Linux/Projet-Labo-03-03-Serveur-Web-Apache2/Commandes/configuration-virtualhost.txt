@@ -1,0 +1,581 @@
+###############################################################################
+# Projet-Labo-03-3-Serveur-Web-Apache2
+# Configuration du VirtualHost Apache2
+#
+# Objectifs :
+# - Créer un VirtualHost Apache2
+# - Associer le domaine tarantino.family au site Web
+# - Définir le DocumentRoot
+# - Configurer les droits d'accès Apache
+# - Activer le nouveau VirtualHost
+# - Désactiver le site Apache par défaut
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+Un VirtualHost permet à Apache2
+d'héberger un ou plusieurs sites Web
+avec des configurations distinctes.
+
+Dans ce laboratoire :
+
+Domaine :
+
+tarantino.family
+
+
+Nom principal :
+
+tarantino.family
+
+
+Alias :
+
+www.tarantino.family
+
+
+Répertoire Web :
+
+/var/www/tarantino.family
+
+
+###############################################################################
+# 2. RÉPERTOIRE DES VIRTUALHOSTS
+###############################################################################
+
+Les configurations des sites Apache2
+sont disponibles dans :
+
+/etc/apache2/sites-available/
+
+
+Accéder au répertoire :
+
+cd /etc/apache2/sites-available
+
+
+Afficher son contenu :
+
+ls
+
+
+###############################################################################
+# 3. FICHIER PAR DÉFAUT
+###############################################################################
+
+Le VirtualHost Apache2 par défaut est :
+
+000-default.conf
+
+
+Vérifier sa présence :
+
+ls -l 000-default.conf
+
+
+###############################################################################
+# 4. CRÉATION DU NOUVEAU VIRTUALHOST
+###############################################################################
+
+Créer le nouveau VirtualHost
+à partir du fichier par défaut :
+
+cp /etc/apache2/sites-available/000-default.conf \
+/etc/apache2/sites-available/001-tarantino.family.conf
+
+
+###############################################################################
+# 5. VÉRIFICATION
+###############################################################################
+
+ls -l /etc/apache2/sites-available/
+
+
+Le fichier suivant doit maintenant apparaître :
+
+001-tarantino.family.conf
+
+
+###############################################################################
+# 6. ÉDITION DU VIRTUALHOST
+###############################################################################
+
+Éditer :
+
+nano /etc/apache2/sites-available/001-tarantino.family.conf
+
+
+###############################################################################
+# 7. CONFIGURATION UTILISÉE
+###############################################################################
+
+<VirtualHost *:80>
+
+    ServerAdmin giosue@tarantino.family
+
+    ServerName tarantino.family
+
+    ServerAlias www.tarantino.family
+
+    DocumentRoot /var/www/tarantino.family
+
+
+    <Directory /var/www/tarantino.family>
+
+        Options Indexes FollowSymLinks
+
+        AllowOverride All
+
+        Require all granted
+
+    </Directory>
+
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+
+
+###############################################################################
+# 8. SERVERADMIN
+###############################################################################
+
+Directive :
+
+ServerAdmin giosue@tarantino.family
+
+
+Cette directive définit l'adresse
+de l'administrateur du site.
+
+
+###############################################################################
+# 9. SERVERNAME
+###############################################################################
+
+Directive :
+
+ServerName tarantino.family
+
+
+Cette directive définit le nom principal
+associé au VirtualHost.
+
+
+###############################################################################
+# 10. SERVERALIAS
+###############################################################################
+
+Directive :
+
+ServerAlias www.tarantino.family
+
+
+Cette directive permet également
+d'accéder au site avec :
+
+www.tarantino.family
+
+
+###############################################################################
+# 11. DOCUMENTROOT
+###############################################################################
+
+Directive :
+
+DocumentRoot /var/www/tarantino.family
+
+
+Le contenu du site Web est stocké dans :
+
+/var/www/tarantino.family
+
+
+###############################################################################
+# 12. CONFIGURATION DIRECTORY
+###############################################################################
+
+Configuration :
+
+<Directory /var/www/tarantino.family>
+
+    Options Indexes FollowSymLinks
+
+    AllowOverride All
+
+    Require all granted
+
+</Directory>
+
+
+Cette section définit les règles Apache2
+appliquées au répertoire du site.
+
+
+###############################################################################
+# 13. CRÉATION DU DOCUMENTROOT
+###############################################################################
+
+Créer le répertoire si nécessaire :
+
+mkdir -p /var/www/tarantino.family
+
+
+###############################################################################
+# 14. PROPRIÉTAIRE
+###############################################################################
+
+Attribuer le répertoire à Apache2 :
+
+chown -R www-data:www-data /var/www/tarantino.family
+
+
+###############################################################################
+# 15. PERMISSIONS
+###############################################################################
+
+Configurer les permissions utilisées
+dans le laboratoire :
+
+chmod -R 755 /var/www/tarantino.family
+
+
+Vérifier :
+
+ls -ld /var/www/tarantino.family
+
+
+###############################################################################
+# 16. PAGE D'ACCUEIL
+###############################################################################
+
+Copier la page Apache2 :
+
+cp /var/www/html/index.html \
+/var/www/tarantino.family/index.html
+
+
+Vérifier :
+
+ls -l /var/www/tarantino.family/
+
+
+###############################################################################
+# 17. MODIFICATION DE LA PAGE
+###############################################################################
+
+Éditer :
+
+nano /var/www/tarantino.family/index.html
+
+
+Personnaliser la page afin d'identifier
+le site :
+
+Tarantino Family
+
+
+###############################################################################
+# 18. TEST DE LA CONFIGURATION
+###############################################################################
+
+Avant d'activer le site :
+
+apache2ctl configtest
+
+
+Résultat attendu :
+
+Syntax OK
+
+
+###############################################################################
+# 19. ACTIVATION DU VIRTUALHOST
+###############################################################################
+
+Activer :
+
+a2ensite 001-tarantino.family.conf
+
+
+###############################################################################
+# 20. DÉSACTIVATION DU SITE PAR DÉFAUT
+###############################################################################
+
+Désactiver :
+
+a2dissite 000-default.conf
+
+
+###############################################################################
+# 21. RECHARGEMENT D'APACHE2
+###############################################################################
+
+Appliquer les modifications :
+
+systemctl reload apache2
+
+
+###############################################################################
+# 22. VÉRIFICATION DU SERVICE
+###############################################################################
+
+systemctl status apache2
+
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 23. VÉRIFICATION DES VIRTUALHOSTS
+###############################################################################
+
+apache2ctl -S
+
+
+Vérifier la présence de :
+
+001-tarantino.family.conf
+
+
+###############################################################################
+# 24. VÉRIFICATION DES SITES ACTIVÉS
+###############################################################################
+
+Afficher :
+
+ls -l /etc/apache2/sites-enabled/
+
+
+Le nouveau VirtualHost doit être présent.
+
+
+###############################################################################
+# 25. TEST LOCAL
+###############################################################################
+
+Depuis le serveur :
+
+curl http://localhost
+
+
+Ou :
+
+curl http://127.0.0.1
+
+
+###############################################################################
+# 26. TEST PAR ADRESSE IP
+###############################################################################
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 27. TEST PAR NOM DNS
+###############################################################################
+
+Une fois le DNS configuré :
+
+curl http://tarantino.family
+
+
+Puis :
+
+curl http://www.tarantino.family
+
+
+###############################################################################
+# 28. TEST DEPUIS LE POSTE CLIENT
+###############################################################################
+
+Depuis le navigateur :
+
+http://web.tarantino.family
+
+
+Deuxième test :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page personnalisée du site
+Tarantino Family doit apparaître.
+
+
+###############################################################################
+# 29. JOURNAUX
+###############################################################################
+
+Journal des accès :
+
+/var/log/apache2/access.log
+
+
+Journal des erreurs :
+
+/var/log/apache2/error.log
+
+
+Afficher les dernières erreurs :
+
+tail /var/log/apache2/error.log
+
+
+Suivre les accès :
+
+tail -f /var/log/apache2/access.log
+
+
+###############################################################################
+# 30. DÉPANNAGE
+###############################################################################
+
+Le site par défaut apparaît :
+
+Vérifier :
+
+a2dissite 000-default.conf
+
+systemctl reload apache2
+
+
+Le VirtualHost n'est pas chargé :
+
+Vérifier :
+
+a2ensite 001-tarantino.family.conf
+
+apache2ctl -S
+
+
+Erreur de syntaxe :
+
+apache2ctl configtest
+
+
+Erreur 403 :
+
+Vérifier :
+
+ls -ld /var/www/tarantino.family
+
+chown -R www-data:www-data /var/www/tarantino.family
+
+
+Le nom de domaine ne fonctionne pas :
+
+Vérifier la résolution DNS :
+
+nslookup tarantino.family
+
+nslookup www.tarantino.family
+
+
+###############################################################################
+# 31. RÉCAPITULATIF
+###############################################################################
+
+VirtualHost :
+
+001-tarantino.family.conf
+
+
+Chemin :
+
+/etc/apache2/sites-available/001-tarantino.family.conf
+
+
+Port :
+
+80/TCP
+
+
+ServerName :
+
+tarantino.family
+
+
+ServerAlias :
+
+www.tarantino.family
+
+
+DocumentRoot :
+
+/var/www/tarantino.family
+
+
+Page principale :
+
+/var/www/tarantino.family/index.html
+
+
+Site Apache par défaut :
+
+000-default.conf
+
+
+État :
+
+Désactivé
+
+
+###############################################################################
+# 32. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-apache2.txt
+
+configuration-reseau.txt
+
+configuration-apache2.txt
+
+configuration-dns.txt
+
+verification.txt
+
+
+###############################################################################
+# 33. VALIDATION
+###############################################################################
+
+[ ] 001-tarantino.family.conf existe.
+
+[ ] Le VirtualHost écoute sur le port 80.
+
+[ ] ServerName est configuré.
+
+[ ] ServerAlias est configuré.
+
+[ ] DocumentRoot pointe vers /var/www/tarantino.family.
+
+[ ] Le répertoire du site existe.
+
+[ ] index.html est présent.
+
+[ ] Les permissions sont configurées.
+
+[ ] Le propriétaire est www-data:www-data.
+
+[ ] apache2ctl configtest retourne Syntax OK.
+
+[ ] 001-tarantino.family.conf est activé.
+
+[ ] 000-default.conf est désactivé.
+
+[ ] Apache2 a été rechargé.
+
+[ ] Apache2 est actif.
+
+[ ] La page Web est accessible depuis le poste client.
+###############################################################################

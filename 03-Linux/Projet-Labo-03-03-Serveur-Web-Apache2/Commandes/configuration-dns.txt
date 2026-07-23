@@ -1,0 +1,424 @@
+###############################################################################
+# Projet-Labo-03-3-Serveur-Web-Apache2
+# Configuration DNS du serveur Web
+#
+# Objectifs :
+# - Déclarer le serveur Web dans le DNS
+# - Créer les enregistrements de zone directe
+# - Créer l'enregistrement de zone inversée
+# - Permettre l'accès au serveur Apache2 par son nom DNS
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+Le serveur Apache2 possède l'adresse IP :
+
+192.168.11.241
+
+
+Afin d'accéder au serveur Web avec un nom
+plutôt qu'avec son adresse IP, il doit être
+déclaré sur le serveur DNS.
+
+Domaine utilisé :
+
+tarantino.family
+
+
+Noms utilisés pour le serveur Web :
+
+web.tarantino.family
+
+www.tarantino.family
+
+
+###############################################################################
+# 2. SERVEUR WEB
+###############################################################################
+
+Nom d'hôte :
+
+WEB
+
+
+Adresse IP :
+
+192.168.11.241
+
+
+FQDN :
+
+web.tarantino.family
+
+
+Alias / nom Web supplémentaire :
+
+www.tarantino.family
+
+
+###############################################################################
+# 3. ZONE DNS DIRECTE
+###############################################################################
+
+Le fichier de zone directe utilisé
+dans le laboratoire est :
+
+/var/cache/bind/tarantino.family.dns
+
+
+Éditer :
+
+nano /var/cache/bind/tarantino.family.dns
+
+
+###############################################################################
+# 4. ENREGISTREMENT DU SERVEUR WEB
+###############################################################################
+
+Ajouter :
+
+WEB             A       192.168.11.241
+
+
+Cet enregistrement permet de résoudre :
+
+web.tarantino.family
+
+vers :
+
+192.168.11.241
+
+
+###############################################################################
+# 5. ENREGISTREMENT WWW
+###############################################################################
+
+Ajouter :
+
+www             A       192.168.11.241
+
+
+Cet enregistrement permet de résoudre :
+
+www.tarantino.family
+
+vers :
+
+192.168.11.241
+
+
+###############################################################################
+# 6. ZONE DNS INVERSÉE
+###############################################################################
+
+Le fichier de zone inversée utilisé
+dans le laboratoire est :
+
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+Éditer :
+
+nano /var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+###############################################################################
+# 7. ENREGISTREMENT PTR
+###############################################################################
+
+Ajouter :
+
+241             PTR     web.tarantino.family.
+
+
+Cet enregistrement permet d'obtenir :
+
+192.168.11.241
+
+→
+
+web.tarantino.family
+
+
+###############################################################################
+# 8. VÉRIFICATION DE LA ZONE DIRECTE
+###############################################################################
+
+Contrôler la zone :
+
+named-checkzone tarantino.family \
+/var/cache/bind/tarantino.family.dns
+
+
+Résultat attendu :
+
+OK
+
+
+###############################################################################
+# 9. VÉRIFICATION DE LA ZONE INVERSÉE
+###############################################################################
+
+Contrôler la zone :
+
+named-checkzone 11.168.192.in-addr.arpa \
+/var/cache/bind/11.168.192.in-addr.arpa.dns
+
+
+Résultat attendu :
+
+OK
+
+
+###############################################################################
+# 10. RECHARGEMENT DU SERVICE DNS
+###############################################################################
+
+Après modification des fichiers de zones,
+recharger le serveur DNS.
+
+Selon le service utilisé :
+
+systemctl reload bind9
+
+
+Vérifier ensuite son état :
+
+systemctl status bind9
+
+
+###############################################################################
+# 11. TEST DE RÉSOLUTION DIRECTE
+###############################################################################
+
+Depuis un client utilisant le serveur DNS :
+
+nslookup web.tarantino.family
+
+
+Résultat attendu :
+
+Nom :
+
+web.tarantino.family
+
+
+Adresse :
+
+192.168.11.241
+
+
+###############################################################################
+# 12. TEST DE WWW
+###############################################################################
+
+nslookup www.tarantino.family
+
+
+Résultat attendu :
+
+192.168.11.241
+
+
+###############################################################################
+# 13. TEST DE RÉSOLUTION INVERSÉE
+###############################################################################
+
+nslookup 192.168.11.241
+
+
+Résultat attendu :
+
+web.tarantino.family
+
+
+###############################################################################
+# 14. TEST AVEC DIG
+###############################################################################
+
+Résolution directe :
+
+dig web.tarantino.family
+
+
+Résolution de www :
+
+dig www.tarantino.family
+
+
+Résolution inversée :
+
+dig -x 192.168.11.241
+
+
+###############################################################################
+# 15. TEST DE CONNECTIVITÉ PAR NOM
+###############################################################################
+
+Depuis le poste client :
+
+ping web.tarantino.family
+
+
+Puis :
+
+ping www.tarantino.family
+
+
+###############################################################################
+# 16. TEST DEPUIS LE NAVIGATEUR
+###############################################################################
+
+Ouvrir un navigateur Web.
+
+Premier test :
+
+http://web.tarantino.family
+
+
+Deuxième test :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page Web personnalisée hébergée
+par Apache2 doit apparaître.
+
+
+###############################################################################
+# 17. CORRESPONDANCE DNS
+###############################################################################
+
+web.tarantino.family
+        │
+        │ Enregistrement A
+        ▼
+192.168.11.241
+        │
+        │ Port TCP 80
+        ▼
+Apache2
+        │
+        ▼
+/var/www/tarantino.family/index.html
+
+
+###############################################################################
+# 18. RÉCAPITULATIF
+###############################################################################
+
+Domaine :
+
+tarantino.family
+
+
+Serveur Web :
+
+web.tarantino.family
+
+
+Adresse IP :
+
+192.168.11.241
+
+
+Enregistrements directs :
+
+WEB     A     192.168.11.241
+
+www     A     192.168.11.241
+
+
+Enregistrement inverse :
+
+241     PTR   web.tarantino.family.
+
+
+###############################################################################
+# 19. DÉPANNAGE
+###############################################################################
+
+Le nom web.tarantino.family n'est pas résolu :
+
+- Vérifier l'enregistrement A.
+- Vérifier le fichier de zone.
+- Vérifier le serveur DNS utilisé par le client.
+
+
+www.tarantino.family ne fonctionne pas :
+
+- Vérifier l'enregistrement www.
+- Vérifier la zone directe.
+
+
+La résolution inverse ne fonctionne pas :
+
+- Vérifier l'enregistrement PTR.
+- Vérifier la zone inversée.
+
+
+La résolution DNS fonctionne mais pas le site :
+
+- Vérifier Apache2.
+- Vérifier le VirtualHost.
+- Vérifier le port 80.
+
+Commandes :
+
+systemctl status apache2
+
+apache2ctl -S
+
+ss -tln
+
+
+###############################################################################
+# 20. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-apache2.txt
+
+configuration-reseau.txt
+
+configuration-apache2.txt
+
+configuration-virtualhost.txt
+
+verification.txt
+
+
+###############################################################################
+# 21. VALIDATION
+###############################################################################
+
+[ ] Le serveur Web possède l'adresse 192.168.11.241.
+
+[ ] L'enregistrement WEB existe dans la zone directe.
+
+[ ] L'enregistrement www existe dans la zone directe.
+
+[ ] WEB pointe vers 192.168.11.241.
+
+[ ] www pointe vers 192.168.11.241.
+
+[ ] Le PTR de 192.168.11.241 existe.
+
+[ ] La zone directe est valide.
+
+[ ] La zone inversée est valide.
+
+[ ] web.tarantino.family est résolu depuis le client.
+
+[ ] www.tarantino.family est résolu depuis le client.
+
+[ ] La résolution inverse fonctionne.
+
+[ ] http://web.tarantino.family est accessible.
+
+[ ] http://www.tarantino.family est accessible.
+###############################################################################

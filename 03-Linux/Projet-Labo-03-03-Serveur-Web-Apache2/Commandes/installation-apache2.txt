@@ -1,0 +1,491 @@
+###############################################################################
+# Projet-Labo-03-3-Serveur-Web-Apache2
+# Installation du serveur Web Apache2
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Mettre à jour le système
+# - Installer Apache2
+# - Démarrer et activer le service
+# - Vérifier son fonctionnement
+# - Préparer le serveur pour la configuration du VirtualHost
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+Apache2 est un serveur Web permettant
+de distribuer des contenus à des clients
+à l'aide des protocoles HTTP et HTTPS.
+
+Dans ce laboratoire, Apache2 sera utilisé
+pour héberger le site :
+
+tarantino.family
+
+
+Le serveur Web sera ensuite configuré
+avec un VirtualHost dédié.
+
+
+###############################################################################
+# 2. OUVERTURE D'UNE SESSION ROOT
+###############################################################################
+
+Se connecter avec un compte disposant
+des droits d'administration.
+
+Exemple :
+
+su -
+
+
+Ou utiliser sudo si celui-ci est configuré.
+
+
+###############################################################################
+# 3. MISE À JOUR DES DÉPÔTS
+###############################################################################
+
+Mettre à jour la liste des paquets :
+
+apt update
+
+
+###############################################################################
+# 4. MISE À JOUR DU SYSTÈME
+###############################################################################
+
+Mettre à jour les paquets installés :
+
+apt upgrade -y
+
+
+###############################################################################
+# 5. INSTALLATION D'APACHE2
+###############################################################################
+
+Installer Apache2 :
+
+apt install apache2 -y
+
+
+###############################################################################
+# 6. VÉRIFICATION DE L'INSTALLATION
+###############################################################################
+
+Afficher la version d'Apache2 :
+
+apache2 -v
+
+
+Exemple de résultat :
+
+Server version: Apache/2.x
+
+
+###############################################################################
+# 7. VÉRIFICATION DU SERVICE
+###############################################################################
+
+Vérifier l'état d'Apache2 :
+
+systemctl status apache2
+
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 8. DÉMARRAGE DU SERVICE
+###############################################################################
+
+Si Apache2 n'est pas démarré :
+
+systemctl start apache2
+
+
+###############################################################################
+# 9. ACTIVATION AU DÉMARRAGE
+###############################################################################
+
+Configurer Apache2 pour qu'il démarre
+automatiquement avec Debian :
+
+systemctl enable apache2
+
+
+Vérifier :
+
+systemctl is-enabled apache2
+
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# 10. REDÉMARRAGE D'APACHE2
+###############################################################################
+
+Si nécessaire :
+
+systemctl restart apache2
+
+
+###############################################################################
+# 11. VÉRIFICATION DES PORTS
+###############################################################################
+
+Afficher les ports en écoute :
+
+ss -tln
+
+
+Apache2 doit normalement écouter sur :
+
+80/TCP
+
+
+Le port 80 correspond au protocole HTTP.
+
+
+###############################################################################
+# 12. VÉRIFICATION DU RÉPERTOIRE WEB PAR DÉFAUT
+###############################################################################
+
+Afficher le contenu de :
+
+/var/www/html
+
+
+Commande :
+
+ls -l /var/www/html
+
+
+Le fichier suivant doit être présent :
+
+index.html
+
+
+###############################################################################
+# 13. TEST LOCAL AVEC CURL
+###############################################################################
+
+Tester Apache2 depuis le serveur :
+
+curl http://localhost
+
+
+Ou :
+
+curl http://127.0.0.1
+
+
+Le contenu de la page Web doit être retourné.
+
+
+###############################################################################
+# 14. TEST AVEC L'ADRESSE IP DU SERVEUR
+###############################################################################
+
+Adresse IP utilisée dans le laboratoire :
+
+192.168.11.241
+
+
+Tester :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 15. TEST DEPUIS UN NAVIGATEUR
+###############################################################################
+
+Depuis un poste client du même réseau,
+ouvrir un navigateur Web.
+
+Entrer :
+
+http://192.168.11.241
+
+
+Résultat attendu :
+
+La page Apache2 par défaut doit apparaître.
+
+
+###############################################################################
+# 16. RÉPERTOIRES IMPORTANTS D'APACHE2
+###############################################################################
+
+Configuration principale :
+
+/etc/apache2/
+
+
+Sites disponibles :
+
+/etc/apache2/sites-available/
+
+
+Sites activés :
+
+/etc/apache2/sites-enabled/
+
+
+Modules disponibles :
+
+/etc/apache2/mods-available/
+
+
+Modules activés :
+
+/etc/apache2/mods-enabled/
+
+
+Répertoire Web par défaut :
+
+/var/www/html/
+
+
+Journaux :
+
+/var/log/apache2/
+
+
+###############################################################################
+# 17. FICHIERS IMPORTANTS
+###############################################################################
+
+Configuration Apache2 :
+
+/etc/apache2/apache2.conf
+
+
+Configuration des ports :
+
+/etc/apache2/ports.conf
+
+
+VirtualHost par défaut :
+
+/etc/apache2/sites-available/000-default.conf
+
+
+Page Web par défaut :
+
+/var/www/html/index.html
+
+
+###############################################################################
+# 18. TEST DE LA CONFIGURATION APACHE2
+###############################################################################
+
+Tester la syntaxe :
+
+apache2ctl configtest
+
+
+Résultat attendu :
+
+Syntax OK
+
+
+###############################################################################
+# 19. COMMANDES DE GESTION DU SERVICE
+###############################################################################
+
+Démarrer Apache2 :
+
+systemctl start apache2
+
+
+Arrêter Apache2 :
+
+systemctl stop apache2
+
+
+Redémarrer Apache2 :
+
+systemctl restart apache2
+
+
+Recharger la configuration :
+
+systemctl reload apache2
+
+
+Afficher l'état :
+
+systemctl status apache2
+
+
+Activer au démarrage :
+
+systemctl enable apache2
+
+
+Désactiver au démarrage :
+
+systemctl disable apache2
+
+
+###############################################################################
+# 20. JOURNAUX APACHE2
+###############################################################################
+
+Afficher les dernières erreurs :
+
+tail /var/log/apache2/error.log
+
+
+Suivre les erreurs en temps réel :
+
+tail -f /var/log/apache2/error.log
+
+
+Afficher les accès HTTP :
+
+tail /var/log/apache2/access.log
+
+
+Suivre les accès :
+
+tail -f /var/log/apache2/access.log
+
+
+###############################################################################
+# 21. VÉRIFICATION AVEC JOURNALCTL
+###############################################################################
+
+Afficher les événements du service :
+
+journalctl -u apache2
+
+
+Afficher les événements récents :
+
+journalctl -u apache2 --since today
+
+
+###############################################################################
+# 22. DIAGNOSTIC
+###############################################################################
+
+Apache2 ne démarre pas :
+
+systemctl status apache2
+
+
+Puis :
+
+journalctl -u apache2
+
+
+Tester également la configuration :
+
+apache2ctl configtest
+
+
+###############################################################################
+# 23. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Apache2 n'est pas installé :
+
+apt install apache2 -y
+
+
+Le service est arrêté :
+
+systemctl start apache2
+
+
+Le service ne démarre pas :
+
+apache2ctl configtest
+
+
+Le port 80 n'est pas en écoute :
+
+ss -tln
+
+
+La page ne s'affiche pas :
+
+- Vérifier le service Apache2.
+- Vérifier l'adresse IP du serveur.
+- Vérifier la connectivité réseau.
+- Vérifier le port TCP 80.
+
+
+###############################################################################
+# 24. ÉTAPE SUIVANTE
+###############################################################################
+
+Une fois Apache2 installé et fonctionnel,
+la configuration du site peut commencer.
+
+Étapes suivantes :
+
+1. Configuration réseau
+2. Création du VirtualHost
+3. Création du répertoire du site
+4. Configuration des permissions
+5. Configuration DNS
+6. Tests depuis le poste client
+
+
+###############################################################################
+# 25. FICHIERS ASSOCIÉS
+###############################################################################
+
+configuration-reseau.txt
+
+configuration-apache2.txt
+
+configuration-virtualhost.txt
+
+configuration-dns.txt
+
+verification.txt
+
+
+###############################################################################
+# 26. VALIDATION
+###############################################################################
+
+[ ] La liste des paquets a été mise à jour.
+
+[ ] Apache2 est installé.
+
+[ ] La version d'Apache2 est affichée.
+
+[ ] Le service Apache2 est actif.
+
+[ ] Apache2 démarre automatiquement avec Debian.
+
+[ ] Le port TCP 80 est en écoute.
+
+[ ] /var/www/html existe.
+
+[ ] index.html est présent.
+
+[ ] apache2ctl configtest retourne Syntax OK.
+
+[ ] http://localhost fonctionne.
+
+[ ] http://192.168.11.241 fonctionne.
+
+[ ] La page Apache2 est accessible depuis le poste client.
+###############################################################################

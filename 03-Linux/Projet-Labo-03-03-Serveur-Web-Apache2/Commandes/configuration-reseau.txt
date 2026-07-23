@@ -1,0 +1,509 @@
+###############################################################################
+# Projet-Labo-03-3-Serveur-Web-Apache2
+# Configuration réseau du serveur Web
+#
+# Système :
+# - Debian GNU/Linux
+#
+# Objectifs :
+# - Configurer le réseau du serveur Web
+# - Attribuer une adresse IP fixe
+# - Vérifier la configuration réseau
+# - Vérifier la connectivité
+# - Préparer le serveur pour Apache2 et le DNS
+###############################################################################
+
+
+###############################################################################
+# 1. PRÉSENTATION
+###############################################################################
+
+Avant de configurer Apache2, le serveur Web
+doit disposer d'une configuration réseau fonctionnelle.
+
+Une adresse IP fixe permet au serveur :
+
+- d'être accessible depuis les postes clients ;
+- d'être déclaré dans le DNS ;
+- d'héberger le site Web de manière permanente.
+
+
+###############################################################################
+# 2. CONFIGURATION DU SERVEUR WEB
+###############################################################################
+
+Nom du serveur :
+
+WEB
+
+
+Adresse IP :
+
+192.168.11.241
+
+
+Domaine :
+
+tarantino.family
+
+
+FQDN :
+
+web.tarantino.family
+
+
+###############################################################################
+# 3. IDENTIFICATION DE L'INTERFACE RÉSEAU
+###############################################################################
+
+Afficher les interfaces :
+
+ip a
+
+
+Ou :
+
+ip link
+
+
+Identifier l'interface réseau utilisée
+par le serveur Debian.
+
+
+###############################################################################
+# 4. FICHIER DE CONFIGURATION
+###############################################################################
+
+Le réseau est configuré dans :
+
+/etc/network/interfaces
+
+
+Éditer :
+
+nano /etc/network/interfaces
+
+
+###############################################################################
+# 5. CONFIGURATION DE L'INTERFACE
+###############################################################################
+
+Configurer l'interface réseau avec
+l'adresse IP utilisée dans le laboratoire.
+
+Exemple :
+
+auto lo
+iface lo inet loopback
+
+auto <interface>
+iface <interface> inet static
+    address 192.168.11.241/24
+    gateway <passerelle>
+
+
+Remplacer :
+
+<interface>
+
+par le nom réel de l'interface réseau.
+
+
+###############################################################################
+# 6. ENREGISTREMENT
+###############################################################################
+
+Enregistrer les modifications.
+
+Avec nano :
+
+CTRL + O
+
+Entrée
+
+CTRL + X
+
+
+###############################################################################
+# 7. APPLICATION DE LA CONFIGURATION
+###############################################################################
+
+Redémarrer le service réseau :
+
+systemctl restart networking
+
+
+Si nécessaire :
+
+reboot
+
+
+###############################################################################
+# 8. VÉRIFICATION DE L'ADRESSE IP
+###############################################################################
+
+Afficher la configuration :
+
+ip a
+
+
+Résultat attendu :
+
+192.168.11.241/24
+
+
+###############################################################################
+# 9. VÉRIFICATION DES ROUTES
+###############################################################################
+
+Afficher la table de routage :
+
+ip route
+
+
+Vérifier :
+
+- la présence du réseau local ;
+- la présence de la route par défaut
+  si une passerelle est configurée.
+
+
+###############################################################################
+# 10. TEST DE LA PILE TCP/IP
+###############################################################################
+
+ping -c 4 127.0.0.1
+
+
+Résultat attendu :
+
+Réponses reçues.
+
+
+###############################################################################
+# 11. TEST DE L'ADRESSE LOCALE
+###############################################################################
+
+ping -c 4 192.168.11.241
+
+
+Résultat attendu :
+
+Réponses reçues.
+
+
+###############################################################################
+# 12. TEST DU RÉSEAU LOCAL
+###############################################################################
+
+Tester une autre machine du réseau :
+
+ping -c 4 <adresse-IP-machine>
+
+
+Résultat attendu :
+
+La machine distante répond.
+
+
+###############################################################################
+# 13. TEST DE LA PASSERELLE
+###############################################################################
+
+Si une passerelle est configurée :
+
+ping -c 4 <adresse-IP-passerelle>
+
+
+###############################################################################
+# 14. TEST DNS
+###############################################################################
+
+Une fois la configuration DNS réalisée :
+
+ping web.tarantino.family
+
+
+Résultat attendu :
+
+web.tarantino.family
+
+est résolu vers :
+
+192.168.11.241
+
+
+###############################################################################
+# 15. VÉRIFICATION AVEC NSLOOKUP
+###############################################################################
+
+nslookup web.tarantino.family
+
+
+Résultat attendu :
+
+Name:
+
+web.tarantino.family
+
+
+Address:
+
+192.168.11.241
+
+
+###############################################################################
+# 16. VÉRIFICATION DE WWW
+###############################################################################
+
+nslookup www.tarantino.family
+
+
+Résultat attendu :
+
+192.168.11.241
+
+
+###############################################################################
+# 17. TEST DEPUIS LE POSTE CLIENT
+###############################################################################
+
+Depuis le poste client :
+
+ping 192.168.11.241
+
+
+Puis :
+
+ping web.tarantino.family
+
+
+Résultat attendu :
+
+Le serveur Web est joignable.
+
+
+###############################################################################
+# 18. VÉRIFICATION DU SERVEUR APACHE2
+###############################################################################
+
+Une fois Apache2 configuré :
+
+ss -tln
+
+
+Vérifier que le serveur écoute
+sur le port HTTP :
+
+80/TCP
+
+
+###############################################################################
+# 19. TEST HTTP
+###############################################################################
+
+Depuis le serveur :
+
+curl http://localhost
+
+
+Puis :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 20. TEST DEPUIS LE NAVIGATEUR
+###############################################################################
+
+Depuis le poste client :
+
+http://web.tarantino.family
+
+
+Deuxième test :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page Web hébergée par Apache2
+doit apparaître.
+
+
+###############################################################################
+# 21. ARCHITECTURE RÉSEAU
+###############################################################################
+
+Poste client
+     │
+     │ Réseau local
+     │
+     ▼
+192.168.11.241
+     │
+     │
+     ▼
+Serveur Debian
+     │
+     ├── Apache2
+     │      │
+     │      └── TCP/80
+     │
+     └── web.tarantino.family
+
+
+###############################################################################
+# 22. COMMANDES DE DIAGNOSTIC
+###############################################################################
+
+Interfaces :
+
+ip a
+
+
+État des interfaces :
+
+ip link
+
+
+Routes :
+
+ip route
+
+
+Configuration :
+
+cat /etc/network/interfaces
+
+
+Ports :
+
+ss -tln
+
+
+Résolution DNS :
+
+nslookup web.tarantino.family
+
+
+Test HTTP :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 23. PROBLÈMES FRÉQUENTS
+###############################################################################
+
+Le serveur n'a pas l'adresse attendue :
+
+- Vérifier /etc/network/interfaces.
+- Vérifier le nom de l'interface.
+- Redémarrer le service networking.
+
+
+Le poste client ne joint pas le serveur :
+
+- Vérifier l'adressage IP.
+- Vérifier le masque.
+- Vérifier la connectivité du réseau local.
+
+
+L'adresse IP fonctionne mais pas le nom :
+
+- Vérifier la configuration DNS.
+- Vérifier que le client utilise le bon serveur DNS.
+
+
+Le nom est résolu mais le site ne répond pas :
+
+- Vérifier Apache2.
+- Vérifier le VirtualHost.
+- Vérifier le port TCP 80.
+
+
+###############################################################################
+# 24. RÉCAPITULATIF
+###############################################################################
+
+Serveur :
+
+WEB
+
+
+Système :
+
+Debian GNU/Linux
+
+
+Adresse IP :
+
+192.168.11.241
+
+
+Domaine :
+
+tarantino.family
+
+
+FQDN :
+
+web.tarantino.family
+
+
+Alias Web :
+
+www.tarantino.family
+
+
+Service Web :
+
+Apache2
+
+
+Port HTTP :
+
+80/TCP
+
+
+###############################################################################
+# 25. FICHIERS ASSOCIÉS
+###############################################################################
+
+installation-apache2.txt
+
+configuration-apache2.txt
+
+configuration-virtualhost.txt
+
+configuration-dns.txt
+
+verification.txt
+
+
+###############################################################################
+# 26. VALIDATION
+###############################################################################
+
+[ ] L'interface réseau est active.
+
+[ ] Le serveur possède l'adresse 192.168.11.241.
+
+[ ] La table de routage est correcte.
+
+[ ] Le serveur communique avec le réseau local.
+
+[ ] Le poste client peut joindre 192.168.11.241.
+
+[ ] web.tarantino.family pointe vers 192.168.11.241.
+
+[ ] www.tarantino.family pointe vers 192.168.11.241.
+
+[ ] Apache2 écoute sur le port 80.
+
+[ ] Le serveur répond aux requêtes HTTP.
+
+[ ] Le site est accessible depuis le poste client.
+###############################################################################
