@@ -1,5 +1,5 @@
 ###############################################################################
-# Projet-Labo-03-1-Premiers-Pas-sur-Linux
+# Projet-Labo-03-01-Premiers-Pas-sur-Linux
 # Configuration des utilisateurs Linux
 #
 # Système :
