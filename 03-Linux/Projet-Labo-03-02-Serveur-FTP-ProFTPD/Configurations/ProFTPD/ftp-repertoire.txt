@@ -1,0 +1,217 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Répertoire FTP
+###############################################################################
+
+Objectif :
+
+Définir le répertoire utilisé par ProFTPD
+pour le partage des fichiers avec les clients FTP.
+
+
+###############################################################################
+# Répertoire utilisé
+###############################################################################
+
+Chemin :
+
+/srv/ftp
+
+
+###############################################################################
+# Description
+###############################################################################
+
+Le répertoire /srv/ftp constitue
+la racine du partage FTP.
+
+Tous les utilisateurs autorisés
+accèdent à ce dossier après
+l'établissement de la connexion.
+
+
+###############################################################################
+# Vérification de l'existence
+###############################################################################
+
+Commande :
+
+ls -ld /srv/ftp
+
+
+Résultat attendu :
+
+Le répertoire existe
+et est accessible par le serveur FTP.
+
+
+###############################################################################
+# Création du répertoire
+###############################################################################
+
+Si le dossier n'existe pas :
+
+mkdir -p /srv/ftp
+
+
+###############################################################################
+# Propriétaire
+###############################################################################
+
+Commande :
+
+ls -ld /srv/ftp
+
+
+Résultat attendu :
+
+Utilisateur :
+
+ftp
+
+Groupe :
+
+nogroup
+
+
+Configuration :
+
+ftp:nogroup
+
+
+###############################################################################
+# Modification du propriétaire
+###############################################################################
+
+Commande :
+
+chown ftp:nogroup /srv/ftp
+
+
+###############################################################################
+# Permissions
+###############################################################################
+
+Commande :
+
+ls -ld /srv/ftp
+
+
+Exemple :
+
+drwx-wx-wx
+
+
+Configuration utilisée :
+
+733
+
+
+Modification :
+
+chmod 733 /srv/ftp
+
+
+###############################################################################
+# Contenu initial
+###############################################################################
+
+Le répertoire contient notamment :
+
+welcome.msg
+
+mega-fichier.txt
+
+
+###############################################################################
+# Vérification du contenu
+###############################################################################
+
+Commande :
+
+ls -l /srv/ftp
+
+
+###############################################################################
+# Affichage du contenu d'un fichier
+###############################################################################
+
+Commande :
+
+cat /srv/ftp/mega-fichier.txt
+
+
+###############################################################################
+# Utilisation par ProFTPD
+###############################################################################
+
+Le répertoire est défini dans
+le fichier :
+
+/etc/proftpd/proftpd.conf
+
+Il correspond au dossier partagé
+avec les clients FTP.
+
+
+###############################################################################
+# Accès depuis FileZilla
+###############################################################################
+
+Après connexion :
+
+Le client affiche directement
+le contenu du dossier :
+
+/srv/ftp
+
+
+###############################################################################
+# Vérification
+###############################################################################
+
+✓ Le répertoire existe.
+
+✓ Le propriétaire est ftp:nogroup.
+
+✓ Les permissions sont correctement définies.
+
+✓ Les fichiers de test sont présents.
+
+✓ Le contenu est accessible depuis FileZilla.
+
+✓ Les transferts de fichiers fonctionnent.
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+Le dossier est introuvable :
+
+Créer le dossier :
+
+mkdir -p /srv/ftp
+
+
+Impossible d'envoyer un fichier :
+
+Vérifier les permissions :
+
+ls -ld /srv/ftp
+
+
+Modifier si nécessaire :
+
+chmod 733 /srv/ftp
+
+
+Le client FTP ne voit aucun fichier :
+
+Vérifier le contenu :
+
+ls -l /srv/ftp
+
+Vérifier la configuration :
+
+/etc/proftpd/proftpd.conf

@@ -1,0 +1,265 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Service ProFTPD
+###############################################################################
+
+Service :
+
+proftpd
+
+
+Description :
+
+Serveur FTP permettant le partage de fichiers
+entre un serveur Debian et des clients FTP.
+
+
+###############################################################################
+# Gestion du service
+###############################################################################
+
+Démarrer le service :
+
+systemctl start proftpd
+
+
+Arrêter le service :
+
+systemctl stop proftpd
+
+
+Redémarrer le service :
+
+systemctl restart proftpd
+
+
+Recharger la configuration :
+
+systemctl reload proftpd
+
+
+Activer au démarrage :
+
+systemctl enable proftpd
+
+
+Désactiver le démarrage automatique :
+
+systemctl disable proftpd
+
+
+###############################################################################
+# Vérification du service
+###############################################################################
+
+Afficher l'état :
+
+systemctl status proftpd
+
+
+Vérifier si le service est actif :
+
+systemctl is-active proftpd
+
+
+Résultat attendu :
+
+active
+
+
+Vérifier si le démarrage automatique
+est activé :
+
+systemctl is-enabled proftpd
+
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# Vérification des processus
+###############################################################################
+
+Afficher les processus liés à ProFTPD :
+
+ps aux | grep proftpd
+
+
+Résultat attendu :
+
+Un ou plusieurs processus ProFTPD
+sont en cours d'exécution.
+
+
+###############################################################################
+# Vérification des ports
+###############################################################################
+
+Afficher les ports ouverts :
+
+ss -tln
+
+
+Résultat attendu :
+
+Le port TCP 21 est à l'écoute.
+
+
+Exemple :
+
+LISTEN 0 128 *:21 *:*
+
+
+###############################################################################
+# Consultation des journaux
+###############################################################################
+
+Afficher les journaux du service :
+
+journalctl -u proftpd
+
+
+Afficher les derniers événements :
+
+journalctl -u proftpd -n 20
+
+
+Suivre les journaux en temps réel :
+
+journalctl -u proftpd -f
+
+
+###############################################################################
+# Test du service
+###############################################################################
+
+Depuis le serveur :
+
+ftp localhost
+
+
+Ou :
+
+ftp 127.0.0.1
+
+
+Depuis un poste client :
+
+Hôte :
+
+192.168.11.240
+
+Port :
+
+21
+
+Utilisateur :
+
+anonymous
+
+
+Résultat attendu :
+
+Connexion FTP réussie.
+
+
+###############################################################################
+# Vérification après redémarrage
+###############################################################################
+
+Redémarrer le serveur :
+
+reboot
+
+
+Après le redémarrage :
+
+systemctl status proftpd
+
+systemctl is-enabled proftpd
+
+
+Résultat attendu :
+
+Le service démarre automatiquement
+et son état est :
+
+active (running)
+
+
+###############################################################################
+# Informations du service
+###############################################################################
+
+Nom du service :
+
+proftpd
+
+Gestionnaire de services :
+
+systemd
+
+Fichier principal :
+
+/etc/proftpd/proftpd.conf
+
+Port :
+
+21/TCP
+
+Répertoire partagé :
+
+/srv/ftp
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+Le service ne démarre pas :
+
+- Vérifier le fichier de configuration.
+- Consulter les journaux.
+
+Commandes :
+
+systemctl status proftpd
+
+journalctl -u proftpd
+
+
+Le port 21 n'est pas ouvert :
+
+- Vérifier que le service est actif.
+- Redémarrer le service.
+
+systemctl restart proftpd
+
+
+Impossible de se connecter :
+
+- Vérifier l'adresse IP.
+- Vérifier le port 21.
+- Vérifier les règles du pare-feu.
+- Vérifier que les connexions anonymes sont autorisées.
+
+
+###############################################################################
+# Validation
+###############################################################################
+
+✓ Le service est installé.
+
+✓ Le service est actif.
+
+✓ Le démarrage automatique est activé.
+
+✓ Le port 21 est à l'écoute.
+
+✓ Les journaux ne contiennent aucune erreur critique.
+
+✓ Les connexions FTP fonctionnent.
+
+✓ Les transferts de fichiers sont opérationnels.

@@ -1,0 +1,274 @@
+###############################################################################
+# Projet-Labo-03-2-Serveur-FTP-ProFTPD
+# Permissions du répertoire FTP
+###############################################################################
+
+Objectif :
+
+Définir les permissions du répertoire partagé
+afin d'autoriser les opérations de lecture,
+d'écriture et de navigation nécessaires
+au fonctionnement du serveur FTP.
+
+
+###############################################################################
+# Répertoire concerné
+###############################################################################
+
+Chemin :
+
+/srv/ftp
+
+
+###############################################################################
+# Propriétaire
+###############################################################################
+
+Utilisateur :
+
+ftp
+
+Groupe :
+
+nogroup
+
+
+Configuration :
+
+ftp:nogroup
+
+
+Vérification :
+
+ls -ld /srv/ftp
+
+
+###############################################################################
+# Permissions configurées
+###############################################################################
+
+Commande :
+
+chmod 733 /srv/ftp
+
+
+Valeur numérique :
+
+733
+
+
+Notation symbolique :
+
+drwx-wx-wx
+
+
+###############################################################################
+# Détail des permissions
+###############################################################################
+
+Utilisateur (Owner)
+
+rwx
+
+- Lecture
+- Écriture
+- Exécution
+
+------------------------------
+
+Groupe (Group)
+
+-wx
+
+- Pas de lecture
+- Écriture
+- Exécution
+
+------------------------------
+
+Autres (Others)
+
+-wx
+
+- Pas de lecture
+- Écriture
+- Exécution
+
+
+###############################################################################
+# Signification des droits
+###############################################################################
+
+Lecture (r)
+
+Permet d'afficher le contenu d'un fichier
+ou de lister le contenu d'un répertoire.
+
+------------------------------
+
+Écriture (w)
+
+Permet de créer, modifier ou supprimer
+des fichiers selon les autorisations
+accordées par le serveur FTP.
+
+------------------------------
+
+Exécution (x)
+
+Pour un répertoire :
+
+Permet de traverser le répertoire
+et d'accéder aux fichiers qu'il contient.
+
+Pour un fichier :
+
+Permet son exécution lorsqu'il s'agit
+d'un programme ou d'un script.
+
+
+###############################################################################
+# Vérification des permissions
+###############################################################################
+
+Commande :
+
+ls -ld /srv/ftp
+
+
+Exemple de résultat :
+
+drwx-wx-wx 2 ftp nogroup 4096 ...
+
+
+###############################################################################
+# Vérification du propriétaire
+###############################################################################
+
+Commande :
+
+stat /srv/ftp
+
+
+Informations attendues :
+
+Owner : ftp
+
+Group : nogroup
+
+
+###############################################################################
+# Modification du propriétaire
+###############################################################################
+
+Commande :
+
+chown ftp:nogroup /srv/ftp
+
+
+###############################################################################
+# Modification des permissions
+###############################################################################
+
+Commande :
+
+chmod 733 /srv/ftp
+
+
+###############################################################################
+# Contrôle depuis FileZilla
+###############################################################################
+
+Les utilisateurs FTP doivent pouvoir :
+
+✓ Accéder au répertoire.
+
+✓ Télécharger les fichiers autorisés.
+
+✓ Envoyer de nouveaux fichiers.
+
+✓ Remplacer un fichier existant
+  lorsque les droits le permettent.
+
+
+###############################################################################
+# Contrôle côté serveur
+###############################################################################
+
+Lister les fichiers :
+
+ls -l /srv/ftp
+
+Afficher un fichier :
+
+cat /srv/ftp/mega-fichier.txt
+
+
+###############################################################################
+# Sécurité
+###############################################################################
+
+Les permissions doivent être adaptées
+aux besoins du serveur FTP.
+
+Éviter d'attribuer des droits
+plus élevés que nécessaire.
+
+Limiter les permissions en fonction
+des utilisateurs autorisés.
+
+
+###############################################################################
+# Dépannage
+###############################################################################
+
+Impossible d'envoyer un fichier :
+
+Vérifier :
+
+ls -ld /srv/ftp
+
+Modifier si nécessaire :
+
+chmod 733 /srv/ftp
+
+
+Erreur "Permission denied" :
+
+Vérifier le propriétaire :
+
+ls -ld /srv/ftp
+
+Corriger :
+
+chown ftp:nogroup /srv/ftp
+
+
+Le contenu du dossier est inaccessible :
+
+Vérifier :
+
+- les permissions ;
+- le propriétaire ;
+- la configuration de ProFTPD.
+
+
+###############################################################################
+# Validation
+###############################################################################
+
+✓ Le propriétaire est ftp.
+
+✓ Le groupe est nogroup.
+
+✓ Les permissions sont définies à 733.
+
+✓ Le répertoire est accessible.
+
+✓ Les transferts FTP fonctionnent.
+
+✓ Les opérations de téléchargement
+  et d'envoi sont autorisées.
+
+✓ Aucun problème de permissions
+  n'est constaté.
