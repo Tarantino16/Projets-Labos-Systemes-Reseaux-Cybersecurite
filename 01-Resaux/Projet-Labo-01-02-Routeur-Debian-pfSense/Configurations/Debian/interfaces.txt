@@ -1,5 +1,5 @@
 #=========================================================
-# Projet-Labo 02 - Routeur Debian & pfSense
+# Projet-Labo-01-02-Routeur-Debian-pfSense
 # Fichier : /etc/network/interfaces
 # Description :
 # Configuration des interfaces réseau du routeur Debian.
