@@ -1,0 +1,326 @@
+###############################################################################
+# Projet-Labo-03-03-Serveur-Web-Apache2
+# Répertoire Web Apache2
+###############################################################################
+
+
+###############################################################################
+# 1. RÉPERTOIRE WEB
+###############################################################################
+
+Répertoire utilisé pour héberger le site :
+
+/var/www/tarantino.family
+
+
+Ce répertoire constitue le DocumentRoot
+du VirtualHost :
+
+001-tarantino.family.conf
+
+
+###############################################################################
+# 2. CRÉATION DU RÉPERTOIRE
+###############################################################################
+
+Commande :
+
+mkdir -p /var/www/tarantino.family
+
+
+Vérification :
+
+ls -ld /var/www/tarantino.family
+
+
+###############################################################################
+# 3. DOCUMENTROOT
+###############################################################################
+
+Dans le VirtualHost Apache2 :
+
+DocumentRoot /var/www/tarantino.family
+
+
+Apache2 utilise donc ce répertoire
+pour rechercher les fichiers du site.
+
+
+###############################################################################
+# 4. ARBORESCENCE
+###############################################################################
+
+/var/www/
+│
+├── html/
+│   └── index.html
+│
+└── tarantino.family/
+    └── index.html
+
+
+Le répertoire :
+
+/var/www/html
+
+correspond au site Apache2 par défaut.
+
+
+Le répertoire :
+
+/var/www/tarantino.family
+
+correspond au site créé dans ce laboratoire.
+
+
+###############################################################################
+# 5. PAGE WEB PAR DÉFAUT
+###############################################################################
+
+Le fichier index.html du site Apache2
+par défaut est initialement situé dans :
+
+/var/www/html/index.html
+
+
+Ce fichier est utilisé comme base
+pour créer la page du nouveau site.
+
+
+###############################################################################
+# 6. COPIE DE INDEX.HTML
+###############################################################################
+
+Copier la page dans le nouveau répertoire :
+
+cp /var/www/html/index.html \
+/var/www/tarantino.family/index.html
+
+
+###############################################################################
+# 7. VÉRIFICATION
+###############################################################################
+
+Afficher le contenu :
+
+ls -l /var/www/tarantino.family/
+
+
+Résultat attendu :
+
+index.html
+
+
+###############################################################################
+# 8. PAGE PRINCIPALE
+###############################################################################
+
+Page principale du site :
+
+/var/www/tarantino.family/index.html
+
+
+Cette page est automatiquement recherchée
+par Apache2 lorsqu'un client accède
+à la racine du site.
+
+
+###############################################################################
+# 9. MODIFICATION DE LA PAGE
+###############################################################################
+
+Éditer :
+
+nano /var/www/tarantino.family/index.html
+
+
+La page Apache2 d'origine est personnalisée
+afin d'identifier le site du laboratoire.
+
+
+###############################################################################
+# 10. ASSOCIATION AVEC LE VIRTUALHOST
+###############################################################################
+
+VirtualHost :
+
+001-tarantino.family.conf
+
+
+Configuration :
+
+DocumentRoot /var/www/tarantino.family
+
+
+Le fonctionnement est donc :
+
+Requête HTTP
+      │
+      ▼
+VirtualHost Apache2
+      │
+      ▼
+DocumentRoot
+      │
+      ▼
+/var/www/tarantino.family
+      │
+      ▼
+index.html
+
+
+###############################################################################
+# 11. CONFIGURATION DIRECTORY
+###############################################################################
+
+Le VirtualHost contient également
+une configuration dédiée au répertoire :
+
+<Directory /var/www/tarantino.family>
+
+    Options Indexes FollowSymLinks
+
+    AllowOverride All
+
+    Require all granted
+
+</Directory>
+
+
+###############################################################################
+# 12. TEST LOCAL
+###############################################################################
+
+Tester depuis le serveur :
+
+curl http://localhost
+
+
+Ou avec l'adresse IP :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 13. TEST PAR NOM DNS
+###############################################################################
+
+Une fois le DNS configuré :
+
+curl http://www.tarantino.family
+
+
+Le contenu de :
+
+/var/www/tarantino.family/index.html
+
+doit être retourné.
+
+
+###############################################################################
+# 14. TEST DEPUIS LE POSTE CLIENT
+###############################################################################
+
+Depuis un navigateur :
+
+http://www.tarantino.family
+
+
+Résultat attendu :
+
+La page personnalisée du site
+doit apparaître.
+
+
+###############################################################################
+# 15. DIAGNOSTIC
+###############################################################################
+
+Si la page n'est pas trouvée :
+
+Vérifier le répertoire :
+
+ls -ld /var/www/tarantino.family
+
+
+Vérifier index.html :
+
+ls -l /var/www/tarantino.family/index.html
+
+
+Vérifier le DocumentRoot :
+
+grep DocumentRoot \
+/etc/apache2/sites-available/001-tarantino.family.conf
+
+
+Vérifier le VirtualHost :
+
+apache2ctl -S
+
+
+###############################################################################
+# 16. RÉCAPITULATIF
+###############################################################################
+
+Répertoire Web :
+
+/var/www/tarantino.family
+
+
+DocumentRoot :
+
+/var/www/tarantino.family
+
+
+Page principale :
+
+/var/www/tarantino.family/index.html
+
+
+VirtualHost :
+
+001-tarantino.family.conf
+
+
+Configuration VirtualHost :
+
+/etc/apache2/sites-available/001-tarantino.family.conf
+
+
+Ancien répertoire par défaut :
+
+/var/www/html
+
+
+###############################################################################
+# 17. FICHIERS ASSOCIÉS
+###############################################################################
+
+configurations/apache2/permissions.txt
+
+configurations/apache2/virtualhost.txt
+
+configurations/apache2/service.txt
+
+configurations/site-web/index.html
+
+
+###############################################################################
+# 18. VALIDATION
+###############################################################################
+
+[ ] /var/www/tarantino.family existe.
+
+[ ] index.html est présent.
+
+[ ] Le VirtualHost utilise /var/www/tarantino.family.
+
+[ ] Le bloc Directory correspond au bon répertoire.
+
+[ ] Apache2 peut accéder au contenu.
+
+[ ] La page est accessible localement.
+
+[ ] La page est accessible depuis le poste client.
+###############################################################################

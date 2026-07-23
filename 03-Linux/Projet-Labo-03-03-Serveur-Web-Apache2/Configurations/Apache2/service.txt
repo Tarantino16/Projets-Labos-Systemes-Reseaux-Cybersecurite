@@ -1,0 +1,601 @@
+###############################################################################
+# Projet-Labo-03-03-Serveur-Web-Apache2
+# Service Apache2
+###############################################################################
+
+
+###############################################################################
+# 1. SERVICE
+###############################################################################
+
+Nom du service :
+
+apache2
+
+
+Rôle :
+
+Serveur Web HTTP permettant d'héberger
+et de distribuer les pages Web aux clients.
+
+
+Gestionnaire de services :
+
+systemd
+
+
+###############################################################################
+# 2. ÉTAT DU SERVICE
+###############################################################################
+
+Afficher l'état d'Apache2 :
+
+systemctl status apache2
+
+
+Résultat attendu :
+
+active (running)
+
+
+###############################################################################
+# 3. DÉMARRAGE DU SERVICE
+###############################################################################
+
+Démarrer Apache2 :
+
+systemctl start apache2
+
+
+###############################################################################
+# 4. ARRÊT DU SERVICE
+###############################################################################
+
+Arrêter Apache2 :
+
+systemctl stop apache2
+
+
+###############################################################################
+# 5. REDÉMARRAGE DU SERVICE
+###############################################################################
+
+Redémarrer Apache2 :
+
+systemctl restart apache2
+
+
+Cette commande arrête puis redémarre
+complètement le service.
+
+
+###############################################################################
+# 6. RECHARGEMENT DE LA CONFIGURATION
+###############################################################################
+
+Recharger la configuration Apache2 :
+
+systemctl reload apache2
+
+
+Cette commande permet d'appliquer
+les modifications de configuration
+sans effectuer un redémarrage complet.
+
+
+###############################################################################
+# 7. ACTIVATION AU DÉMARRAGE
+###############################################################################
+
+Activer le démarrage automatique :
+
+systemctl enable apache2
+
+
+Vérifier :
+
+systemctl is-enabled apache2
+
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# 8. DÉSACTIVATION AU DÉMARRAGE
+###############################################################################
+
+Désactiver le démarrage automatique :
+
+systemctl disable apache2
+
+
+###############################################################################
+# 9. VÉRIFICATION RAPIDE
+###############################################################################
+
+Vérifier si Apache2 est actif :
+
+systemctl is-active apache2
+
+
+Résultat attendu :
+
+active
+
+
+Vérifier s'il est activé au démarrage :
+
+systemctl is-enabled apache2
+
+
+Résultat attendu :
+
+enabled
+
+
+###############################################################################
+# 10. TEST DE LA CONFIGURATION
+###############################################################################
+
+Avant de recharger ou redémarrer Apache2,
+vérifier la syntaxe de la configuration :
+
+apache2ctl configtest
+
+
+Résultat attendu :
+
+Syntax OK
+
+
+###############################################################################
+# 11. VÉRIFICATION DES VIRTUALHOSTS
+###############################################################################
+
+Afficher les VirtualHosts chargés :
+
+apache2ctl -S
+
+
+Vérifier la présence du VirtualHost :
+
+001-tarantino.family.conf
+
+
+###############################################################################
+# 12. PORT HTTP
+###############################################################################
+
+Apache2 utilise dans ce laboratoire :
+
+80/TCP
+
+
+Protocole :
+
+HTTP
+
+
+Vérifier que le port est en écoute :
+
+ss -tlnp | grep :80
+
+
+###############################################################################
+# 13. PROCESSUS APACHE2
+###############################################################################
+
+Afficher les processus :
+
+ps aux | grep apache2
+
+
+Le processus principal est normalement
+lancé avec les privilèges nécessaires
+au fonctionnement du service.
+
+Les processus chargés de traiter
+les requêtes utilisent généralement :
+
+www-data
+
+
+###############################################################################
+# 14. JOURNAUX SYSTEMD
+###############################################################################
+
+Afficher les journaux Apache2 :
+
+journalctl -u apache2
+
+
+Afficher les derniers événements :
+
+journalctl -u apache2 -n 20
+
+
+Suivre les événements en temps réel :
+
+journalctl -u apache2 -f
+
+
+###############################################################################
+# 15. JOURNAUX APACHE2
+###############################################################################
+
+Répertoire :
+
+/var/log/apache2/
+
+
+Journal des accès :
+
+/var/log/apache2/access.log
+
+
+Journal des erreurs :
+
+/var/log/apache2/error.log
+
+
+###############################################################################
+# 16. CONSULTATION DES JOURNAUX
+###############################################################################
+
+Afficher les derniers accès :
+
+tail /var/log/apache2/access.log
+
+
+Afficher les dernières erreurs :
+
+tail /var/log/apache2/error.log
+
+
+Suivre les accès en temps réel :
+
+tail -f /var/log/apache2/access.log
+
+
+Suivre les erreurs en temps réel :
+
+tail -f /var/log/apache2/error.log
+
+
+###############################################################################
+# 17. TEST HTTP LOCAL
+###############################################################################
+
+Tester le service depuis le serveur :
+
+curl http://localhost
+
+
+Ou :
+
+curl http://127.0.0.1
+
+
+Résultat attendu :
+
+Apache2 retourne le contenu
+de la page Web.
+
+
+###############################################################################
+# 18. TEST AVEC L'ADRESSE IP
+###############################################################################
+
+Adresse du serveur Web :
+
+192.168.11.241
+
+
+Test :
+
+curl http://192.168.11.241
+
+
+###############################################################################
+# 19. TEST PAR NOM DNS
+###############################################################################
+
+Une fois le DNS configuré :
+
+curl http://www.tarantino.family
+
+
+Le serveur Apache2 doit retourner
+la page Web du VirtualHost.
+
+
+###############################################################################
+# 20. FICHIERS ET RÉPERTOIRES IMPORTANTS
+###############################################################################
+
+Configuration principale :
+
+/etc/apache2/apache2.conf
+
+
+Configuration des ports :
+
+/etc/apache2/ports.conf
+
+
+Sites disponibles :
+
+/etc/apache2/sites-available/
+
+
+Sites activés :
+
+/etc/apache2/sites-enabled/
+
+
+VirtualHost du laboratoire :
+
+/etc/apache2/sites-available/001-tarantino.family.conf
+
+
+DocumentRoot :
+
+/var/www/tarantino.family
+
+
+Journaux :
+
+/var/log/apache2/
+
+
+###############################################################################
+# 21. PROCÉDURE APRÈS MODIFICATION
+###############################################################################
+
+Après modification d'un fichier
+de configuration Apache2 :
+
+1. Tester la configuration :
+
+apache2ctl configtest
+
+
+2. Si le résultat est :
+
+Syntax OK
+
+
+3. Recharger Apache2 :
+
+systemctl reload apache2
+
+
+4. Vérifier le service :
+
+systemctl status apache2
+
+
+5. Tester le site :
+
+curl http://localhost
+
+
+###############################################################################
+# 22. DIAGNOSTIC
+###############################################################################
+
+Apache2 ne fonctionne pas :
+
+systemctl status apache2
+
+
+Consulter les journaux :
+
+journalctl -u apache2
+
+
+Tester la configuration :
+
+apache2ctl configtest
+
+
+###############################################################################
+# 23. SERVICE ACTIF MAIS SITE INACCESSIBLE
+###############################################################################
+
+Vérifier le port :
+
+ss -tlnp | grep :80
+
+
+Vérifier les VirtualHosts :
+
+apache2ctl -S
+
+
+Vérifier le DocumentRoot :
+
+ls -ld /var/www/tarantino.family
+
+
+Tester localement :
+
+curl http://localhost
+
+
+###############################################################################
+# 24. ÉCHEC APRÈS MODIFICATION
+###############################################################################
+
+Si Apache2 refuse de recharger
+la configuration :
+
+apache2ctl configtest
+
+
+Puis :
+
+journalctl -u apache2 -n 20
+
+
+Vérifier également :
+
+/var/log/apache2/error.log
+
+
+###############################################################################
+# 25. RÉCAPITULATIF
+###############################################################################
+
+Service :
+
+apache2
+
+
+Gestionnaire :
+
+systemd
+
+
+État attendu :
+
+active (running)
+
+
+Démarrage automatique :
+
+enabled
+
+
+Port :
+
+80/TCP
+
+
+Protocole :
+
+HTTP
+
+
+Utilisateur Apache :
+
+www-data
+
+
+VirtualHost :
+
+001-tarantino.family.conf
+
+
+DocumentRoot :
+
+/var/www/tarantino.family
+
+
+###############################################################################
+# 26. COMMANDES PRINCIPALES
+###############################################################################
+
+État :
+
+systemctl status apache2
+
+
+Démarrage :
+
+systemctl start apache2
+
+
+Arrêt :
+
+systemctl stop apache2
+
+
+Redémarrage :
+
+systemctl restart apache2
+
+
+Rechargement :
+
+systemctl reload apache2
+
+
+Activation :
+
+systemctl enable apache2
+
+
+Test de configuration :
+
+apache2ctl configtest
+
+
+VirtualHosts :
+
+apache2ctl -S
+
+
+Ports :
+
+ss -tlnp | grep :80
+
+
+Journaux :
+
+journalctl -u apache2
+
+
+###############################################################################
+# 27. VALIDATION
+###############################################################################
+
+[ ] Apache2 est installé.
+
+[ ] Le service apache2 est actif.
+
+[ ] Le service démarre automatiquement.
+
+[ ] apache2ctl configtest retourne Syntax OK.
+
+[ ] Le port TCP 80 est en écoute.
+
+[ ] Le VirtualHost est chargé.
+
+[ ] Les processus Apache2 fonctionnent.
+
+[ ] Les journaux sont accessibles.
+
+[ ] curl http://localhost fonctionne.
+
+[ ] Le site est accessible depuis le réseau.
+
+
+###############################################################################
+# RÉSULTAT
+###############################################################################
+
+Service :
+
+apache2
+
+
+État :
+
+active (running)
+
+
+Démarrage automatique :
+
+enabled
+
+
+Port HTTP :
+
+80/TCP
+
+
+Le service Apache2 est opérationnel.
+###############################################################################

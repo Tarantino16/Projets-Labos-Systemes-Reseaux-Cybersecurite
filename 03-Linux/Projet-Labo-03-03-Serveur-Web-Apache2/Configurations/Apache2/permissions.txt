@@ -1,0 +1,275 @@
+###############################################################################
+# Projet-Labo-03-03-Serveur-Web-Apache2
+# Configuration finale des permissions Apache2
+###############################################################################
+
+
+###############################################################################
+# 1. RÉPERTOIRE DU SITE
+###############################################################################
+
+Répertoire Web :
+
+/var/www/tarantino.family
+
+
+Ce répertoire contient les fichiers
+du site Web hébergé par Apache2.
+
+
+###############################################################################
+# 2. PROPRIÉTAIRE
+###############################################################################
+
+Utilisateur :
+
+www-data
+
+
+Groupe :
+
+www-data
+
+
+Configuration :
+
+www-data:www-data
+
+
+Commande utilisée :
+
+chown -R www-data:www-data /var/www/tarantino.family
+
+
+###############################################################################
+# 3. PERMISSIONS DU RÉPERTOIRE
+###############################################################################
+
+Permissions appliquées :
+
+755
+
+
+Commande :
+
+chmod -R 755 /var/www/tarantino.family
+
+
+Correspondance :
+
+Utilisateur propriétaire :
+
+rwx
+
+Lecture
+Écriture
+Exécution
+
+
+Groupe :
+
+r-x
+
+Lecture
+Exécution
+
+
+Autres utilisateurs :
+
+r-x
+
+Lecture
+Exécution
+
+
+###############################################################################
+# 4. REPRÉSENTATION
+###############################################################################
+
+755
+
+équivaut à :
+
+rwxr-xr-x
+
+
+###############################################################################
+# 5. ÉTAT ATTENDU
+###############################################################################
+
+Exemple :
+
+drwxr-xr-x  www-data  www-data  /var/www/tarantino.family
+
+
+###############################################################################
+# 6. FICHIER INDEX.HTML
+###############################################################################
+
+Fichier principal :
+
+/var/www/tarantino.family/index.html
+
+
+Le fichier doit être lisible
+par le serveur Apache2.
+
+
+Exemple attendu :
+
+-rwxr-xr-x  www-data  www-data  index.html
+
+
+###############################################################################
+# 7. VÉRIFICATION
+###############################################################################
+
+Vérifier le répertoire :
+
+ls -ld /var/www/tarantino.family
+
+
+Vérifier les fichiers :
+
+ls -l /var/www/tarantino.family/
+
+
+Vérifier le propriétaire :
+
+stat /var/www/tarantino.family
+
+
+###############################################################################
+# 8. UTILISATEUR APACHE2
+###############################################################################
+
+Apache2 fonctionne principalement
+avec l'utilisateur système :
+
+www-data
+
+
+Vérification :
+
+ps aux | grep apache2
+
+
+Les processus enfants Apache2
+doivent apparaître avec l'utilisateur :
+
+www-data
+
+
+###############################################################################
+# 9. OBJECTIF DES PERMISSIONS
+###############################################################################
+
+Les permissions doivent permettre à Apache2 :
+
+- de traverser le répertoire ;
+- de lire les fichiers du site ;
+- de servir index.html aux clients HTTP.
+
+
+Elles doivent également éviter
+de donner des droits d'écriture inutiles
+aux autres utilisateurs du système.
+
+
+###############################################################################
+# 10. VÉRIFICATION HTTP
+###############################################################################
+
+Tester localement :
+
+curl http://localhost
+
+
+Tester avec l'adresse IP :
+
+curl http://192.168.11.241
+
+
+Résultat attendu :
+
+Le contenu de index.html est retourné.
+
+
+###############################################################################
+# 11. DIAGNOSTIC
+###############################################################################
+
+En cas d'erreur HTTP 403 :
+
+Vérifier :
+
+ls -ld /var/www/tarantino.family
+
+
+Puis :
+
+ls -l /var/www/tarantino.family/
+
+
+Vérifier le propriétaire :
+
+www-data:www-data
+
+
+Vérifier les permissions :
+
+755
+
+
+###############################################################################
+# 12. RÉCAPITULATIF
+###############################################################################
+
+Répertoire :
+
+/var/www/tarantino.family
+
+
+Utilisateur :
+
+www-data
+
+
+Groupe :
+
+www-data
+
+
+Permissions :
+
+755
+
+
+Notation symbolique :
+
+rwxr-xr-x
+
+
+Fichier principal :
+
+/var/www/tarantino.family/index.html
+
+
+###############################################################################
+# 13. VALIDATION
+###############################################################################
+
+[ ] /var/www/tarantino.family existe.
+
+[ ] Le propriétaire est www-data.
+
+[ ] Le groupe est www-data.
+
+[ ] Les permissions sont 755.
+
+[ ] index.html est présent.
+
+[ ] Apache2 peut lire le contenu du site.
+
+[ ] Le site est accessible en HTTP.
+###############################################################################
